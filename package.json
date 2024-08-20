@@ -39,6 +39,7 @@
 		"@fontsource/poppins": "^5.0.14",
 		"@supabase/auth-helpers-sveltekit": "^0.13.0",
 		"@supabase/supabase-js": "^2.44.4",
+		"node-fetch": "^3.3.2",
 		"tailwind-merge": "^2.3.0"
 	}
 }

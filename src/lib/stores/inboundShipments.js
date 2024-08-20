@@ -8,7 +8,7 @@ export const inboundShipments = writable([]);
  * @returns
  */
 export const loadInboundShipments = async (supabase) => {
-  const { data, error } = await supabase.from("Inbound_Shipments").select("*");
+  const { data, error } = await supabase.from("Inbound_Shipments").select("*").order("created_at", { ascending: false });
 
   if (error) {
     console.error(error);

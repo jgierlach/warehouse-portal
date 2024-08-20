@@ -8,7 +8,7 @@ export const inventory = writable([]);
  * @returns
  */
 export const loadInventory = async (supabase) => {
-  const { data, error } = await supabase.from("Inventory").select("*");
+  const { data, error } = await supabase.from("Inventory").select("*").order("created_at", { ascending: false });
 
   if (error) {
     console.error(error);

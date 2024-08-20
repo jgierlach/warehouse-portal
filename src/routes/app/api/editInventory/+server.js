@@ -13,6 +13,7 @@ export async function PUT({ request, locals }) {
     productImageUrl,
     pending,
     quantity,
+    expirationDate
   } = await request.json();
 
   const row = {
@@ -25,7 +26,8 @@ export async function PUT({ request, locals }) {
     Sku: sku,
     Product_Image_Url: productImageUrl,
     Pending: pending,
-    Quantity: quantity
+    Quantity: quantity,
+    Product_Expiration: expirationDate
   };
 
   const { data, error } = await locals.supabase
