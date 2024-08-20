@@ -27,6 +27,79 @@
     console.log('INVENTORY', $inventory)
   }
 
+  let showDeleteInventory = false
+  let inventoryToDelete = {}
+
+  async function deleteInventory(id, createdAt) {
+    const response = await fetch('/app/api/deleteinventory', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+        createdAt,
+      }),
+    })
+    if (response.ok) {
+      loadInventory(data.supabase)
+      inventoryToDelete = {}
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to delete inventory: ${errorData.message}`)
+    }
+    inventoryToDelete = {}
+    showDeleteInventory = false
+  }
+
+  // Inventory fields
+  let clientId = ''
+  let name = ''
+  let asin = ''
+  let productTitle = ''
+  let sku = ''
+  let productImageUrl = ''
+  let pending = 0
+  let quantity = 0
+
+  let showEditInventory = false
+  let inventoryToEdit = {}
+
+  async function editInventory() {
+    const id = inventoryToEdit.id
+    const createdAt = inventoryToEdit.created_at
+    const response = await fetch('/app/api/editInventory', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+        createdAt,
+        clientId,
+        name,
+        asin,
+        productTitle,
+        sku,
+        productImageUrl,
+        pending,
+        quantity,
+      }),
+    })
+    if (response.ok) {
+      loadInventory(data.supabase)
+      showEditInventory = false
+      inventoryToEdit = {}
+      clientId = ''
+      name = ''
+      asin = ''
+      productTitle = ''
+      sku = ''
+      productImageUrl = ''
+      pending = 0
+      quantity = 0
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to edit inventory: ${errorData.message}`)
+    }
+  }
+
   let hoveredTitleId = null
   let timer
 
@@ -44,7 +117,12 @@
 
 <div class="mt-6 flex justify-center">
   <div class="ml-10 mr-10 bg-base-100 p-4 shadow-xl">
-    <h1 class="mb-4 text-center text-3xl font-bold">Client Inventory</h1>
+    <h1 class="mb-2 text-center text-3xl font-bold">Client Inventory</h1>
+    <div class="mb-4 flex justify-center">
+      <button class="btn btn-outline btn-primary btn-sm"
+        >Add Product <i class="fas fa-plus"></i>
+      </button>
+    </div>
     <table class="table table-zebra">
       <thead>
         <tr>
@@ -101,8 +179,28 @@
             <td>{product.Pending}</td>
             <td>{product.Product_Expiration}</td>
             <td class="flex items-center justify-center"
-              ><button class="btn btn-outline btn-info btn-sm mr-2">Edit</button>
-              <button class="btn btn-outline btn-error btn-sm">Delete</button></td
+              ><button
+                on:click={() => {
+                  showEditInventory = true
+                  inventoryToEdit = product
+                  clientId = product.Client_Id
+                  name = product.Name
+                  asin = product.Asin
+                  productTitle = product.Product_Title
+                  sku = product.Sku
+                  productImageUrl = product.Product_Image_Url
+                  pending = product.Pending
+                  quantity = product.Quantity
+                }}
+                class="btn btn-outline btn-info btn-sm mr-2">Edit</button
+              >
+              <button
+                on:click={() => {
+                  showDeleteInventory = true
+                  inventoryToDelete = product
+                }}
+                class="btn btn-outline btn-error btn-sm">Delete</button
+              ></td
             >
           </tr>
         {/each}
@@ -110,3 +208,68 @@
     </table>
   </div>
 </div>
+
+<!-- DELETE INVENTORY MODAL BEGINS -->
+<div class={`modal ${showDeleteInventory ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showDeleteInventory = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mt-2 text-center text-lg font-bold">
+      Are you sure you want to delete this inventory?
+    </h1>
+    <p class="entry-content py-4" style="white-space: pre-line;">
+      {inventoryToDelete.Product_Title}
+    </p>
+    <div class="flex justify-center">
+      <button
+        on:click={() => deleteInventory(inventoryToDelete.id, inventoryToDelete.created_at)}
+        class="btn btn-error"
+      >
+        Yes, Delete
+      </button>
+    </div>
+  </div>
+</div>
+<!-- DELETE INVENTORY MODAL ENDS -->
+
+<!-- EDIT INVENTORY MODAL BEGINS -->
+<div class={`modal ${showEditInventory ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showEditInventory = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mb-5 text-center text-xl font-semibold">Edit Inventory</h1>
+    <form on:submit={editInventory}>
+      <div class="form-control mb-4">
+        <label class="label" for="habitName">Client Id</label>
+        <input
+          required
+          class="input input-bordered"
+          type="text"
+          id="habitName"
+          bind:value={clientId}
+          placeholder="Client Id"
+        />
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label" for="name">Name</label>
+        <textarea
+          required
+          class="textarea textarea-bordered placeholder:text-base"
+          id="description"
+          bind:value={name}
+          placeholder="Product Name"
+        ></textarea>
+      </div>
+
+      <div class="mt-4 flex justify-center">
+        <button class="btn btn-info" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- EDIT INVENTORY MODAL ENDS -->
