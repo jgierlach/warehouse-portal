@@ -8,16 +8,26 @@
 <nav class="navbar flex flex-none bg-base-100 px-4 py-2 shadow-lg">
   <div class="flex flex-1 items-center">
     {#if isUserLoggedIn}
-      <a href="/app" class="btn btn-ghost text-xl normal-case">Brand</a>
+      <a href="/app" class="btn btn-ghost text-xl normal-case">Warehouse Portal</a>
       <div class="ml-4 hidden space-x-4 md:flex">
         <a href="/app" class={`btn btn-ghost`} class:btn-active={$page.url.pathname === '/app'}
-          >Home</a
+          >Inventory</a
         >
         <a
+          href="/app/outboundshipments"
+          class={`btn btn-ghost`}
+          class:btn-active={$page.url.pathname === '/app/outboundshipments'}>Outbound Shipments</a
+        >
+        <a
+          href="/app/inboundshipments"
+          class={`btn btn-ghost`}
+          class:btn-active={$page.url.pathname === '/app/inboundshipments'}>Inbound Shipments</a
+        >
+        <!-- <a
           href="/app/about"
           class={`btn btn-ghost`}
           class:btn-active={$page.url.pathname === '/app/about'}>About</a
-        >
+        > -->
       </div>
     {:else}
       <a href="/" class="btn btn-ghost text-xl normal-case">Home</a>

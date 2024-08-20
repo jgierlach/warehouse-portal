@@ -2,9 +2,9 @@
   const currentYear = new Date().getFullYear()
 </script>
 
-<footer class="footer flex flex-none bg-base-100 p-4">
+<footer class="footer mt-8 flex flex-none bg-base-100 p-4">
   <div class="text-center">
-    <strong>{`Your Company Name © ${currentYear} - All Rights Reserved.`}</strong>
+    <strong>{`Hometown Industries © ${currentYear} - All Rights Reserved.`}</strong>
   </div>
 </footer>
 
