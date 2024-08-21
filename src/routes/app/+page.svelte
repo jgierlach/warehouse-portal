@@ -226,31 +226,33 @@
             <td>{product.Quantity}</td>
             <td>{product.Pending}</td>
             <td>{product.Product_Expiration}</td>
-            <td class="flex items-center justify-center"
-              ><button
-                on:click={() => {
-                  showEditInventory = true
-                  inventoryToEdit = product
-                  clientId = product.Client_Id
-                  name = product.Name
-                  asin = product.Asin
-                  productTitle = product.Product_Title
-                  sku = product.Sku
-                  productImageUrl = product.Product_Image_Url
-                  pending = product.Pending
-                  quantity = product.Quantity
-                  expirationDate = product.Product_Expiration
-                }}
-                class="btn btn-outline btn-info btn-sm mr-2">Edit</button
-              >
-              <button
-                on:click={() => {
-                  showDeleteInventory = true
-                  inventoryToDelete = product
-                }}
-                class="btn btn-outline btn-error btn-sm">Delete</button
-              ></td
-            >
+            <td>
+              <div class="flex items-center justify-center">
+                <button
+                  on:click={() => {
+                    showEditInventory = true
+                    inventoryToEdit = product
+                    clientId = product.Client_Id
+                    name = product.Name
+                    asin = product.Asin
+                    productTitle = product.Product_Title
+                    sku = product.Sku
+                    productImageUrl = product.Product_Image_Url
+                    pending = product.Pending
+                    quantity = product.Quantity
+                    expirationDate = product.Product_Expiration
+                  }}
+                  class="btn btn-info btn-sm mr-2">Edit</button
+                >
+                <button
+                  on:click={() => {
+                    showDeleteInventory = true
+                    inventoryToDelete = product
+                  }}
+                  class="btn btn-error btn-sm">Delete</button
+                >
+              </div>
+            </td>
           </tr>
         {/each}
       </tbody>

@@ -44,10 +44,10 @@
 
 <Loading {loading} />
 <div class="mt-10 flex justify-center">
-  <div class="ml-5 mr-5 w-full max-w-6xl bg-base-100 p-4 shadow-xl">
+  <div class="ml-5 mr-5 w-full max-w-7xl bg-base-100 p-4 shadow-xl">
     <h1 class="mb-2 text-center text-3xl font-bold">Outbound Shipments</h1>
     <div class="overflow-x-auto">
-      <table class="table table-zebra w-full">
+      <table class="table table-zebra">
         <thead>
           <tr>
             <th>Product Image</th>
@@ -98,12 +98,29 @@
                   {/if}
                 </div>
               </td>
-              <td>{shipment.Sku}</td>
+              <!-- <td>{shipment.Sku}</td> -->
+              <td>
+                <div
+                  class="tooltip"
+                  role="tooltip"
+                  on:mouseenter={() => handleMouseEnter(shipment.Sku)}
+                  on:mouseleave={handleMouseLeave}
+                >
+                  {abbreviateString(shipment.Sku, 15)}
+                  {#if hoveredTitleId === shipment.Sku}
+                    <span class="tooltip-text">
+                      {shipment.Sku}...
+                    </span>
+                  {/if}
+                </div>
+              </td>
               <td>{shipment.Quantity}</td>
-              <td class="flex justify-center">
-                <button class="btn btn-outline btn-info btn-sm mr-2">Edit</button>
-                <button class="btn btn-outline btn-primary btn-sm mr-2">Update Tracking</button>
-                <button class="btn btn-outline btn-error btn-sm">Delete</button>
+              <td>
+                <div>
+                  <button class="btn btn-info btn-xs mb-2">Edit</button>
+                  <button class="btn btn-primary btn-xs mb-2">Update Tracking</button>
+                  <button class="btn btn-error btn-xs">Delete</button>
+                </div>
               </td>
             </tr>
           {/each}
