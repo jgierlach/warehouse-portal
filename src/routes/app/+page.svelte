@@ -32,7 +32,7 @@
 
   async function deleteInventory(id, createdAt) {
     loading = true
-    const response = await fetch('/app/api/deleteInventory', {
+    const response = await fetch('/app/api/inventory/deleteInventory', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -70,7 +70,7 @@
     loading = true
     const id = inventoryToEdit.id
     const createdAt = inventoryToEdit.created_at
-    const response = await fetch('/app/api/editInventory', {
+    const response = await fetch('/app/api/inventory/editInventory', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -111,7 +111,7 @@
 
   async function createInventory() {
     loading = true
-    const response = await fetch('/app/api/createInventory', {
+    const response = await fetch('/app/api/inventory/createInventory', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

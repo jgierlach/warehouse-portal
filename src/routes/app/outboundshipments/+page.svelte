@@ -21,11 +21,41 @@
 
   // Component specific variables and business logic
 
+  let loading = false
+
+  let showDeleteOutboundShipment = false
+  let outboundShipmentToDelete = {}
+
+  async function deleteOutboundShipment(id, createdAt) {
+    loading = true
+    const response = await fetch('/app/api/outboundshipments/deleteShipment', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+        createdAt,
+      }),
+    })
+    if (response.ok) {
+      loadOutboundShipments(data.supabase)
+      outboundShipmentToDelete = {}
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to delete outboundshipments: ${errorData.message}`)
+    }
+    outboundShipmentToDelete = {}
+    showDeleteOutboundShipment = false
+    loading = false
+  }
+
   $: outboundShipmentsByMostRecent = $outboundShipments.sort(
     (a, b) => new Date(b.Date_Of_Last_Change) - new Date(a.Date_Of_Last_Change),
   )
 
-  let loading = false
+  // Filtered shipments based on search query, handle null values safely
+  $: filteredShipments = outboundShipmentsByMostRecent.filter((shipment) =>
+    shipment.Shipment_Number?.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
 
   let hoveredTitleId = null
   let timer
@@ -41,11 +71,6 @@
     clearTimeout(timer)
     hoveredTitleId = null
   }
-
-  // Filtered shipments based on search query, handle null values safely
-  $: filteredShipments = outboundShipmentsByMostRecent.filter((shipment) =>
-    shipment.Shipment_Number?.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
 </script>
 
 <Loading {loading} />
@@ -136,7 +161,13 @@
                 <div>
                   <button class="btn btn-info btn-xs mb-2">Edit</button>
                   <button class="btn btn-primary btn-xs mb-2">Update Tracking</button>
-                  <button class="btn btn-error btn-xs">Delete</button>
+                  <button
+                    on:click={() => {
+                      showDeleteOutboundShipment = true
+                      outboundShipmentToDelete = shipment
+                    }}
+                    class="btn btn-error btn-xs">Delete</button
+                  >
                 </div>
               </td>
             </tr>
@@ -146,3 +177,29 @@
     </div>
   </div>
 </div>
+
+<!-- DELETE SHIPMENT MODAL BEGINS -->
+<div class={`modal ${showDeleteOutboundShipment ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showDeleteOutboundShipment = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mt-2 text-center text-lg font-bold">
+      Are you sure you want to delete this inventory?
+    </h1>
+    <p class="entry-content py-4" style="white-space: pre-line;">
+      {outboundShipmentToDelete.Product_Title}
+    </p>
+    <div class="flex justify-center">
+      <button
+        on:click={() =>
+          deleteOutboundShipment(outboundShipmentToDelete.id, outboundShipmentToDelete.created_at)}
+        class="btn btn-error"
+      >
+        Yes, Delete
+      </button>
+    </div>
+  </div>
+</div>
+<!-- DELETE SHIPMENT MODAL ENDS -->
