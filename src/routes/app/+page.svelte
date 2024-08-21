@@ -12,12 +12,10 @@
   export let data
 
   // Import stores
-  import { testStore, loadTestStore } from '$lib/stores/test'
   import { inventory, loadInventory } from '$lib/stores/inventory.js'
 
   // Execute onMount
   onMount(() => {
-    loadTestStore()
     loadInventory(data.supabase)
   })
 
