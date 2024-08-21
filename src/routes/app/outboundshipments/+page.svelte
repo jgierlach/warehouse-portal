@@ -29,6 +29,7 @@
 
   let hoveredTitleId = null
   let timer
+  let searchQuery = ''
 
   function handleMouseEnter(id) {
     timer = setTimeout(() => {
@@ -40,12 +41,29 @@
     clearTimeout(timer)
     hoveredTitleId = null
   }
+
+  // Filtered shipments based on search query, handle null values safely
+  $: filteredShipments = outboundShipmentsByMostRecent.filter((shipment) =>
+    shipment.Shipment_Number?.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
 </script>
 
 <Loading {loading} />
 <div class="mt-10 flex justify-center">
   <div class="ml-5 mr-5 w-full max-w-7xl bg-base-100 p-4 shadow-xl">
-    <h1 class="mb-2 text-center text-3xl font-bold">Outbound Shipments</h1>
+    <h1 class="mb-5 text-center text-3xl font-bold">Outbound Shipments</h1>
+
+    <!-- Search input -->
+    <div class="mb-4 flex justify-center">
+      <input
+        type="text"
+        class="input w-1/4 bg-base-200"
+        placeholder="Search by Shipment Number"
+        bind:value={searchQuery}
+      />
+      <button class="btn btn-primary">Search</button>
+    </div>
+
     <div class="overflow-x-auto">
       <table class="table table-zebra">
         <thead>
@@ -65,7 +83,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each outboundShipmentsByMostRecent as shipment}
+          {#each filteredShipments as shipment}
             <tr>
               <td>
                 <img
@@ -98,7 +116,6 @@
                   {/if}
                 </div>
               </td>
-              <!-- <td>{shipment.Sku}</td> -->
               <td>
                 <div
                   class="tooltip"
