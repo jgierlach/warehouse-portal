@@ -186,10 +186,10 @@
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mt-2 text-center text-lg font-bold">
-      Are you sure you want to delete this inventory?
+      Are you sure you want to delete this Shipment?
     </h1>
-    <p class="entry-content py-4" style="white-space: pre-line;">
-      {outboundShipmentToDelete.Product_Title}
+    <p class="entry-content py-4 text-center" style="white-space: pre-line;">
+      {outboundShipmentToDelete.Shipment_Number}
     </p>
     <div class="flex justify-center">
       <button
