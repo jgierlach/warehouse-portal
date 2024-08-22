@@ -22,7 +22,7 @@ export async function POST({ request }) {
       {
         type: 'text/html',
         value: `
-          <p>Tracking has been updated for Shipment Number: ${shipmentNumber}</p> 
+          <p>Tracking has been updated for Shipment Number: <strong>${shipmentNumber}</strong></p> 
           <ul>
             <li><strong>Carrier:</strong> ${carrier}</li>
             <li><strong>Tracking Number:</strong> ${trackingNumber}</li>
@@ -30,8 +30,7 @@ export async function POST({ request }) {
           <ul>
             <li><strong>Customer Name:</strong> ${recipientName}</li>
             <li><strong>PO Number:</strong> ${poNumber}</li>
-          </ul>
-        `
+          </ul>`
       }
     ],
   };
