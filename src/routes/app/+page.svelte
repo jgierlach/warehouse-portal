@@ -1,6 +1,7 @@
 <script>
   // Import svelte specific functions
   import { onMount } from 'svelte'
+  import { goto } from '$app/navigation'
 
   // Import components
   import Loading from '$lib/components/Loading.svelte'
@@ -90,6 +91,7 @@
     if (response.ok) {
       loadInventory(data.supabase)
       showEditInventory = false
+      goto(`/app/#${inventoryToEdit.id}`)
       inventoryToEdit = {}
       clientId = ''
       name = ''
@@ -188,7 +190,7 @@
       </thead>
       <tbody>
         {#each $inventory as product}
-          <tr>
+          <tr id={product.id}>
             <td
               ><img
                 class="h-12 w-12 rounded-md object-cover shadow-md"
