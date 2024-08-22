@@ -27,52 +27,52 @@
 
   // Variables and function to create a new 3PL client
   let showAddUserModal = false
-  let newUser = {
-    company_name: '',
-    username: '',
-    password: '',
-    isAdmin: false,
-    isClient: true,
-    per_order_fee: 1.3,
-    per_order_unit_fee: 0.3,
-    per_unit_fba_pack_prep: 0.25,
-    per_unit_wfs_pack_prep: 0.25,
-    b2b_freight_percentage_markup: 10.0,
-  }
+
+  // User fields
+  let company_name = ''
+  let username = ''
+  let password = ''
+  let isadmin = false
+  let isclient = true
+  let per_order_fee = 1.3
+  let per_order_unit_fee = 0.3
+  let per_unit_fba_pack_prep = 0.25
+  let per_unit_wfs_pack_prep = 0.25
+  let b2b_freight_percentage_markup = 10.0
 
   async function createUser() {
-    try {
-      // Create the user in Supabase auth first
-      const { user, error: authError } = await data.supabase.auth.signUp({
-        email: newUser.username,
-        password: newUser.password,
-      })
-
-      if (authError) throw authError
-
-      // Insert into the users table
-      const { error: userError } = await data.supabase.from('users').insert([
-        {
-          id: user.id,
-          company_name: newUser.company_name,
-          username: newUser.username,
-          isAdmin: newUser.isAdmin,
-          isClient: newUser.isClient,
-          per_order_fee: newUser.per_order_fee,
-          per_order_unit_fee: newUser.per_order_unit_fee,
-          per_unit_fba_pack_prep: newUser.per_unit_fba_pack_prep,
-          per_unit_wfs_pack_prep: newUser.per_unit_wfs_pack_prep,
-          b2b_freight_percentage_markup: newUser.b2b_freight_percentage_markup,
-        },
-      ])
-
-      if (userError) throw userError
-
-      // Reload the clients list
-      await loadClients(data.supabase)
-      showAddUserModal = false // Close the modal
-    } catch (error) {
-      console.error('Error creating user:', error)
+    const response = await fetch('/app/api/users/createUser', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company_name,
+        username,
+        password,
+        isadmin,
+        isclient,
+        per_order_fee,
+        per_order_unit_fee,
+        per_unit_fba_pack_prep,
+        per_unit_wfs_pack_prep,
+        b2b_freight_percentage_markup,
+      }),
+    })
+    if (response.ok) {
+      loadClients(data.supabase)
+      showAddUserModal = false
+      company_name = ''
+      username = ''
+      password = ''
+      isadmin = false
+      isclient = true
+      per_order_fee = 1.3
+      per_order_unit_fee = 0.3
+      per_unit_fba_pack_prep = 0.25
+      per_unit_wfs_pack_prep = 0.25
+      b2b_freight_percentage_markup = 10.0
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to Create inventory: ${errorData.message}`)
     }
   }
 
@@ -209,21 +209,21 @@
         <input
           type="text"
           placeholder="Company Name"
-          bind:value={newUser.company_name}
+          bind:value={company_name}
           class="input input-bordered mb-2 bg-base-200"
         />
         <label class="label" for="clientId">Client Id</label>
         <input
           type="email"
           placeholder="Username (email)"
-          bind:value={newUser.username}
+          bind:value={username}
           class="input input-bordered mb-2 bg-base-200"
         />
         <label class="label" for="password">Password</label>
         <input
           type="password"
           placeholder="Password"
-          bind:value={newUser.password}
+          bind:value={password}
           class="input input-bordered mb-2 bg-base-200"
         />
         <label class="label" for="perOrderFee">Per Order Fee</label>
@@ -231,7 +231,7 @@
           type="number"
           step="0.01"
           placeholder="Per Order Fee"
-          bind:value={newUser.per_order_fee}
+          bind:value={per_order_fee}
           class="input input-bordered mb-2 bg-base-200"
         />
         <label class="label" for="perOrderUnitFee">Per Order Unit Fee</label>
@@ -239,7 +239,7 @@
           type="number"
           step="0.01"
           placeholder="Per Order Unit Fee"
-          bind:value={newUser.per_order_unit_fee}
+          bind:value={per_order_unit_fee}
           class="input input-bordered mb-2 bg-base-200"
         />
         <label class="label" for="fbaPackAndPrep">FBA Pack and Prep</label>
@@ -247,7 +247,7 @@
           type="number"
           step="0.01"
           placeholder="Per Unit FBA Pack Prep"
-          bind:value={newUser.per_unit_fba_pack_prep}
+          bind:value={per_unit_fba_pack_prep}
           class="input input-bordered mb-2 bg-base-200"
         />
         <label class="label" for="wfsFulfillmentServices">WFS Pack and Prep</label>
@@ -255,7 +255,7 @@
           type="number"
           step="0.01"
           placeholder="Per Unit WFS Pack Prep"
-          bind:value={newUser.per_unit_wfs_pack_prep}
+          bind:value={per_unit_wfs_pack_prep}
           class="input input-bordered mb-2 bg-base-200"
         />
         <label class="label" for="b2bFreightPercentageMarkup">B2B Freight Percentage Markup</label>
@@ -263,7 +263,7 @@
           type="number"
           step="0.01"
           placeholder="B2B Freight Percentage Markup"
-          bind:value={newUser.b2b_freight_percentage_markup}
+          bind:value={b2b_freight_percentage_markup}
           class="input input-bordered mb-2 bg-base-200"
         />
         <div class="mt-4 flex justify-center">
