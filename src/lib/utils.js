@@ -1,3 +1,10 @@
+export const formatDollarValue = (number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(number);
+};
+
 export const formatDate = (date) => {
   date = new Date(date)
   const day = String(date.getDate()).padStart(2, '0');

@@ -6,22 +6,23 @@
   import Navbar from '$lib/components/Navbar.svelte'
 
   // Import utility functions
-  import { test } from '$lib/utils'
+  import { formatDollarValue } from '$lib/utils'
 
   // Import props
   export let data
 
   // Import stores
-  import { testStore, loadTestStore } from '$lib/stores/test'
   import { clients, loadClients } from '$lib/stores/clients.js'
 
   // Execute onMount
   onMount(() => {
-    loadTestStore()
     loadClients(data.supabase)
   })
 
   // Component specific variables and business logic
+
+  let showClientBillingTermsModal = false
+  let clientBillingTermsToDisplay = {}
 </script>
 
 <div class="mt-10 flex justify-center">
@@ -57,7 +58,13 @@
                 <button class="btn btn-info btn-sm">Edit</button><button
                   class="btn btn-error btn-sm">Delete</button
                 >
-                <button class="btn btn-sm">View Billing Terms</button>
+                <button
+                  on:click={() => {
+                    showClientBillingTermsModal = true
+                    clientBillingTermsToDisplay = client
+                  }}
+                  class="btn btn-sm">View Billing Terms</button
+                >
               </div></td
             >
             <!-- <td>{client.per_order_fee}</td>
@@ -71,3 +78,46 @@
     </table>
   </div>
 </div>
+
+<!-- VIEW BILLING TERMS MODAL BEGINS -->
+<div class={`modal ${showClientBillingTermsModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showClientBillingTermsModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mt-2 text-center text-lg font-bold">
+      {clientBillingTermsToDisplay.company_name} - Billing Terms
+    </h1>
+    <div class="prose mt-5 flex justify-center">
+      <ul>
+        <li>
+          Per Order Fee: <strong
+            >{formatDollarValue(clientBillingTermsToDisplay.per_order_fee)}</strong
+          >
+        </li>
+        <li>
+          Per Order Unit Fee: <strong
+            >{formatDollarValue(clientBillingTermsToDisplay.per_order_unit_fee)}</strong
+          >
+        </li>
+        <li>
+          FBA Pack and Prep: <strong
+            >{formatDollarValue(clientBillingTermsToDisplay.per_unit_fba_pack_prep)}</strong
+          >
+        </li>
+        <li>
+          WFS Pack and Prep: <strong
+            >{formatDollarValue(clientBillingTermsToDisplay.per_unit_wfs_pack_prep)}</strong
+          >
+        </li>
+        <li>
+          B2B Freight Percentage Markup: <strong
+            >{clientBillingTermsToDisplay.b2b_freight_percentage_markup}%</strong
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- VIEW BILLING TERMS MODAL ENDS -->
