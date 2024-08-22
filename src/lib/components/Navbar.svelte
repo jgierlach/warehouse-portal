@@ -23,6 +23,11 @@
           class={`btn btn-ghost`}
           class:btn-active={$page.url.pathname === '/app/inboundshipments'}>Inbound Shipments</a
         >
+        <a
+          href="/app/clients"
+          class={`btn btn-ghost`}
+          class:btn-active={$page.url.pathname === '/app/clients'}>Clients</a
+        >
         <!-- <a
           href="/app/about"
           class={`btn btn-ghost`}
