@@ -3,7 +3,7 @@
   import { onMount } from 'svelte'
 
   // Import components
-  import Navbar from '$lib/components/Navbar.svelte'
+  import Loading from '$lib/components/Loading.svelte'
 
   // Import utility functions
   import { formatDollarValue } from '$lib/utils'
@@ -21,15 +21,93 @@
 
   // Component specific variables and business logic
 
+  // Variables for displaying clients billing terms
   let showClientBillingTermsModal = false
   let clientBillingTermsToDisplay = {}
+
+  // Variables and function to create a new 3PL client
+  let showAddUserModal = false
+  let newUser = {
+    company_name: '',
+    username: '',
+    password: '',
+    isAdmin: false,
+    isClient: true,
+    per_order_fee: 1.3,
+    per_order_unit_fee: 0.3,
+    per_unit_fba_pack_prep: 0.25,
+    per_unit_wfs_pack_prep: 0.25,
+    b2b_freight_percentage_markup: 10.0,
+  }
+
+  async function createUser() {
+    try {
+      // Create the user in Supabase auth first
+      const { user, error: authError } = await data.supabase.auth.signUp({
+        email: newUser.username,
+        password: newUser.password,
+      })
+
+      if (authError) throw authError
+
+      // Insert into the users table
+      const { error: userError } = await data.supabase.from('users').insert([
+        {
+          id: user.id,
+          company_name: newUser.company_name,
+          username: newUser.username,
+          isAdmin: newUser.isAdmin,
+          isClient: newUser.isClient,
+          per_order_fee: newUser.per_order_fee,
+          per_order_unit_fee: newUser.per_order_unit_fee,
+          per_unit_fba_pack_prep: newUser.per_unit_fba_pack_prep,
+          per_unit_wfs_pack_prep: newUser.per_unit_wfs_pack_prep,
+          b2b_freight_percentage_markup: newUser.b2b_freight_percentage_markup,
+        },
+      ])
+
+      if (userError) throw userError
+
+      // Reload the clients list
+      await loadClients(data.supabase)
+      showAddUserModal = false // Close the modal
+    } catch (error) {
+      console.error('Error creating user:', error)
+    }
+  }
+
+  // Variables and function to delete user
+  let showDeleteUserModal = false
+  let userToDelete = {}
+
+  async function deleteUser() {
+    const id = userToDelete.id
+    const createdAt = userToDelete.created_at
+    const response = await fetch('/app/api/users/deleteUser', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+        createdAt,
+      }),
+    })
+    if (response.ok) {
+      loadClients(data.supabase)
+      userToDelete = {}
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to delete inventory: ${errorData.message}`)
+    }
+    userToDelete = {}
+    showDeleteUserModal = false
+  }
 </script>
 
 <div class="mt-10 flex justify-center">
   <div class="ml-10 mr-10 bg-base-100 p-4 shadow-xl">
     <h1 class="mb-2 text-center text-3xl font-bold">3PL Clients</h1>
     <div class="mb-4 flex justify-center">
-      <button on:click={() => console.log('HELLO')} class="btn btn-outline btn-primary btn-sm"
+      <button on:click={() => (showAddUserModal = true)} class="btn btn-outline btn-primary btn-sm"
         >Add Client <i class="fas fa-plus"></i>
       </button>
     </div>
@@ -40,11 +118,6 @@
           <th>Username</th>
           <th>Password</th>
           <th>Actions</th>
-          <!-- <th>Per Order Fee</th>
-          <th>Per Unit Fee</th>
-          <th>FBA Pack and Prep</th>
-          <th>WFS Pack and Prep</th>
-          <th>B2B Freight Percentage Markup</th> -->
         </tr>
       </thead>
       <tbody>
@@ -55,7 +128,12 @@
             <td>{client.password}</td>
             <td
               ><div class="flex space-x-1">
-                <button class="btn btn-info btn-sm">Edit</button><button
+                <button class="btn btn-info btn-sm">Edit</button>
+                <button
+                  on:click={() => {
+                    showDeleteUserModal = true
+                    userToDelete = client
+                  }}
                   class="btn btn-error btn-sm">Delete</button
                 >
                 <button
@@ -67,11 +145,6 @@
                 >
               </div></td
             >
-            <!-- <td>{client.per_order_fee}</td>
-            <td>{client.per_order_unit_fee}</td>
-            <td>{client.per_unit_fba_pack_prep}</td>
-            <td>{client.per_unit_wfs_pack_prep}</td>
-            <td>{client.b2b_freight_percentage_markup}</td> -->
           </tr>
         {/each}
       </tbody>
@@ -121,3 +194,106 @@
   </div>
 </div>
 <!-- VIEW BILLING TERMS MODAL ENDS -->
+
+<!-- ADD USER MODAL BEGINS -->
+<div class={`modal ${showAddUserModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showAddUserModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <form on:submit={createUser}>
+      <h3 class="text-center text-xl font-bold">Add New Client</h3>
+      <div class="form-control mt-4">
+        <label class="label" for="company_name">Company Name</label>
+        <input
+          type="text"
+          placeholder="Company Name"
+          bind:value={newUser.company_name}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="clientId">Client Id</label>
+        <input
+          type="email"
+          placeholder="Username (email)"
+          bind:value={newUser.username}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="password">Password</label>
+        <input
+          type="password"
+          placeholder="Password"
+          bind:value={newUser.password}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="perOrderFee">Per Order Fee</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Order Fee"
+          bind:value={newUser.per_order_fee}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="perOrderUnitFee">Per Order Unit Fee</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Order Unit Fee"
+          bind:value={newUser.per_order_unit_fee}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="fbaPackAndPrep">FBA Pack and Prep</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Unit FBA Pack Prep"
+          bind:value={newUser.per_unit_fba_pack_prep}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="wfsFulfillmentServices">WFS Pack and Prep</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Unit WFS Pack Prep"
+          bind:value={newUser.per_unit_wfs_pack_prep}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="b2bFreightPercentageMarkup">B2B Freight Percentage Markup</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="B2B Freight Percentage Markup"
+          bind:value={newUser.b2b_freight_percentage_markup}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <div class="mt-4 flex justify-center">
+          <button class="btn btn-primary" type="submit">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- ADD USER MODAL ENDS -->
+
+<!-- DELETE USER MODAL BEGINS -->
+<div class={`modal ${showDeleteUserModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showDeleteUserModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mt-2 text-center text-lg font-bold">Are you sure you want to delete this client?</h1>
+    <p class="entry-content py-4 text-center" style="white-space: pre-line;">
+      {userToDelete.company_name}
+    </p>
+    <div class="flex justify-center">
+      <button
+        on:click={() => deleteUser(userToDelete.id, userToDelete.created_at)}
+        class="btn btn-error"
+      >
+        Yes, Delete
+      </button>
+    </div>
+  </div>
+</div>
+<!-- DELETE USER MODAL ENDS -->
