@@ -20,6 +20,12 @@
   })
 
   // Component specific variables and business logic
+  $: three3plClients = $clients.filter(
+    (client) =>
+      client.username !== 'jan@hometown-industries.com' &&
+      client.username !== 'wesley@hometown-industries.com' &&
+      client.username !== 'susan@hometown-industries.com',
+  )
 
   // Variables for displaying clients billing terms
   let showClientBillingTermsModal = false
@@ -101,6 +107,36 @@
     userToDelete = {}
     showDeleteUserModal = false
   }
+
+  // Variables and function to edit client billing details
+  let showEditUserModal = false
+  let userToEdit = {}
+  async function editUser() {
+    const response = await fetch('/app/api/users/editUser', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: userToEdit.id,
+        per_order_fee,
+        per_order_unit_fee,
+        per_unit_fba_pack_prep,
+        per_unit_wfs_pack_prep,
+        b2b_freight_percentage_markup,
+      }),
+    })
+    if (response.ok) {
+      loadClients(data.supabase)
+      showEditUserModal = false
+      per_order_fee = 1.3
+      per_order_unit_fee = 0.3
+      per_unit_fba_pack_prep = 0.25
+      per_unit_wfs_pack_prep = 0.25
+      b2b_freight_percentage_markup = 10.0
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to Create inventory: ${errorData.message}`)
+    }
+  }
 </script>
 
 <div class="mt-10 flex justify-center">
@@ -121,20 +157,26 @@
         </tr>
       </thead>
       <tbody>
-        {#each $clients as client}
+        {#each three3plClients as client}
           <tr>
             <td>{client.company_name}</td>
             <td>{client.username}</td>
             <td>{client.password}</td>
             <td
               ><div class="flex space-x-1">
-                <button class="btn btn-info btn-sm">Edit</button>
+                <button
+                  on:click={() => {
+                    showEditUserModal = true
+                    userToEdit = client
+                  }}
+                  class="btn btn-info btn-sm">Edit Billing Terms</button
+                >
                 <button
                   on:click={() => {
                     showDeleteUserModal = true
                     userToDelete = client
                   }}
-                  class="btn btn-error btn-sm">Delete</button
+                  class="btn btn-error btn-sm">Delete Client</button
                 >
                 <button
                   on:click={() => {
@@ -194,6 +236,65 @@
   </div>
 </div>
 <!-- VIEW BILLING TERMS MODAL ENDS -->
+
+<!-- EDIT USER MODAL BEGINS -->
+<div class={`modal ${showEditUserModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showEditUserModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <form on:submit={editUser}>
+      <h3 class="text-center text-xl font-bold">Edit Client Billing Details</h3>
+      <div class="form-control mt-4">
+        <label class="label" for="perOrderFee">Per Order Fee</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Order Fee"
+          bind:value={per_order_fee}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="perOrderUnitFee">Per Order Unit Fee</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Order Unit Fee"
+          bind:value={per_order_unit_fee}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="fbaPackAndPrep">FBA Pack and Prep</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Unit FBA Pack Prep"
+          bind:value={per_unit_fba_pack_prep}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="wfsFulfillmentServices">WFS Pack and Prep</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Unit WFS Pack Prep"
+          bind:value={per_unit_wfs_pack_prep}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="b2bFreightPercentageMarkup">B2B Freight Percentage Markup</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="B2B Freight Percentage Markup"
+          bind:value={b2b_freight_percentage_markup}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <div class="mt-4 flex justify-center">
+          <button class="btn btn-primary" type="submit">Update</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- EDIT USER MODAL ENDS -->
 
 <!-- ADD USER MODAL BEGINS -->
 <div class={`modal ${showAddUserModal ? 'modal-open' : ''}`}>

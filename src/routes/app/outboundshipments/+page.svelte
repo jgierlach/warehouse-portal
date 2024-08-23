@@ -695,7 +695,9 @@
       on:click={() => (showTrackingFields = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
-    <h1 class="mb-5 text-center text-xl font-semibold">Update Tracking</h1>
+    <h1 class="mb-5 text-center text-xl font-semibold">
+      Update Tracking - {outboundShipmentToEdit.Shipment_Number}
+    </h1>
     <form on:submit={updateTrackingInformationAndSendNotification}>
       <!-- Carrier -->
       <div class="form-control mb-4">

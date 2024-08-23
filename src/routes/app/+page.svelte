@@ -7,7 +7,7 @@
   import Loading from '$lib/components/Loading.svelte'
 
   // Import utility functions
-  import { test, abbreviateString } from '$lib/utils'
+  import { abbreviateString } from '$lib/utils'
 
   // Import props
   export let data
@@ -21,11 +21,6 @@
   })
 
   // Component specific variables and business logic
-
-  $: {
-    console.log('INVENTORY', $inventory)
-  }
-
   let loading = false
 
   let showDeleteInventory = false
