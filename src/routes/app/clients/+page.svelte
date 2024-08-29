@@ -20,7 +20,7 @@
   })
 
   // Component specific variables and business logic
-  $: three3plClients = $clients.filter(
+  $: activeClients = $clients.filter(
     (client) =>
       client.username !== 'jan@hometown-industries.com' &&
       client.username !== 'wesley@hometown-industries.com' &&
@@ -157,7 +157,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each three3plClients as client}
+        {#each activeClients as client}
           <tr>
             <td>{client.company_name}</td>
             <td>{client.username}</td>
