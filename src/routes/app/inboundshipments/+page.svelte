@@ -49,7 +49,8 @@
     loading = false
   }
 
-  // Shipment fields
+  // Shipment field
+  let id = 0
   let clientId = ''
   let shipmentNumber = ''
   let carrier = ''
@@ -65,6 +66,7 @@
   let sku = ''
   let productImageUrl = ''
   let quantity = 0
+  let countedQuantity = 0
   let costOfShipment = 0
   let buyerName = ''
   let buyerEmail = ''
@@ -158,46 +160,45 @@
     loading = false
   }
 
-  let showTrackingFields = false
-  async function updateTrackingInformationAndSendNotification() {
+  let showCountFields = false
+  async function confirmCountAndSendNotification() {
     loading = true
     // Send email notifying that a client has created a shipment
-    await fetch('/app/api/notifications/sendTrackingInformation', {
+    await fetch('/app/api/notifications/sendCountConfirmation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         clientId,
         shipmentNumber,
-        carrier,
-        trackingNumber,
-        poNumber,
-        recipientName,
+        sku,
+        productTitle,
+        quantity,
+        countedQuantity,
       }),
     })
-    // Edit Carrier and tracking fields
-    const response = await fetch('/app/api/inboundShipments/updateTracking', {
+    // Update counted quantity field
+    const response = await fetch('/app/api/inboundshipments/confirmCount', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        clientId,
-        shipmentNumber,
-        carrier,
-        trackingNumber,
+        id,
+        countedQuantity,
       }),
     })
     if (response.ok) {
       loadInboundShipments(data.supabase)
       clientId = ''
+      sku = ''
       shipmentNumber = ''
-      carrier = ''
-      trackingNumber = ''
-      poNumber = ''
-      recipientName = ''
+      productTitle = ''
+      quantity = 0
+      countedQuantity = 0
+      id = 0
     } else {
       const errorData = await response.json()
       alert(`Failed to update tracking for shipment: ${errorData.message}`)
     }
-    showTrackingFields = false
+    showCountFields = false
     loading = false
   }
 
@@ -347,14 +348,14 @@
                   >
                   <button
                     on:click={() => {
-                      showTrackingFields = true
-                      // InboundShipmentToEdit = shipment
+                      showCountFields = true
                       clientId = shipment.Client_Id
+                      sku = shipment.Sku
                       shipmentNumber = shipment.Shipment_Number
-                      carrier = shipment.Carrier
-                      trackingNumber = shipment.Tracking_Number
-                      poNumber = shipment.PO_Number
-                      recipientName = shipment.Recipient_Name
+                      productTitle = shipment.Product_Title
+                      quantity = shipment.Quantity
+                      countedQuantity = 0
+                      id = shipment.id
                     }}
                     class="btn btn-primary btn-xs mb-2">Confirm Count</button
                   >
@@ -710,46 +711,47 @@
 </div>
 <!-- EDIT SHIPMENT MODAL ENDS -->
 
-<!-- UPDATE TRACKING MODAL BEGINS -->
-<div class={`modal ${showTrackingFields ? 'modal-open' : ''}`}>
+<!-- Confirm Count MODAL BEGINS -->
+<div class={`modal ${showCountFields ? 'modal-open' : ''}`}>
   <div class="modal-box relative">
     <button
-      on:click={() => (showTrackingFields = false)}
+      on:click={() => (showCountFields = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 mt-5 text-center text-xl font-semibold">
-      Update Tracking - {shipmentNumber}
+      Confirm Count - {shipmentNumber}
     </h1>
-    <form on:submit={updateTrackingInformationAndSendNotification}>
-      <!-- Carrier -->
+    <form on:submit={confirmCountAndSendNotification}>
+      <!-- quantity -->
       <div class="form-control mb-4">
-        <label class="label" for="carrier">Carrier</label>
+        <label class="label" for="quantity">Expected Quantity</label>
         <input
           class="input input-bordered bg-base-200"
-          type="text"
-          id="carrier"
-          bind:value={carrier}
-          placeholder="Carrier"
+          type="number"
+          id="quantity"
+          bind:value={quantity}
+          placeholder="quantity"
         />
       </div>
 
-      <!-- Tracking Number -->
+      <!-- counted quantity -->
       <div class="form-control mb-4">
-        <label class="label" for="trackingNumber">Tracking Number</label>
+        <label class="label" for="countedQuantity">Counted Quantity</label>
         <input
           class="input input-bordered bg-base-200"
-          type="text"
-          id="trackingNumber"
-          bind:value={trackingNumber}
-          placeholder="Tracking Number"
+          type="number"
+          id="countedQuantity"
+          bind:value={countedQuantity}
+          on:input={(e) => (countedQuantity = Number(e.target.value) || 0)}
+          placeholder="0"
         />
       </div>
 
       <!-- Submit Button -->
       <div class="mt-4 mt-5 flex justify-center">
-        <button class="btn btn-info" type="submit">Update Tracking and Send Notification</button>
+        <button class="btn btn-info" type="submit">Confirm Count and Send Notification</button>
       </div>
     </form>
   </div>
 </div>
-<!-- UPDATE TRACKING MODAL ENDS -->
+<!-- Confirm Count MODAL ENDS -->
