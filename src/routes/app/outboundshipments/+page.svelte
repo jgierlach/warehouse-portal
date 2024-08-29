@@ -175,7 +175,28 @@
       }),
     })
     // Edit Carrier and tracking fields
-    await editOutboundShipment()
+    const response = await fetch('/app/api/outboundshipments/updateTracking', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId,
+        shipmentNumber,
+        carrier,
+        trackingNumber,
+      }),
+    })
+    if (response.ok) {
+      loadOutboundShipments(data.supabase)
+      clientId = ''
+      shipmentNumber = ''
+      carrier = ''
+      trackingNumber = ''
+      poNumber = ''
+      recipientName = ''
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to update tracking for shipment: ${errorData.message}`)
+    }
     showTrackingFields = false
     loading = false
   }
@@ -325,31 +346,13 @@
                   <button
                     on:click={() => {
                       showTrackingFields = true
-                      outboundShipmentToEdit = shipment
+                      // outboundShipmentToEdit = shipment
                       clientId = shipment.Client_Id
                       shipmentNumber = shipment.Shipment_Number
                       carrier = shipment.Carrier
                       trackingNumber = shipment.Tracking_Number
                       poNumber = shipment.PO_Number
-                      destination = shipment.Destination
-                      requiresAmazonLabeling = shipment.Requires_Amazon_Labeling
-                      shipmentType = shipment.Shipment_Type
-                      status = shipment.Status
-                      dateOfLastChange = shipment.Date_Of_Last_Change
-                      asin = shipment.Asin
-                      productTitle = shipment.Product_Title
-                      sku = shipment.Sku
-                      productImageUrl = shipment.Product_Image_Url
-                      quantity = shipment.Quantity
-                      costOfShipment = shipment.Cost_Of_Shipment
-                      buyerName = shipment.Buyer_Name
-                      buyerEmail = shipment.Buyer_Email
                       recipientName = shipment.Recipient_Name
-                      recipientCompany = shipment.Recipient_Company
-                      recipientAddressLine1 = shipment.Recipient_Address_Line_1
-                      recipientCity = shipment.Recipient_City
-                      recipientState = shipment.Recipient_State
-                      recipientPostalCode = shipment.Recipient_Postal_Code
                     }}
                     class="btn btn-primary btn-xs mb-2">Update Tracking</button
                   >
@@ -712,8 +715,8 @@
       on:click={() => (showTrackingFields = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
-    <h1 class="mb-5 text-center text-xl font-semibold">
-      Update Tracking - {outboundShipmentToEdit.Shipment_Number}
+    <h1 class="mb-5 mt-5 text-center text-xl font-semibold">
+      Update Tracking - {shipmentNumber}
     </h1>
     <form on:submit={updateTrackingInformationAndSendNotification}>
       <!-- Carrier -->
