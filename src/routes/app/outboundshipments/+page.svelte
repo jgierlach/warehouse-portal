@@ -65,6 +65,7 @@
   let sku = ''
   let productImageUrl = ''
   let quantity = 0
+  let costOfShipment = 0
   let buyerName = ''
   let buyerEmail = ''
   let recipientName = ''
@@ -110,6 +111,7 @@
         sku,
         productImageUrl,
         quantity,
+        costOfShipment,
         buyerName,
         buyerEmail,
         recipientName,
@@ -140,6 +142,7 @@
       sku = ''
       productImageUrl = ''
       quantity = 0
+      costOfShipment = 0
       buyerName = ''
       buyerEmail = ''
       recipientName = ''
@@ -307,6 +310,7 @@
                       sku = shipment.Sku
                       productImageUrl = shipment.Product_Image_Url
                       quantity = shipment.Quantity
+                      costOfShipment = shipment.Cost_Of_Shipment
                       buyerName = shipment.Buyer_Name
                       buyerEmail = shipment.Buyer_Email
                       recipientName = shipment.Recipient_Name
@@ -337,6 +341,7 @@
                       sku = shipment.Sku
                       productImageUrl = shipment.Product_Image_Url
                       quantity = shipment.Quantity
+                      costOfShipment = shipment.Cost_Of_Shipment
                       buyerName = shipment.Buyer_Name
                       buyerEmail = shipment.Buyer_Email
                       recipientName = shipment.Recipient_Name
@@ -580,6 +585,18 @@
           id="quantity"
           bind:value={quantity}
           placeholder="Total Quantity"
+        />
+      </div>
+
+      <!-- Quantity -->
+      <div class="form-control mb-4">
+        <label class="label" for="costOfShipment">Cost Of Shipment</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="number"
+          id="costOfShipment"
+          bind:value={costOfShipment}
+          placeholder="$4.55"
         />
       </div>
 
