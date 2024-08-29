@@ -14,13 +14,24 @@
 
   // Import stores
   import { inventory, loadInventory } from '$lib/stores/inventory.js'
+  import { clients, loadClients } from '$lib/stores/clients.js'
 
   // Execute onMount
   onMount(() => {
     loadInventory(data.supabase)
+    loadClients(data.supabase)
   })
 
   // Component specific variables and business logic
+  $: activeClients = $clients.filter(
+    (client) =>
+      client.username !== 'jan@hometown-industries.com' &&
+      client.username !== 'wesley@hometown-industries.com' &&
+      client.username !== 'susan@hometown-industries.com',
+  )
+
+  $: clientIds = activeClients.map((client) => client.username)
+
   let loading = false
 
   let showDeleteInventory = false
@@ -267,7 +278,7 @@
     <h1 class="mt-2 text-center text-lg font-bold">
       Are you sure you want to delete this inventory?
     </h1>
-    <p class="entry-content py-4" style="white-space: pre-line;">
+    <p class="entry-content py-4 text-center" style="white-space: pre-line;">
       {inventoryToDelete.Product_Title}
     </p>
     <div class="flex justify-center">
@@ -423,17 +434,20 @@
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Create Inventory</h1>
     <form on:submit={createInventory}>
-      <!-- Client ID -->
+      <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="clientId">Client Id</label>
-        <input
+        <select
           required
-          class="input input-bordered bg-base-200"
-          type="text"
+          class="select select-bordered bg-base-200"
           id="clientId"
           bind:value={clientId}
-          placeholder="Client Id"
-        />
+        >
+          <option value="" disabled>Select Client Id</option>
+          {#each clientIds as clientIdOption}
+            <option value={clientIdOption}>{clientIdOption}</option>
+          {/each}
+        </select>
       </div>
 
       <!-- Name -->
