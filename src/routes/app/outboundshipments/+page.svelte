@@ -207,7 +207,7 @@
 
   // Filtered shipments based on search query, handle null values safely
   $: filteredShipments = outboundShipmentsByMostRecent.filter((shipment) =>
-    shipment.Shipment_Number?.toLowerCase().includes(searchQuery.toLowerCase()),
+    shipment.Shipment_Number?.toLowerCase().includes(searchQuery.toLowerCase().trim()),
   )
 
   let hoveredTitleId = null
