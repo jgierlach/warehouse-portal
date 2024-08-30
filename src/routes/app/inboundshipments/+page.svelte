@@ -206,6 +206,16 @@
     (a, b) => new Date(b.Date_Of_Last_Change) - new Date(a.Date_Of_Last_Change),
   )
 
+  let shipmentStatus = 'Pending'
+
+  $: pendingShipments = inboundShipmentsByMostRecent.filter(
+    (shipment) => shipment.Status === 'Pending',
+  )
+
+  $: receivedShipments = inboundShipmentsByMostRecent.filter(
+    (shipment) => shipment.Status === 'Received',
+  )
+
   // Filtered shipments based on search query, handle null values safely
   $: filteredShipments = inboundShipmentsByMostRecent.filter((shipment) =>
     shipment.Shipment_Number?.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -232,8 +242,21 @@
   <div class="ml-5 mr-5 w-full max-w-7xl bg-base-100 p-4 shadow-xl">
     <h1 class="mb-5 text-center text-3xl font-bold">Inbound Shipments</h1>
 
-    <!-- Search input -->
     <div class="mb-4 flex justify-center">
+      <button
+        on:click={() => (shipmentStatus = 'Pending')}
+        class:btn-active={shipmentStatus === 'Pending'}
+        class="btn">Pending</button
+      >
+      <button
+        on:click={() => (shipmentStatus = 'Received')}
+        class:btn-active={shipmentStatus === 'Received'}
+        class="btn">Received</button
+      >
+    </div>
+
+    <!-- Search input -->
+    <!-- <div class="mb-4 flex justify-center">
       <input
         type="text"
         class="input w-1/4 bg-base-200"
@@ -241,7 +264,7 @@
         bind:value={searchQuery}
       />
       <button class="btn btn-primary">Search</button>
-    </div>
+    </div> -->
 
     <div class="overflow-x-auto">
       <table class="table table-zebra">
@@ -263,7 +286,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each filteredShipments as shipment}
+          {#each shipmentStatus === 'Pending' ? pendingShipments : receivedShipments as shipment}
             <tr id={shipment.id}>
               <td>
                 <img
@@ -278,7 +301,13 @@
               <td>{shipment.BOL_Number}</td>
               <td>{shipment.Carrier}</td>
               <td>{shipment.Tracking_Number}</td>
-              <td>{shipment.Status}</td>
+              <td
+                ><button
+                  class:btn-accent={shipmentStatus === 'Received'}
+                  class:btn-warning={shipmentStatus === 'Pending'}
+                  class="btn btn-sm">{shipment.Status}</button
+                ></td
+              >
               <td>{formatDate(shipment.Date_Of_Last_Change)}</td>
               <td>
                 <div
