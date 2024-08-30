@@ -53,11 +53,10 @@
   let id = 0
   let clientId = ''
   let shipmentNumber = ''
+  let bolNumber = ''
   let carrier = ''
   let trackingNumber = ''
-  let poNumber = ''
   let destination = ''
-  let requiresAmazonLabeling = ''
   let shipmentType = ''
   let status = ''
   let dateOfLastChange = ''
@@ -67,23 +66,12 @@
   let productImageUrl = ''
   let quantity = 0
   let countedQuantity = 0
-  let costOfShipment = 0
-  let buyerName = ''
-  let buyerEmail = ''
-  let recipientName = ''
-  let recipientCompany = ''
-  let recipientAddressLine1 = ''
-  let recipientCity = ''
-  let recipientState = ''
-  let recipientPostalCode = ''
+  let warehouseAddress = '2821 West P Circle'
+  let warehousePostalCode = '68528'
+  let warehouseCity = 'Lincoln'
+  let warehouseState = 'NE'
 
-  const destinations = [
-    'Website Customer Order',
-    'B2B Order',
-    'Amazon FBA',
-    'Chewy.com',
-    'Walmart Customer Order',
-  ]
+  const destinations = ['Hometown Warehouse']
 
   let showEditInboundShipment = false
   let inboundShipmentToEdit = {}
@@ -92,7 +80,7 @@
     loading = true
     const id = inboundShipmentToEdit.id
     const createdAt = inboundShipmentToEdit.created_at
-    const response = await fetch('/app/api/inboundShipments/editShipment', {
+    const response = await fetch('/app/api/inboundshipments/editShipment', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -100,11 +88,10 @@
         createdAt,
         clientId,
         shipmentNumber,
+        bolNumber,
         carrier,
         trackingNumber,
-        poNumber,
         destination,
-        requiresAmazonLabeling,
         shipmentType,
         status,
         dateOfLastChange,
@@ -113,29 +100,23 @@
         sku,
         productImageUrl,
         quantity,
-        costOfShipment,
-        buyerName,
-        buyerEmail,
-        recipientName,
-        recipientCompany,
-        recipientAddressLine1,
-        recipientCity,
-        recipientState,
-        recipientPostalCode,
+        countedQuantity,
+        warehouseAddress,
+        warehousePostalCode,
+        warehouseCity,
+        warehouseState,
       }),
     })
     if (response.ok) {
       loadInboundShipments(data.supabase)
-      goto(`/app/inboundShipments/#${inboundShipmentToEdit.id}`)
       showEditInboundShipment = false
       inboundShipmentToEdit = {}
       clientId = ''
       shipmentNumber = ''
+      bolNumber = ''
       carrier = ''
       trackingNumber = ''
-      poNumber = ''
       destination = ''
-      requiresAmazonLabeling = ''
       shipmentType = ''
       status = ''
       dateOfLastChange = ''
@@ -144,18 +125,14 @@
       sku = ''
       productImageUrl = ''
       quantity = 0
-      costOfShipment = 0
-      buyerName = ''
-      buyerEmail = ''
-      recipientName = ''
-      recipientCompany = ''
-      recipientAddressLine1 = ''
-      recipientCity = ''
-      recipientState = ''
-      recipientPostalCode = ''
+      countedQuantity = 0
+      warehouseAddress = '2821 West P Circle'
+      warehousePostalCode = '68528'
+      warehouseCity = 'Lincoln'
+      warehouseState = 'NE'
     } else {
       const errorData = await response.json()
-      alert(`Failed to edit outbound shipment: ${errorData.message}`)
+      alert(`Failed to edit inbound shipment: ${errorData.message}`)
     }
     loading = false
   }
@@ -352,9 +329,8 @@
                       shipmentNumber = shipment.Shipment_Number
                       carrier = shipment.Carrier
                       trackingNumber = shipment.Tracking_Number
-                      poNumber = shipment.PO_Number
+                      bolNumber = shipment.BOL_Number
                       destination = shipment.Destination
-                      requiresAmazonLabeling = shipment.Requires_Amazon_Labeling
                       shipmentType = shipment.Shipment_Type
                       status = shipment.Status
                       dateOfLastChange = shipment.Date_Of_Last_Change
@@ -363,15 +339,7 @@
                       sku = shipment.Sku
                       productImageUrl = shipment.Product_Image_Url
                       quantity = shipment.Quantity
-                      costOfShipment = shipment.Cost_Of_Shipment
-                      buyerName = shipment.Buyer_Name
-                      buyerEmail = shipment.Buyer_Email
-                      recipientName = shipment.Recipient_Name
-                      recipientCompany = shipment.Recipient_Company
-                      recipientAddressLine1 = shipment.Recipient_Address_Line_1
-                      recipientCity = shipment.Recipient_City
-                      recipientState = shipment.Recipient_State
-                      recipientPostalCode = shipment.Recipient_Postal_Code
+                      countedQuantity = shipment.Counted_Quantity
                     }}
                     class="btn btn-info btn-xs mb-2">Edit</button
                   >
@@ -492,13 +460,13 @@
 
       <!-- PO Number -->
       <div class="form-control mb-4">
-        <label class="label" for="poNumber">PO Number</label>
+        <label class="label" for="bolNumber">BOL Number</label>
         <input
           class="input input-bordered bg-base-200"
           type="text"
-          id="poNumber"
-          bind:value={poNumber}
-          placeholder="PO Number"
+          id="bolNumber"
+          bind:value={bolNumber}
+          placeholder="BOL Number"
         />
       </div>
 
@@ -514,17 +482,6 @@
             <option value={destinationOption}>{destinationOption}</option>
           {/each}
         </select>
-      </div>
-
-      <!-- Requires Amazon Labeling -->
-      <div class="form-control mb-4">
-        <label class="label" for="requiresAmazonLabeling">Requires Amazon Labeling</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="text"
-          id="requiresAmazonLabeling"
-          bind:value={requiresAmazonLabeling}
-        />
       </div>
 
       <!-- Shipment Type -->
@@ -623,111 +580,63 @@
         />
       </div>
 
-      <!-- Quantity -->
+      <!-- Counted Quantity -->
       <div class="form-control mb-4">
-        <label class="label" for="costOfShipment">Cost Of Shipment</label>
+        <label class="label" for="countedQuantity">Counted Quantity</label>
         <input
           class="input input-bordered bg-base-200"
           type="number"
-          id="costOfShipment"
-          bind:value={costOfShipment}
-          placeholder="$4.55"
+          id="countedQuantity"
+          bind:value={countedQuantity}
+          placeholder="0"
         />
       </div>
 
-      <!-- Buyer Name -->
+      <!-- Warehouse Address -->
       <div class="form-control mb-4">
-        <label class="label" for="buyerName">Buyer Name</label>
+        <label class="label" for="warehouseAddress">Warehouse Address</label>
         <input
           class="input input-bordered bg-base-200"
           type="text"
-          id="buyerName"
-          bind:value={buyerName}
-          placeholder="Buyer Name"
+          id="warehouseAddress"
+          bind:value={warehouseAddress}
+          placeholder="Warehouse Address"
         />
       </div>
 
-      <!-- Buyer Email -->
+      <!-- Warehouse City -->
       <div class="form-control mb-4">
-        <label class="label" for="buyerEmail">Buyer Email</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="email"
-          id="buyerEmail"
-          bind:value={buyerEmail}
-          placeholder="Buyer Email"
-        />
-      </div>
-
-      <!-- Recipient Name -->
-      <div class="form-control mb-4">
-        <label class="label" for="recipientName">Recipient Name</label>
+        <label class="label" for="warehouseCity">Warehouse City</label>
         <input
           class="input input-bordered bg-base-200"
           type="text"
-          id="recipientName"
-          bind:value={recipientName}
-          placeholder="Recipient Name"
+          id="warehouseCity"
+          bind:value={warehouseCity}
+          placeholder="Warehouse City"
         />
       </div>
 
-      <!-- Recipient Company -->
+      <!-- Warehouse State -->
       <div class="form-control mb-4">
-        <label class="label" for="recipientCompany">Recipient Company</label>
+        <label class="label" for="warehouseState">Warehouse State</label>
         <input
           class="input input-bordered bg-base-200"
           type="text"
-          id="recipientCompany"
-          bind:value={recipientCompany}
-          placeholder="Recipient Company"
+          id="warehouseState"
+          bind:value={warehouseState}
+          placeholder="Warehouse State"
         />
       </div>
 
-      <!-- Recipient Address Line 1 -->
+      <!-- Warehouse Postal Code -->
       <div class="form-control mb-4">
-        <label class="label" for="recipientAddressLine1">Recipient Address Line 1</label>
+        <label class="label" for="warehousePostalCode">Warehouse Postal Code</label>
         <input
           class="input input-bordered bg-base-200"
           type="text"
-          id="recipientAddressLine1"
-          bind:value={recipientAddressLine1}
-          placeholder="Recipient Address Line 1"
-        />
-      </div>
-
-      <!-- Recipient City -->
-      <div class="form-control mb-4">
-        <label class="label" for="recipientCity">Recipient City</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="text"
-          id="recipientCity"
-          bind:value={recipientCity}
-          placeholder="Recipient City"
-        />
-      </div>
-
-      <!-- Recipient State -->
-      <div class="form-control mb-4">
-        <label class="label" for="recipientState">Recipient State</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="text"
-          id="recipientState"
-          bind:value={recipientState}
-          placeholder="Recipient State"
-        />
-      </div>
-
-      <!-- Recipient Postal Code -->
-      <div class="form-control mb-4">
-        <label class="label" for="recipientPostalCode">Recipient Postal Code</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="text"
-          id="recipientPostalCode"
-          bind:value={recipientPostalCode}
-          placeholder="Recipient Postal Code"
+          id="warehousePostalCode"
+          bind:value={warehousePostalCode}
+          placeholder="Warehouse Postal Code"
         />
       </div>
 
