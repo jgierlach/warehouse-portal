@@ -277,7 +277,14 @@
               <td>{shipment.Tracking_Number}</td>
               <td>{shipment.PO_Number}</td>
               <td>{shipment.Destination}</td>
-              <td>{shipment.Status}</td>
+              <!-- <td>{shipment.Status}</td> -->
+              <td
+                ><button
+                  class:btn-accent={shipment.Status === 'Shipped'}
+                  class:btn-warning={shipment.Status === 'Pending'}
+                  class="btn btn-sm">{shipment.Status}</button
+                ></td
+              >
               <td>{formatDate(shipment.Date_Of_Last_Change)}</td>
               <td>
                 <div
