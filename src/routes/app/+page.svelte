@@ -390,19 +390,6 @@
         />
       </div>
 
-      <!-- Pending Quantity -->
-      <div class="form-control mb-4">
-        <label class="label" for="pending">Pending Quantity</label>
-        <input
-          required
-          class="input input-bordered bg-base-200"
-          type="number"
-          id="pending"
-          bind:value={pending}
-          placeholder="Pending Quantity"
-        />
-      </div>
-
       <!-- Quantity -->
       <div class="form-control mb-4">
         <label class="label" for="quantity">Quantity</label>
@@ -413,6 +400,19 @@
           id="quantity"
           bind:value={quantity}
           placeholder="Total Quantity"
+        />
+      </div>
+
+      <!-- Pending Quantity -->
+      <div class="form-control mb-4">
+        <label class="label" for="pending">Pending Quantity</label>
+        <input
+          required
+          class="input input-bordered bg-base-200"
+          type="number"
+          id="pending"
+          bind:value={pending}
+          placeholder="Pending Quantity"
         />
       </div>
 

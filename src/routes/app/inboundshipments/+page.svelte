@@ -14,6 +14,7 @@
 
   // Import stores
   import { inboundShipments, loadInboundShipments } from '$lib/stores/inboundShipments.js'
+  import { inventory, loadInventory } from '$lib/stores/inventory.js'
 
   // Execute onMount
   onMount(() => {
@@ -164,6 +165,7 @@
     })
     if (response.ok) {
       loadInboundShipments(data.supabase)
+      loadInventory(data.supabase)
       clientId = ''
       sku = ''
       shipmentNumber = ''
@@ -217,7 +219,7 @@
 <Loading {loading} />
 <div class="mt-10 flex justify-center">
   <div class="ml-5 mr-5 w-full max-w-7xl bg-base-100 p-4 shadow-xl">
-    <h1 class="mb-5 text-center text-3xl font-bold">Inbound Shipments</h1>
+    <h1 class="mb-5 text-center text-3xl font-bold">{shipmentStatus} Inbound Shipments</h1>
 
     <div class="mb-4 flex justify-center">
       <button
