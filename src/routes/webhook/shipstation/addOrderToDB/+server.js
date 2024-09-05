@@ -71,6 +71,8 @@ export async function POST({ request, locals }) {
       .from('Outbound_Shipments')
       .insert(shipmentData);
 
+    console.log('Insert result:', data, error);
+
     if (error) {
       console.error('Error inserting shipment data:', error);
       return json({ error: 'Failed to process shipment' }, { status: 500 });
