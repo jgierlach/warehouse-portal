@@ -43,7 +43,7 @@ export async function POST({ request, locals }) {
       Tracking_Number: trackingNumber,
       PO_Number: orderNumber,
       Destination: source,
-      Requires_Amazon_Labeling: advancedOptions?.requiresAmazonLabeling || null,
+      Requires_Amazon_Labeling: "No",
       Shipment_Type: 'Outbound',  // Default or map from payload if available
       Status: 'Pending',  // Set a default status
       Date_Of_Last_Change: orderDate,
