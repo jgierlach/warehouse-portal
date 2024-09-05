@@ -18,14 +18,10 @@ export async function POST({ request, locals }) {
       advancedOptions,
       customerEmail,
       items,
-      modifyDate,
       orderDate,
       shippingAmount,
       customerNotes,
     } = event;
-
-    // Destructure shipTo fields
-    const { name = 'Default', company = "ACME Enterprises", street1 = "5505 O Street", city = "Lincoln", state = "NE", postalCode = "68510", country = "US", phone = "123-456-7890" } = shipTo
 
     // Destructure advanced options
     const { storeId = "5252266", source = "Web Store" } = advancedOptions
@@ -53,14 +49,14 @@ export async function POST({ request, locals }) {
       Sku: item.sku || null,  // SKU for the product
       Product_Image_Url: item.imageUrl || null,  // Image URL if available
       Quantity: item.quantity || 1,  // Quantity of the current item
-      Buyer_Name: name || null,
+      Buyer_Name: shipTo?.name || null,
       Buyer_Email: customerEmail || null,
-      Recipient_Name: name || null,
-      Recipient_Company: company || null,
-      Recipient_Address_Line_1: street1,
-      Recipient_City: city || null,
-      Recipient_State: state || null,
-      Recipient_Postal_Code: postalCode || null,
+      Recipient_Name: shipTo?.name || null,
+      Recipient_Company: shipTo?.company || null,
+      Recipient_Address_Line_1: shipTo?.street1 || null,
+      Recipient_City: shipTo?.city || null,
+      Recipient_State: shipTo?.state || null,
+      Recipient_Postal_Code: shipTo?.postalCode || null,
       Notes: customerNotes || null,  // Any internal notes provided
       Cost_Of_Shipment: shippingAmount || null,  // Cost of the shipment, if available
     }));
