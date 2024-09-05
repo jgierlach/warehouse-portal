@@ -25,14 +25,15 @@ export async function POST({ request, locals }) {
     } = event;
 
     // Destructure shipTo fields
-    const { name, company, street1, city, state, postalCode, country, phone } = shipTo
+    const { name = 'Default', company = "ACME Enterprises", street1 = "5505 O Street", city = "Lincoln", state = "NE", postalCode = "68510", country = "US", phone = "123-456-7890" } = shipTo
 
     // Destructure advanced options
-    const { storeId, source } = advancedOptions
+    const { storeId = "5252266", source = "Web Store" } = advancedOptions
+
+    console.log("STORE NAME", source)
 
     const clientId = assignClientIdBasedOnStoreName(source)
 
-    console.log("STORE NAME", source)
     console.log("CLIENT ID", clientId)
 
     // Loop through each item in the shipment
