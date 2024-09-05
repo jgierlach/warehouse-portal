@@ -7,6 +7,8 @@ export async function POST({ request, locals }) {
   try {
     const event = await request.json();
 
+    console.log('Webhook received:', event);
+
     // Extracting fields from ShipStation's payload
     const {
       orderNumber,
