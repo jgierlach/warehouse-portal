@@ -29,6 +29,9 @@ export async function POST({ request, locals }) {
 
     const clientId = assignClientIdBasedOnStoreName(storeName)
 
+    console.log("STORE NAME", storeName)
+    console.log("CLIENT ID", clientId)
+
     // Loop through each item in the shipment
     const shipmentData = shipmentItems.map(item => ({
       Client_Id: clientId,
