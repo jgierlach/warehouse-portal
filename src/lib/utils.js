@@ -1,3 +1,25 @@
+export const assignClientIdBasedOnStoreName = (storeName) => {
+  if (storeName === 'Dog Rocks Walmart') {
+    return 'operations@podiumpetproducts.com'
+  }
+  if (storeName === 'Dog Rocks Website') {
+    return 'operations@podiumpetproducts.com'
+  }
+  if (storeName === 'Drink Ballast') {
+    return 'roy@drinkballast.com'
+  }
+  if (storeName === 'Hometown Amazon') {
+    return 'homeinddistribution@gmail.com'
+  }
+  if (storeName === 'Hometown eBay') {
+    return 'homeinddistribution@gmail.com'
+  }
+  if (storeName === 'Jewell Nursing Website') {
+    return 'support@jewellnursingsolutions.com'
+  }
+  return ''
+}
+
 export const formatDollarValue = (number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
