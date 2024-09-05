@@ -42,7 +42,7 @@ export async function POST({ request, locals }) {
       Client_Id: clientId,
       Shipment_Number: orderNumber,
       Carrier: carrierCode,
-      Tracking_Number: trackingNumber,
+      Tracking_Number: trackingNumber || null,
       PO_Number: orderNumber,
       Destination: source,
       Requires_Amazon_Labeling: "No",
@@ -68,12 +68,14 @@ export async function POST({ request, locals }) {
 
     console.log('Shipment Data:', shipmentData);
 
+    console.log('Supabase instance', locals.supabase)
+
     // Insert multiple rows for each SKU in the shipmentItems array
-    const { data, error } = await locals.supabase
+    const response = await locals.supabase
       .from('Outbound_Shipments')
       .insert(shipmentData);
 
-    console.log('Insert result:', data, error);
+    console.log('Insert result:', response);
 
     if (error) {
       console.error('Error inserting shipment data:', error);
