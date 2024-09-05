@@ -18,6 +18,7 @@ export async function POST({ request, locals }) {
       shipmentItems,
       advancedOptions,
       customerEmail,
+      items,
       modifyDate,
       orderDate,
       shippingAmount,
@@ -37,7 +38,7 @@ export async function POST({ request, locals }) {
     console.log("CLIENT ID", clientId)
 
     // Loop through each item in the shipment
-    const shipmentData = shipmentItems.map(item => ({
+    const shipmentData = items.map(item => ({
       Client_Id: clientId,
       Shipment_Number: orderNumber,
       Carrier: carrierCode,
