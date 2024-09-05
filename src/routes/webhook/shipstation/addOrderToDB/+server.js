@@ -66,6 +66,8 @@ export async function POST({ request, locals }) {
       Cost_Of_Shipment: shippingAmount || null,  // Cost of the shipment, if available
     }));
 
+    console.log('Shipment Data:', shipmentData);
+
     // Insert multiple rows for each SKU in the shipmentItems array
     const { data, error } = await locals.supabase
       .from('Outbound_Shipments')
