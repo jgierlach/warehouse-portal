@@ -2,6 +2,34 @@ import fetch from 'node-fetch';
 import { json } from '@sveltejs/kit';
 import { assignClientIdBasedOnStoreName } from '$lib/utils'
 
+const testData = {
+  Client_Id: 'test-client',
+  Shipment_Number: 'TEST123',
+  Carrier: 'fedex',
+  Tracking_Number: 'TRACK123',
+  PO_Number: 'TEST123',
+  Destination: 'Hometown Amazon',
+  Requires_Amazon_Labeling: 'No',
+  Shipment_Type: 'Outbound',
+  Status: 'Pending',
+  Date_Of_Last_Change: '2023-01-01',
+  Asin: null,
+  Product_Title: 'Test Product',
+  Sku: 'ABC123',
+  Product_Image_Url: null,
+  Quantity: 1,
+  Buyer_Name: 'John Doe',
+  Buyer_Email: 'john@example.com',
+  Recipient_Name: 'John Doe',
+  Recipient_Company: 'Test Company',
+  Recipient_Address_Line_1: '123 Main St',
+  Recipient_City: 'Test City',
+  Recipient_State: 'TS',
+  Recipient_Postal_Code: '12345',
+  Notes: 'Test note',
+  Cost_Of_Shipment: 100
+};
+
 export async function POST({ request, locals }) {
 
   try {
@@ -71,18 +99,19 @@ export async function POST({ request, locals }) {
     console.log('Supabase instance', locals.supabase)
 
     // Insert multiple rows for each SKU in the shipmentItems array
-    const { data, error } = await locals.supabase
+    const response = await locals.supabase
       .from('Outbound_Shipments')
-      .insert(shipmentData);
+      .insert(testData);
 
-    console.log('Insert result:', data, error);
+    console.log('Insert result:', response);
 
-    if (error) {
-      console.error('Error inserting shipment data:', error);
+    if (response.error) {
+      console.error('Error inserting shipment data:', response.error);
       return json({ error: 'Failed to process shipment' }, { status: 500 });
     }
 
     return json({ success: true });
+
   } catch (err) {
     console.error('Error parsing webhook data:', err);
     return json({ error: 'Invalid request' }, { status: 400 });
