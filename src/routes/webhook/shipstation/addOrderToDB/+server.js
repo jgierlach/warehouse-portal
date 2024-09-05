@@ -2,34 +2,6 @@ import fetch from 'node-fetch';
 import { json } from '@sveltejs/kit';
 import { assignClientIdBasedOnStoreName } from '$lib/utils'
 
-const testData = {
-  Client_Id: 'test-client',
-  Shipment_Number: 'TEST123',
-  Carrier: 'fedex',
-  Tracking_Number: 'TRACK123',
-  PO_Number: 'TEST123',
-  Destination: 'Hometown Amazon',
-  Requires_Amazon_Labeling: 'No',
-  Shipment_Type: 'Outbound',
-  Status: 'Pending',
-  Date_Of_Last_Change: '2023-01-01',
-  Asin: null,
-  Product_Title: 'Test Product',
-  Sku: 'ABC123',
-  Product_Image_Url: null,
-  Quantity: 1,
-  Buyer_Name: 'John Doe',
-  Buyer_Email: 'john@example.com',
-  Recipient_Name: 'John Doe',
-  Recipient_Company: 'Test Company',
-  Recipient_Address_Line_1: '123 Main St',
-  Recipient_City: 'Test City',
-  Recipient_State: 'TS',
-  Recipient_Postal_Code: '12345',
-  Notes: 'Test note',
-  Cost_Of_Shipment: 100
-};
-
 export async function POST({ request, locals }) {
 
   try {
@@ -43,7 +15,6 @@ export async function POST({ request, locals }) {
       carrierCode,
       trackingNumber,
       shipTo,
-      shipmentItems,
       advancedOptions,
       customerEmail,
       items,
@@ -67,29 +38,29 @@ export async function POST({ request, locals }) {
 
     // Loop through each item in the shipment
     const shipmentData = items.map(item => ({
-      Client_Id: clientId,
-      Shipment_Number: orderNumber,
-      Carrier: carrierCode,
+      Client_Id: clientId || null,
+      Shipment_Number: orderNumber || null,
+      Carrier: carrierCode || null,
       Tracking_Number: trackingNumber || null,
-      PO_Number: orderNumber,
-      Destination: source,
+      PO_Number: orderNumber || null,
+      Destination: source || null,
       Requires_Amazon_Labeling: "No",
       Shipment_Type: 'Outbound',  // Default or map from payload if available
       Status: 'Pending',  // Set a default status
-      Date_Of_Last_Change: orderDate,
+      Date_Of_Last_Change: orderDate || null,
       Asin: item.asin || null,  // ASIN if available, or set to null
       Product_Title: item.name || null,  // Title of the product (SKU)
       Sku: item.sku || null,  // SKU for the product
       Product_Image_Url: item.imageUrl || null,  // Image URL if available
       Quantity: item.quantity || 1,  // Quantity of the current item
-      Buyer_Name: name,
-      Buyer_Email: customerEmail,
-      Recipient_Name: name,
+      Buyer_Name: name || null,
+      Buyer_Email: customerEmail || null,
+      Recipient_Name: name || null,
       Recipient_Company: company || null,
       Recipient_Address_Line_1: street1,
-      Recipient_City: city,
-      Recipient_State: state,
-      Recipient_Postal_Code: postalCode,
+      Recipient_City: city || null,
+      Recipient_State: state || null,
+      Recipient_Postal_Code: postalCode || null,
       Notes: customerNotes || null,  // Any internal notes provided
       Cost_Of_Shipment: shippingAmount || null,  // Cost of the shipment, if available
     }));
@@ -101,7 +72,7 @@ export async function POST({ request, locals }) {
     // Insert multiple rows for each SKU in the shipmentItems array
     const response = await locals.supabase
       .from('Outbound_Shipments')
-      .insert(testData);
+      .insert(shipmentData);
 
     console.log('Insert result:', response);
 
