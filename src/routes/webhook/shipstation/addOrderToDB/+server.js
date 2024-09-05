@@ -71,11 +71,11 @@ export async function POST({ request, locals }) {
     console.log('Supabase instance', locals.supabase)
 
     // Insert multiple rows for each SKU in the shipmentItems array
-    const response = await locals.supabase
+    const { data, error } = await locals.supabase
       .from('Outbound_Shipments')
       .insert(shipmentData);
 
-    console.log('Insert result:', response);
+    console.log('Insert result:', data, error);
 
     if (error) {
       console.error('Error inserting shipment data:', error);
