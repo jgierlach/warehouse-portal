@@ -15,7 +15,7 @@ export async function POST({ request, locals }) {
     // Fetch order data from ShipStation using the resource_url
     const response = await fetch(event.resource_url, {
       headers: {
-        'Authorization': `Basic ${Buffer.from(import.meta.env.VITE_SHIPSTATION_API_KEY + ':' + import.meta.env.VITE_SHIPSTATION_API_KEY).toString('base64')}`,
+        'Authorization': `Basic ${Buffer.from(import.meta.env.VITE_SHIPSTATION_API_KEY + ':' + import.meta.env.VITE_SHIPSTATION_SECRET).toString('base64')}`,
         'Content-Type': 'application/json'
       }
     });
