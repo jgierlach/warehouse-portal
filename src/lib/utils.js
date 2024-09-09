@@ -1,3 +1,32 @@
+export const fetchStores = async () => {
+  const res = await fetch('/app/api/shipstation/listStores');
+  if (res.ok) {
+    const stores = await res.json();
+    return stores.map(store => {
+      return {
+        marketplaceName: store.marketplaceName,
+        storeId: store.storeId,
+        storeName: store.storeName
+      }
+    })
+  } else {
+    console.error('Failed to fetch stores');
+  }
+}
+
+export const findStoreNameBasedOnId = (storeId, stores) => {
+  if (storeId === null || storeId === undefined) {
+    console.log("storeId is null or undefined")
+    return ""
+  }
+  if (stores === null || stores === undefined) {
+    console.log("Stores api call came back as null or undefined")
+    return ""
+  }
+  const store = stores.find(store => store.storeId === storeId);
+  return store ? store.storeName : null;
+}
+
 export const assignClientIdBasedOnStoreName = (storeName) => {
   if (storeName === 'Dog Rocks Walmart') {
     return 'operations@podiumpetproducts.com'
@@ -17,7 +46,7 @@ export const assignClientIdBasedOnStoreName = (storeName) => {
   if (storeName === 'Jewell Nursing Website') {
     return 'support@jewellnursingsolutions.com'
   }
-  return ''
+  return 'clientId Not Found'
 }
 
 export const formatDollarValue = (number) => {

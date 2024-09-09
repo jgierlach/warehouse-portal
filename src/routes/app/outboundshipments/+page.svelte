@@ -39,13 +39,13 @@
     })
     if (response.ok) {
       loadOutboundShipments(data.supabase)
-      outboundShipmentToDelete = {}
+      showDeleteOutboundShipment = false
     } else {
       const errorData = await response.json()
       alert(`Failed to delete outboundshipments: ${errorData.message}`)
     }
-    outboundShipmentToDelete = {}
     showDeleteOutboundShipment = false
+    outboundShipmentToDelete = {}
     loading = false
   }
 
