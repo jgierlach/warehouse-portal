@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { fetchStores, findStoreNameBasedOnId, assignClientIdBasedOnStoreName } from '$lib/utils';
+import { findStoreNameBasedOnId, assignClientIdBasedOnStoreName } from '$lib/utils';
 
 // Disable CSRF protection for this webhook route
 export const config = {
@@ -42,6 +42,23 @@ export async function POST({ request, locals }) {
 
     const allShipmentData = [];
 
+    // Load all of the stores in ShipStation
+    const shipstationStores = await fetch('https://ssapi.shipstation.com/stores', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Basic ${Buffer.from(import.meta.env.VITE_SHIPSTATION_API_KEY + ':' + import.meta.env.VITE_SHIPSTATION_SECRET).toString('base64')}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // Check if the shipstation stores came back as expected
+    if (!shipstationStores.ok) {
+      return json({ error: 'Failed to fetch ShipStation stores' }, { status: shipstationStores.status });
+    }
+
+    // Process the successful return of ShipStation stores
+    const stores = await shipstationStores.json()
+
     // Loop through each order and process it
     for (const order of orders) {
       const {
@@ -58,8 +75,6 @@ export async function POST({ request, locals }) {
       } = order;
 
       const storeId = advancedOptions?.storeId
-
-      const stores = await fetchStores()
 
       const storeName = findStoreNameBasedOnId(storeId, stores)
 
