@@ -261,3 +261,132 @@ export function OPTIONS() {
 //     "labelMessages": null
 //   }
 // ]
+
+const fetchedOrders = [
+  {
+    "orderId": 468190807,
+    "orderNumber": "112-9642641-7659452",
+    "orderKey": "112-9642641-7659452",
+    "orderDate": "2024-08-11T19:03:20.0000000",
+    "createDate": "2024-09-09T12:05:45.3500000",
+    "modifyDate": "2024-09-09T12:08:59.1770000",
+    "paymentDate": "2024-08-11T19:03:20.0000000",
+    "shipByDate": "2024-08-11T17:00:00.0000000",
+    "orderStatus": "shipped",
+    "customerId": 231101599,
+    "customerUsername": "ldm5wnmn5dm4v04@marketplace.amazon.com",
+    "customerEmail": "ldm5wnmn5dm4v04@marketplace.amazon.com",
+    "billTo": {
+      "name": "",
+      "company": null,
+      "street1": "",
+      "street2": "",
+      "street3": "",
+      "city": "Gaitherburg",
+      "state": "Maryland",
+      "postalCode": "20878",
+      "country": "US",
+      "phone": "",
+      "residential": null,
+      "addressVerified": null
+    },
+    "shipTo": {
+      "name": "",
+      "company": "",
+      "street1": "",
+      "street2": "",
+      "street3": "",
+      "city": "Gaitherburg",
+      "state": "MD",
+      "postalCode": "20878",
+      "country": "US",
+      "phone": "",
+      "residential": false,
+      "addressVerified": "Address validation failed"
+    },
+    "items": [
+      {
+        "orderItemId": 780231203,
+        "lineItemKey": "107098493204121",
+        "sku": "B07GJZDVRK",
+        "name": "Dixie Belle Synthetic Flat Small Paint Brush | 1” Quality Synthetic Smooth Release Bristles | Professional Grade Paint Brush | Made in The USA",
+        "imageUrl": "https://m.media-amazon.com/images/I/41ag8sKLnPL.jpg",
+        "weight": {
+          "value": 1.55,
+          "units": "ounces",
+          "WeightUnits": 1
+        },
+        "quantity": 1,
+        "unitPrice": 19.99,
+        "taxAmount": 1.2,
+        "shippingAmount": 0,
+        "warehouseLocation": "",
+        "options": [],
+        "productId": 38404774,
+        "fulfillmentSku": null,
+        "adjustment": false,
+        "upc": "815146025493",
+        "createDate": "2024-09-09T12:05:45.317",
+        "modifyDate": "2024-09-09T12:05:45.317"
+      }
+    ],
+    "orderTotal": 21.19,
+    "amountPaid": 21.19,
+    "taxAmount": 1.2,
+    "shippingAmount": 0,
+    "customerNotes": null,
+    "internalNotes": null,
+    "gift": false,
+    "giftMessage": null,
+    "paymentMethod": "Other",
+    "requestedShippingService": "Expedited",
+    "carrierCode": null,
+    "serviceCode": null,
+    "packageCode": null,
+    "confirmation": "none",
+    "shipDate": null,
+    "holdUntilDate": null,
+    "weight": {
+      "value": 1.55,
+      "units": "ounces",
+      "WeightUnits": 1
+    },
+    "dimensions": null,
+    "insuranceOptions": {
+      "provider": null,
+      "insureShipment": false,
+      "insuredValue": 0
+    },
+    "internationalOptions": {
+      "contents": null,
+      "customsItems": null,
+      "nonDelivery": null
+    },
+    "advancedOptions": {
+      "warehouseId": 499995,
+      "nonMachinable": false,
+      "saturdayDelivery": false,
+      "containsAlcohol": false,
+      "mergedOrSplit": false,
+      "mergedIds": [],
+      "parentId": null,
+      "storeId": 789750,
+      "customField1": "",
+      "customField2": "",
+      "customField3": "",
+      "source": "amazon",
+      "billToParty": null,
+      "billToAccount": null,
+      "billToPostalCode": null,
+      "billToCountryCode": null,
+      "billToMyOtherAccount": null
+    },
+    "tagIds": null,
+    "userId": null,
+    "externallyFulfilled": true,
+    "externallyFulfilledBy": null,
+    "externallyFulfilledById": null,
+    "externallyFulfilledByName": null,
+    "labelMessages": null
+  }
+]
