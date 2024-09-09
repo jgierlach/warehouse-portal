@@ -74,7 +74,7 @@ export async function POST({ request, locals }) {
         Carrier: carrierCode || null,
         Tracking_Number: trackingNumber || null,
         PO_Number: orderNumber || null,
-        Destination: advancedOptions?.source || null,
+        Destination: storeName || null,
         Requires_Amazon_Labeling: "No",
         Shipment_Type: 'Outbound',  // Default or map from payload if available
         Status: 'Pending',  // Set a default status
