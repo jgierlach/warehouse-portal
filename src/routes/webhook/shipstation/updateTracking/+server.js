@@ -5,7 +5,7 @@ export const config = {
   csrf: false
 };
 
-export async function GET({ request, locals }) {
+export async function POST({ request, locals }) {
 
   // Set CORS headers
   const headers = {
