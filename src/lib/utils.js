@@ -43,6 +43,9 @@ export const assignClientIdBasedOnStoreName = (storeName) => {
   if (storeName === 'Hometown eBay') {
     return 'homeinddistribution@gmail.com'
   }
+  if (storeName === 'Hometown Walmart') {
+    return 'homeinddistribution@gmail.com'
+  }
   if (storeName === 'Jewell Nursing Website') {
     return 'support@jewellnursingsolutions.com'
   }
