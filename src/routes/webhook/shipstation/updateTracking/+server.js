@@ -16,7 +16,8 @@ export async function POST({ request, locals }) {
 
   try {
     const event = await request.json();
-    console.log('Webhook received On Fulfillment Shipped Event:', event);
+    console.log('Webhook received On Shipped Event:', event);
+    return json({ success: true }, { headers });
   } catch (err) {
     console.error('Error processing webhook:', err);
     return json({ error: 'Invalid request' }, { status: 400, headers });
