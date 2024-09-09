@@ -28,8 +28,10 @@ export async function POST({ request }) {
         type: 'text/html',
         value: `
           <p>For sku ${sku} the expected quantity on inbound shipment ${shipmentNumber} was ${quantity} units.</p>
-          <p>We received ${countedQuantity} units</p>
-          <p>The discrepancy in count is ${quantity - countedQuantity} units</p>`
+          <ul>
+            <li>We received ${countedQuantity} units</li>
+            <li>The discrepancy in count is ${quantity - countedQuantity} units</li>
+          </ul>`
       }
     ],
   };
