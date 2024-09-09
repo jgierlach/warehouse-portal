@@ -78,8 +78,6 @@ export async function POST({ request, locals }) {
 
       const storeId = advancedOptions?.storeId
 
-      console.log("STORE ID", storeId)
-
       const storeName = findStoreNameBasedOnId(storeId, stores)
 
       const clientId = assignClientIdBasedOnStoreName(storeName);
