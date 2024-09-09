@@ -80,6 +80,12 @@ export async function POST({ request, locals }) {
 
       const storeName = findStoreNameBasedOnId(storeId, stores)
 
+      // Check if the webhook is detecting a manual order
+      if (storeName === "Manual Orders") {
+        console.log("Exit due to Manual Order source")
+        return json({ success: true }, { headers });
+      }
+
       const clientId = assignClientIdBasedOnStoreName(storeName);
 
       console.log("CLIENT ID", clientId);
