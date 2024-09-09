@@ -8,7 +8,6 @@
 
   // Import utility functions
   import { abbreviateString } from '$lib/utils'
-  import { fetchStores } from '$lib/utils.js'
 
   // Import props
   export let data
@@ -21,7 +20,6 @@
   onMount(async () => {
     loadInventory(data.supabase)
     loadClients(data.supabase)
-    await fetchStores()
   })
 
   // Component specific variables and business logic
