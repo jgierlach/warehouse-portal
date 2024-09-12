@@ -55,6 +55,8 @@ export async function POST({ request, locals }) {
         console.error('Error finding clientId by Shipment Number')
       }
 
+      console.log("Query to get Client Id", data)
+
       let clientId = data.Client_Id
 
       // Update the Carrier and Tracking_Number for all matching rows

@@ -345,19 +345,21 @@
                     }}
                     class="btn btn-info btn-xs mb-2">Edit</button
                   >
-                  <button
-                    on:click={() => {
-                      showCountFields = true
-                      clientId = shipment.Client_Id
-                      sku = shipment.Sku
-                      shipmentNumber = shipment.Shipment_Number
-                      productTitle = shipment.Product_Title
-                      quantity = shipment.Quantity
-                      countedQuantity = 0
-                      id = shipment.id
-                    }}
-                    class="btn btn-primary btn-xs mb-2">Confirm Count</button
-                  >
+                  {#if shipment.Status !== 'Received'}
+                    <button
+                      on:click={() => {
+                        showCountFields = true
+                        clientId = shipment.Client_Id
+                        sku = shipment.Sku
+                        shipmentNumber = shipment.Shipment_Number
+                        productTitle = shipment.Product_Title
+                        quantity = shipment.Quantity
+                        countedQuantity = 0
+                        id = shipment.id
+                      }}
+                      class="btn btn-primary btn-xs mb-2">Confirm Count</button
+                    >
+                  {/if}
                   <button
                     on:click={() => {
                       showDeleteInboundShipment = true
