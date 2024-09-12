@@ -90,13 +90,15 @@ export async function POST({ request, locals }) {
       // Check if the webhook is detecting a manual order
       if (storeName === "Manual Orders") {
         console.log("Exit due to Manual Order source")
-        return json({ success: true }, { headers });
+        continue
+        // return json({ success: true }, { headers });
       }
 
       // Check if the webhook is detecting a Hometown Amazon order
       if (storeName === "Hometown Amazon") {
         console.log("Do not process order if from Hometown Amazon")
-        return json({ success: true }, { headers });
+        continue
+        // return json({ success: true }, { headers });
       }
 
       const clientId = assignClientIdBasedOnStoreName(storeName);
