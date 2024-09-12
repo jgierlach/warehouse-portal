@@ -51,13 +51,15 @@ export async function POST({ request, locals }) {
         .eq('Shipment_Number', orderNumber)
         .single();  // Ensures only one row is returned
 
+      console.log("Payload to get Client Id", data)
+
       if (error) {
         console.error('Error finding clientId by Shipment Number')
       }
 
-      console.log("Query to get Client Id", data)
+      let clientId = data?.Client_Id
 
-      let clientId = data.Client_Id
+      console.log("CLIENT ID", clientId)
 
       // Update the Carrier and Tracking_Number for all matching rows
       const { error: updateError } = await locals.supabase
