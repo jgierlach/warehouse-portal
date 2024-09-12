@@ -78,10 +78,10 @@ export async function POST({ request, locals }) {
       } = order;
 
       // Check if order is fulfilled by FBA
-      if (externallyFulfilled) {
-        console.log("This order is fulfilled by Amazon FBA do not import it.")
-        return json({ success: true }, { headers });
-      }
+      // if (externallyFulfilled) {
+      //   console.log("This order is fulfilled by Amazon FBA do not import it.")
+      //   return json({ success: true }, { headers });
+      // }
 
       const storeId = advancedOptions?.storeId
 

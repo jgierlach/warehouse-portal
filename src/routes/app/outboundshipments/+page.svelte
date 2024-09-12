@@ -228,7 +228,7 @@
 
 <Loading {loading} />
 <div class="mt-10 flex justify-center">
-  <div class="ml-5 mr-5 w-full max-w-7xl bg-base-100 p-4 shadow-xl">
+  <div class="ml-20 mr-20 w-full bg-base-100 p-4 shadow-xl">
     <h1 class="mb-5 text-center text-3xl font-bold">Outbound Shipments</h1>
 
     <!-- Search input -->
