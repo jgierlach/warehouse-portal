@@ -36,10 +36,11 @@ export async function POST({ request, locals }) {
       return json({ error: 'Failed to fetch order data' }, { status: 500, headers });
     }
 
-    console.log("RESPONSE", response)
+    // console.log("RESPONSE", response)
 
     const data = await response.json()
-    console.log("DATA", data)
+    // console.log("DATA", data)
+    console.log('DATA', JSON.stringify(data, null, 2));
 
     return json({ success: true }, { headers });
   } catch (err) {
