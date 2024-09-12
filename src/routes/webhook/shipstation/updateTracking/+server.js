@@ -62,7 +62,8 @@ export async function POST({ request, locals }) {
         .from('Outbound_Shipments')
         .update({
           Carrier: carrierCode,
-          Tracking_Number: trackingNumber
+          Tracking_Number: trackingNumber,
+          Status: "Shipped"
         })
         .eq('Shipment_Number', orderNumber);
 
@@ -129,33 +130,41 @@ export function OPTIONS() {
   });
 }
 
-// DATA {
-//   fulfillments: [
-//     {
-//       fulfillmentId: 38184659,
-//       orderId: 469429114,
-//       orderNumber: 'SHIP-1726156944646-54012',
-//       userId: '9e236874-e1c0-4241-8f93-a8223072efd4',
-//       customerEmail: 'storageandfulfillment@hometown-industries.com',
-//       trackingNumber: '1Z 228 5Y8 03 0505 5914',
-//       createDate: '2024-09-12T12:24:24.8430000',
-//       shipDate: '2024-09-12T00:00:00.0000000',
-//       voidDate: null,
-//       deliveryDate: null,
-//       carrierCode: 'UPS',
-//       sellerFillProviderId: null,
-//       sellerFillProviderName: null,
-//       fulfillmentProviderCode: null,
-//       fulfillmentServiceCode: null,
-//       fulfillmentFee: 0,
-//       voidRequested: false,
-//       voided: false,
-//       marketplaceNotified: false,
-//       notifyErrorMessage: null,
-//       shipTo: [Object]
+// const Fulfillments = [
+//   {
+//     "fulfillmentId": 38186502,
+//     "orderId": 469546774,
+//     "orderNumber": "SHIP-1726172778573-66119",
+//     "userId": "5fbe9b59-115c-4486-9800-d895ffb2b0ec",
+//     "customerEmail": "storageandfulfillment@hometown-industries.com",
+//     "trackingNumber": "56556565565",
+//     "createDate": "2024-09-12T13:29:18.3230000",
+//     "shipDate": "2024-09-12T00:00:00.0000000",
+//     "voidDate": null,
+//     "deliveryDate": null,
+//     "carrierCode": "Airtranss",
+//     "sellerFillProviderId": null,
+//     "sellerFillProviderName": null,
+//     "fulfillmentProviderCode": null,
+//     "fulfillmentServiceCode": null,
+//     "fulfillmentFee": 0,
+//     "voidRequested": false,
+//     "voided": false,
+//     "marketplaceNotified": false,
+//     "notifyErrorMessage": null,
+//     "shipTo": {
+//       "name": "Amazon FBA",
+//       "company": "AMAZON",
+//       "street1": "5505 O ST",
+//       "street2": "",
+//       "street3": null,
+//       "city": "LINCOLN",
+//       "state": "NE",
+//       "postalCode": "68510-2151",
+//       "country": "US",
+//       "phone": null,
+//       "residential": null,
+//       "addressVerified": null
 //     }
-//   ],
-//   total: 1,
-//   page: 1,
-//   pages: 1
-// }
+//   }
+// ]
