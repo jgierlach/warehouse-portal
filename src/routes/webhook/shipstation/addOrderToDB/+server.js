@@ -73,8 +73,15 @@ export async function POST({ request, locals }) {
         customerEmail,
         orderDate,
         shippingAmount,
-        customerNotes
+        customerNotes,
+        externallyFulfilled
       } = order;
+
+      // Check if order is fulfilled by FBA
+      if (externallyFulfilled) {
+        console.log("This order is fulfilled by Amazon FBA do not import it.")
+        return json({ success: true }, { headers });
+      }
 
       const storeId = advancedOptions?.storeId
 
@@ -91,33 +98,66 @@ export async function POST({ request, locals }) {
       console.log("CLIENT ID", clientId);
 
       // Loop through each item in the order
-      const shipmentData = items.map(item => ({
-        Client_Id: clientId || null,
-        Shipment_Number: orderNumber || null,
-        Carrier: carrierCode || null,
-        Tracking_Number: trackingNumber || null,
-        PO_Number: orderNumber || null,
-        Destination: storeName || null,
-        Requires_Amazon_Labeling: "No",
-        Shipment_Type: 'Outbound',  // Default or map from payload if available
-        Status: 'Pending',  // Set a default status
-        Date_Of_Last_Change: orderDate || null,
-        Asin: item.upc || null,  // Using UPC as a proxy for ASIN in the payload
-        Product_Title: item.name || null,  // Title of the product (SKU)
-        Sku: item.sku || null,  // SKU for the product
-        Product_Image_Url: item.imageUrl || null,  // Image URL if available
-        Quantity: item.quantity || 1,  // Quantity of the current item
-        Buyer_Name: shipTo?.name || null,
-        Buyer_Email: customerEmail || null,
-        Recipient_Name: shipTo?.name || null,
-        Recipient_Company: shipTo?.company || null,
-        Recipient_Address_Line_1: shipTo?.street1 || null,
-        Recipient_City: shipTo?.city || null,
-        Recipient_State: shipTo?.state || null,
-        Recipient_Postal_Code: shipTo?.postalCode || null,
-        Notes: customerNotes || null,  // Any internal notes provided
-        Cost_Of_Shipment: shippingAmount || null,  // Cost of the shipment, if available
-      }));
+      const shipmentData = items.map(async (item) => {
+        let sku = item?.sku
+        let quantity = item?.quantity
+
+        const { data, error } = await locals.supabase
+          .from('Inventory')
+          .select('Quantity')
+          .eq('Sku', sku)
+          .eq('Client_Id', clientId)
+          .single();  // Ensures only one row is returned
+
+        if (error) {
+          console.error('Error fetching row by sku and clientId:', error);
+          return;
+        }
+
+        const currentQuantity = data.Quantity;
+        const newQuantity = currentQuantity - quantity;
+
+        // Update the Quantity column
+        const { data: updateData, error: updateError } = await locals.supabase
+          .from('Inventory')
+          .update({ Quantity: newQuantity })
+          .eq('Sku', sku)
+          .eq('Client_Id', clientId);
+
+        if (updateError) {
+          console.error('Error updating inventory quantity:', updateError);
+        } else {
+          console.log('Inventory quantity updated successfully:', updateData);
+        }
+
+        return {
+          Client_Id: clientId || null,
+          Shipment_Number: orderNumber || null,
+          Carrier: carrierCode || null,
+          Tracking_Number: trackingNumber || null,
+          PO_Number: orderNumber || null,
+          Destination: storeName || null,
+          Requires_Amazon_Labeling: "No",
+          Shipment_Type: 'Outbound',  // Default or map from payload if available
+          Status: 'Pending',  // Set a default status
+          Date_Of_Last_Change: orderDate || null,
+          Asin: item.upc || null,  // Using UPC as a proxy for ASIN in the payload
+          Product_Title: item.name || null,  // Title of the product (SKU)
+          Sku: item.sku || null,  // SKU for the product
+          Product_Image_Url: item.imageUrl || null,  // Image URL if available
+          Quantity: item.quantity || 1,  // Quantity of the current item
+          Buyer_Name: shipTo?.name || null,
+          Buyer_Email: customerEmail || null,
+          Recipient_Name: shipTo?.name || null,
+          Recipient_Company: shipTo?.company || null,
+          Recipient_Address_Line_1: shipTo?.street1 || null,
+          Recipient_City: shipTo?.city || null,
+          Recipient_State: shipTo?.state || null,
+          Recipient_Postal_Code: shipTo?.postalCode || null,
+          Notes: customerNotes || null,  // Any internal notes provided
+          Cost_Of_Shipment: shippingAmount || null,  // Cost of the shipment, if available
+        }
+      });
 
       allShipmentData.push(...shipmentData);
     }
