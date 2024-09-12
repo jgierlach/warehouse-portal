@@ -111,7 +111,6 @@ export async function POST({ request, locals }) {
 
         if (error) {
           console.error('Error fetching row by sku and clientId:', error);
-          return;
         }
 
         const currentQuantity = data.Quantity;
