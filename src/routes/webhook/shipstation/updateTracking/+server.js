@@ -49,7 +49,6 @@ export async function POST({ request, locals }) {
         .from('Outbound_Shipments')
         .select('Client_Id')
         .eq('Shipment_Number', orderNumber)
-        .single();  // Ensures only one row is returned
 
       console.log("Payload to get Client Id", data)
 
@@ -57,7 +56,7 @@ export async function POST({ request, locals }) {
         console.error('Error finding clientId by Shipment Number')
       }
 
-      let clientId = data?.Client_Id
+      let clientId = data[0]?.Client_Id
 
       console.log("CLIENT ID", clientId)
 
