@@ -22,7 +22,6 @@
   // Component specific variables and business logic
   $: activeClients = $clients.filter(
     (client) =>
-      client.username !== 'jan@hometown-industries.com' &&
       client.username !== 'wesley@hometown-industries.com' &&
       client.username !== 'susan@hometown-industries.com',
   )
@@ -142,6 +141,13 @@
 <div class="mt-10 flex justify-center">
   <div class="ml-10 mr-10 bg-base-100 p-4 shadow-xl">
     <h1 class="mb-2 text-center text-3xl font-bold">3PL Clients</h1>
+    <div class="mb-2 flex justify-center">
+      <a
+        href="https://3pl-client-portal.vercel.app/app"
+        target="_blank"
+        class="btn btn-outline btn-sm">Open Client Portal</a
+      >
+    </div>
     <div class="mb-4 flex justify-center">
       <button on:click={() => (showAddUserModal = true)} class="btn btn-outline btn-primary btn-sm"
         >Add Client <i class="fas fa-plus"></i>
