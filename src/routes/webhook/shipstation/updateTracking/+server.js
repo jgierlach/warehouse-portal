@@ -16,7 +16,7 @@ export async function POST({ request, locals }) {
 
   try {
     const event = await request.json();
-    console.log('Webhook received On Shipped Event:', event);
+    console.log('Webhook received On Fulillment Event:', event);
 
     // Check if the event contains a resource_url
     if (!event.resource_url) {
