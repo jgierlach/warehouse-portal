@@ -59,7 +59,7 @@ export async function POST({ request, locals }) {
     // Process the successful return of ShipStation stores
     const stores = await shipstationStores.json()
 
-    console.log("STORES PAYLOAD FROM SHIPSTATION", stores)
+    // console.log("STORES PAYLOAD FROM SHIPSTATION", stores)
 
     // Loop through each order and process it
     for (const order of orders) {
