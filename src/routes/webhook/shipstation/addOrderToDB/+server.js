@@ -180,7 +180,7 @@ export async function POST({ request, locals }) {
       .from('Outbound_Shipments')
       .insert(allShipmentData);
 
-    console.log('Insert result:', data, error);
+    console.log('Insert result:', allShipmentData, data, error);
 
     if (error) {
       console.error('Error inserting shipment data:', error);
