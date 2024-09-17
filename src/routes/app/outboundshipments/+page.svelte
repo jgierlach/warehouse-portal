@@ -273,8 +273,8 @@
                 />
               </td>
               <td>{shipment.Shipment_Number}</td>
-              <td>{shipment.Carrier}</td>
-              <td>{shipment.Tracking_Number}</td>
+              <td>{shipment.Carrier === null ? 'Pending' : shipment.Carrier}</td>
+              <td>{shipment.Tracking_Number === null ? 'Pending' : shipment.Tracking_Number}</td>
               <td>{shipment.PO_Number}</td>
               <td>{shipment.Destination}</td>
               <!-- <td>{shipment.Status}</td> -->
