@@ -108,38 +108,38 @@ export async function POST({ request, locals }) {
         let sku = item?.sku
         let quantity = item?.quantity
 
-        const { data, error } = await locals.supabase
-          .from('Inventory')
-          .select('Quantity')
-          .eq('Sku', sku)
-          .eq('Client_Id', clientId)
-          .single();  // Ensures only one row is returned
+        // const { data, error } = await locals.supabase
+        //   .from('Inventory')
+        //   .select('Quantity')
+        //   .eq('Sku', sku)
+        //   .eq('Client_Id', clientId)
+        //   .single();  // Ensures only one row is returned
 
-        if (error) {
-          console.error('Error fetching row by sku and clientId:', error);
-        }
+        // if (error) {
+        //   console.error('Error fetching row by sku and clientId:', error);
+        // }
 
-        const currentQuantity = data?.Quantity;
-        let newQuantity = 0
-        // Defensive check if current quantity comes back as not a valid integer
-        if (currentQuantity === null || currentQuantity === undefined) {
-          newQuantity = 0
-        } else {
-          newQuantity = currentQuantity - quantity;
-        }
+        // const currentQuantity = data?.Quantity;
+        // let newQuantity = 0
+        // // Defensive check if current quantity comes back as not a valid integer
+        // if (currentQuantity === null || currentQuantity === undefined) {
+        //   newQuantity = 0
+        // } else {
+        //   newQuantity = currentQuantity - quantity;
+        // }
 
         // Update the Quantity column
-        const { data: updateData, error: updateError } = await locals.supabase
-          .from('Inventory')
-          .update({ Quantity: newQuantity })
-          .eq('Sku', sku)
-          .eq('Client_Id', clientId);
+        // const { data: updateData, error: updateError } = await locals.supabase
+        //   .from('Inventory')
+        //   .update({ Quantity: newQuantity })
+        //   .eq('Sku', sku)
+        //   .eq('Client_Id', clientId);
 
-        if (updateError) {
-          console.error('Error updating inventory quantity:', updateError);
-        } else {
-          console.log('Inventory quantity updated successfully:', updateData);
-        }
+        // if (updateError) {
+        //   console.error('Error updating inventory quantity:', updateError);
+        // } else {
+        //   console.log('Inventory quantity updated successfully:', updateData);
+        // }
 
         return {
           Client_Id: clientId || null,
@@ -166,7 +166,7 @@ export async function POST({ request, locals }) {
           Recipient_State: shipTo?.state || null,
           Recipient_Postal_Code: shipTo?.postalCode || null,
           Notes: customerNotes || null,  // Any internal notes provided
-          Cost_Of_Shipment: shippingAmount || null,  // Cost of the shipment, if available
+          Cost_Of_Shipment: null,
         }
       });
 
@@ -206,6 +206,135 @@ export function OPTIONS() {
     }
   });
 }
+
+const orders = [
+  {
+    "orderId": 471433898,
+    "orderNumber": "11242",
+    "orderKey": "96f893ca-7416-49ed-a01c-335aa716ddeb",
+    "orderDate": "2024-09-17T19:36:17.2100000",
+    "createDate": "2024-09-17T13:29:45.0530000",
+    "modifyDate": "2024-09-17T13:29:46.1770000",
+    "paymentDate": "2024-09-17T19:36:19.9900000",
+    "shipByDate": null,
+    "orderStatus": "awaiting_shipment",
+    "customerId": 221414228,
+    "customerUsername": "dhcarr88@gmail.com",
+    "customerEmail": "dhcarr88@gmail.com",
+    "billTo": {
+      "name": "David Carr",
+      "company": null,
+      "street1": "4510A Illinois Ave",
+      "street2": null,
+      "street3": null,
+      "city": "Nashville",
+      "state": "TN",
+      "postalCode": "37209-2304",
+      "country": "US",
+      "phone": "5047155350",
+      "residential": null,
+      "addressVerified": null
+    },
+    "shipTo": {
+      "name": "David Carr",
+      "company": null,
+      "street1": "4510A ILLINOIS AVE",
+      "street2": "",
+      "street3": null,
+      "city": "NASHVILLE",
+      "state": "TN",
+      "postalCode": "37209-2304",
+      "country": "US",
+      "phone": "5047155350",
+      "residential": true,
+      "addressVerified": "Address validated successfully"
+    },
+    "items": [
+      {
+        "orderItemId": 786353947,
+        "lineItemKey": "1",
+        "sku": "GF1GS30CAN",
+        "name": "Ballast Electrolyte Drink Mix | Keto & Paleo Friendly (Grapefruit)",
+        "imageUrl": "https://static.wixstatic.com/media/201502_cc4afcf9ddbc4f319ec31803231c09b9~mv2.jpg/v1/fit/w_6000,h_4000,q_90/file.jpg",
+        "weight": {
+          "value": 9.6,
+          "units": "ounces",
+          "WeightUnits": 1
+        },
+        "quantity": 1,
+        "unitPrice": 14.99,
+        "taxAmount": 1.46,
+        "shippingAmount": null,
+        "warehouseLocation": null,
+        "options": [],
+        "productId": 30553028,
+        "fulfillmentSku": null,
+        "adjustment": false,
+        "upc": null,
+        "createDate": "2024-09-17T13:29:44.81",
+        "modifyDate": "2024-09-17T13:29:44.81"
+      }
+    ],
+    "orderTotal": 16.45,
+    "amountPaid": 16.45,
+    "taxAmount": 1.46,
+    "shippingAmount": 0,
+    "customerNotes": null,
+    "internalNotes": null,
+    "gift": false,
+    "giftMessage": null,
+    "paymentMethod": "Square",
+    "requestedShippingService": "Free Shipping 3-5 Business Days",
+    "carrierCode": null,
+    "serviceCode": null,
+    "packageCode": null,
+    "confirmation": "none",
+    "shipDate": null,
+    "holdUntilDate": null,
+    "weight": {
+      "value": 9.6,
+      "units": "ounces",
+      "WeightUnits": 1
+    },
+    "dimensions": null,
+    "insuranceOptions": {
+      "provider": null,
+      "insureShipment": false,
+      "insuredValue": 0
+    },
+    "internationalOptions": {
+      "contents": null,
+      "customsItems": null,
+      "nonDelivery": null
+    },
+    "advancedOptions": {
+      "warehouseId": 499995,
+      "nonMachinable": false,
+      "saturdayDelivery": false,
+      "containsAlcohol": false,
+      "mergedOrSplit": false,
+      "mergedIds": [],
+      "parentId": null,
+      "storeId": 788753,
+      "customField1": null,
+      "customField2": null,
+      "customField3": null,
+      "source": "WEB",
+      "billToParty": null,
+      "billToAccount": null,
+      "billToPostalCode": null,
+      "billToCountryCode": null,
+      "billToMyOtherAccount": null
+    },
+    "tagIds": null,
+    "userId": null,
+    "externallyFulfilled": false,
+    "externallyFulfilledBy": null,
+    "externallyFulfilledById": null,
+    "externallyFulfilledByName": null,
+    "labelMessages": null
+  }
+]
 
 // const fetchedOrders = [
 //   {
