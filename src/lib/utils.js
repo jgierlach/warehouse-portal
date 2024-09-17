@@ -28,15 +28,32 @@ export const findStoreNameBasedOnId = (storeId, stores) => {
 }
 
 export const assignClientIdBasedOnStoreName = (storeName) => {
+  // Dog Rocks categorization
   if (storeName === 'Dog Rocks Walmart') {
     return 'operations@podiumpetproducts.com'
   }
   if (storeName === 'Dog Rocks Website') {
     return 'operations@podiumpetproducts.com'
   }
-  if (storeName === 'Drink Ballast') {
+  // Dr. Appleseed categorization
+  if (storeName === 'Dr. Appleseed Amazon') {
+    return 'drappleseedextracts@gmail.com'
+  }
+  if (storeName === 'Dr. Appleseed Faire') {
+    return 'drappleseedextracts@gmail.com'
+  }
+  if (storeName === 'Dr. Appleseed Shopify') {
+    return 'drappleseedextracts@gmail.com'
+  }
+  // Drink Ballast categorization
+  if (storeName === 'Drink Ballast Wix') {
     return 'roy@drinkballast.com'
   }
+  // Jewell Nursing categorization
+  if (storeName === 'Jewell Nursing Website') {
+    return 'support@jewellnursingsolutions.com'
+  }
+  // Hometown categorization
   if (storeName === 'Hometown Amazon') {
     return 'homeinddistribution@gmail.com'
   }
@@ -46,8 +63,11 @@ export const assignClientIdBasedOnStoreName = (storeName) => {
   if (storeName === 'Hometown Walmart') {
     return 'homeinddistribution@gmail.com'
   }
-  if (storeName === 'Jewell Nursing Website') {
-    return 'support@jewellnursingsolutions.com'
+  if (storeName === 'FilterPal Shopify') {
+    return 'homeinddistribution@gmail.com'
+  }
+  if (storeName === "Rob Edward's Shopify") {
+    return 'homeinddistribution@gmail.com'
   }
   return 'clientId Not Found'
 }
