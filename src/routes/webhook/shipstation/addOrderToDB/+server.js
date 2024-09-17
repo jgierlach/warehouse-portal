@@ -119,8 +119,14 @@ export async function POST({ request, locals }) {
           console.error('Error fetching row by sku and clientId:', error);
         }
 
-        const currentQuantity = data.Quantity;
-        const newQuantity = currentQuantity - quantity;
+        const currentQuantity = data?.Quantity;
+        let newQuantity = 0
+        // Defensive check if current quantity comes back as not a valid integer
+        if (currentQuantity === null || currentQuantity === undefined) {
+          newQuantity = 0
+        } else {
+          newQuantity = currentQuantity - quantity;
+        }
 
         // Update the Quantity column
         const { data: updateData, error: updateError } = await locals.supabase
