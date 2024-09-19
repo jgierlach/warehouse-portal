@@ -141,6 +141,7 @@
     'Website Customer Order',
     'B2B Order',
     'Amazon FBA',
+    'Amazon FBM Order',
     'Walmart Fulfillment Services',
     'Chewy.com',
     'Walmart Customer Order',
