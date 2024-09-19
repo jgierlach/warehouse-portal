@@ -40,9 +40,9 @@ export async function POST({ request, locals }) {
     console.log('ON SHIPPED DATA', JSON.stringify(shipments, null, 2));
 
     for (const shipment of shipments) {
-      const { orderNumber, trackingNumber, carrierCode, shipmentCost, shipTo } = shipment
+      const { orderNumber, trackingNumber, carrierCode, serviceCode, shipmentCost, shipTo } = shipment
 
-      console.log("Order Number", orderNumber, "Tracking Number", trackingNumber, "Carrier Code", carrierCode)
+      console.log("Order Number", orderNumber, "Tracking Number", trackingNumber, "Carrier Code", carrierCode, "Service Code", serviceCode)
 
       // Find the client id using the order number
       const { data, error } = await locals.supabase
@@ -65,7 +65,7 @@ export async function POST({ request, locals }) {
       const { error: updateError } = await locals.supabase
         .from('Outbound_Shipments')
         .update({
-          Carrier: carrierCode,
+          Carrier: serviceCode,
           Tracking_Number: trackingNumber,
           Status: "Shipped",
           Cost_Of_Shipment: shipmentCost
@@ -99,7 +99,7 @@ export async function POST({ request, locals }) {
             value: `
           <p>Tracking has been updated for Shipment Number: <strong>${orderNumber}</strong></p> 
           <ul>
-            <li><strong>Carrier:</strong> ${carrierCode}</li>
+            <li><strong>Carrier:</strong> ${serviceCode}</li>
             <li><strong>Tracking Number:</strong> ${trackingNumber}</li>
           </ul>`
           }
