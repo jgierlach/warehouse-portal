@@ -25,7 +25,6 @@
   // Component specific variables and business logic
   $: activeClients = $clients.filter(
     (client) =>
-      client.username !== 'jan@hometown-industries.com' &&
       client.username !== 'wesley@hometown-industries.com' &&
       client.username !== 'susan@hometown-industries.com',
   )
