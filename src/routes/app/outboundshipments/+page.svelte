@@ -91,6 +91,7 @@
         poNumber,
         destination,
         requiresAmazonLabeling,
+        status,
         asin,
         productTitle,
         sku,
