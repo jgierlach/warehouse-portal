@@ -104,7 +104,7 @@ export async function POST({ request, locals }) {
       console.log("CLIENT ID", clientId);
 
       // Loop through each item in the order
-      const shipmentData = items.map(async (item) => {
+      const shipmentData = await Promise.all(items.map(async (item) => {
         let sku = item?.sku
         let quantity = item?.quantity
 
@@ -168,7 +168,7 @@ export async function POST({ request, locals }) {
           Notes: customerNotes || null,  // Any internal notes provided
           Cost_Of_Shipment: null,
         }
-      });
+      }));
 
       allShipmentData.push(...shipmentData);
     }
@@ -207,134 +207,259 @@ export function OPTIONS() {
   });
 }
 
-const orders = [
-  {
-    "orderId": 471433898,
-    "orderNumber": "11242",
-    "orderKey": "96f893ca-7416-49ed-a01c-335aa716ddeb",
-    "orderDate": "2024-09-17T19:36:17.2100000",
-    "createDate": "2024-09-17T13:29:45.0530000",
-    "modifyDate": "2024-09-17T13:29:46.1770000",
-    "paymentDate": "2024-09-17T19:36:19.9900000",
-    "shipByDate": null,
-    "orderStatus": "awaiting_shipment",
-    "customerId": 221414228,
-    "customerUsername": "dhcarr88@gmail.com",
-    "customerEmail": "dhcarr88@gmail.com",
-    "billTo": {
-      "name": "David Carr",
-      "company": null,
-      "street1": "4510A Illinois Ave",
-      "street2": null,
-      "street3": null,
-      "city": "Nashville",
-      "state": "TN",
-      "postalCode": "37209-2304",
-      "country": "US",
-      "phone": "5047155350",
-      "residential": null,
-      "addressVerified": null
-    },
-    "shipTo": {
-      "name": "David Carr",
-      "company": null,
-      "street1": "4510A ILLINOIS AVE",
-      "street2": "",
-      "street3": null,
-      "city": "NASHVILLE",
-      "state": "TN",
-      "postalCode": "37209-2304",
-      "country": "US",
-      "phone": "5047155350",
-      "residential": true,
-      "addressVerified": "Address validated successfully"
-    },
-    "items": [
-      {
-        "orderItemId": 786353947,
-        "lineItemKey": "1",
-        "sku": "GF1GS30CAN",
-        "name": "Ballast Electrolyte Drink Mix | Keto & Paleo Friendly (Grapefruit)",
-        "imageUrl": "https://static.wixstatic.com/media/201502_cc4afcf9ddbc4f319ec31803231c09b9~mv2.jpg/v1/fit/w_6000,h_4000,q_90/file.jpg",
-        "weight": {
-          "value": 9.6,
-          "units": "ounces",
-          "WeightUnits": 1
-        },
-        "quantity": 1,
-        "unitPrice": 14.99,
-        "taxAmount": 1.46,
-        "shippingAmount": null,
-        "warehouseLocation": null,
-        "options": [],
-        "productId": 30553028,
-        "fulfillmentSku": null,
-        "adjustment": false,
-        "upc": null,
-        "createDate": "2024-09-17T13:29:44.81",
-        "modifyDate": "2024-09-17T13:29:44.81"
-      }
-    ],
-    "orderTotal": 16.45,
-    "amountPaid": 16.45,
-    "taxAmount": 1.46,
-    "shippingAmount": 0,
-    "customerNotes": null,
-    "internalNotes": null,
-    "gift": false,
-    "giftMessage": null,
-    "paymentMethod": "Square",
-    "requestedShippingService": "Free Shipping 3-5 Business Days",
-    "carrierCode": null,
-    "serviceCode": null,
-    "packageCode": null,
-    "confirmation": "none",
-    "shipDate": null,
-    "holdUntilDate": null,
-    "weight": {
-      "value": 9.6,
-      "units": "ounces",
-      "WeightUnits": 1
-    },
-    "dimensions": null,
-    "insuranceOptions": {
-      "provider": null,
-      "insureShipment": false,
-      "insuredValue": 0
-    },
-    "internationalOptions": {
-      "contents": null,
-      "customsItems": null,
-      "nonDelivery": null
-    },
-    "advancedOptions": {
-      "warehouseId": 499995,
-      "nonMachinable": false,
-      "saturdayDelivery": false,
-      "containsAlcohol": false,
-      "mergedOrSplit": false,
-      "mergedIds": [],
-      "parentId": null,
-      "storeId": 788753,
-      "customField1": null,
-      "customField2": null,
-      "customField3": null,
-      "source": "WEB",
-      "billToParty": null,
-      "billToAccount": null,
-      "billToPostalCode": null,
-      "billToCountryCode": null,
-      "billToMyOtherAccount": null
-    },
-    "tagIds": null,
-    "userId": null,
-    "externallyFulfilled": false,
-    "externallyFulfilledBy": null,
-    "externallyFulfilledById": null,
-    "externallyFulfilledByName": null,
-    "labelMessages": null
-  }
-]
+// const FetchedOrders = [
+//   {
+//     "orderId": 472630237,
+//     "orderNumber": "KDNEK3WKRK",
+//     "orderKey": "bo_kdnek3wkrk",
+//     "orderDate": "2023-09-18T08:56:16.0000000",
+//     "createDate": "2024-09-20T11:49:10.9530000",
+//     "modifyDate": "2024-09-20T11:49:11.8930000",
+//     "paymentDate": "2023-09-25T11:54:00.0000000",
+//     "shipByDate": null,
+//     "orderStatus": "shipped",
+//     "customerId": 233053031,
+//     "customerUsername": "SUMMER.SOLACE",
+//     "customerEmail": null,
+//     "billTo": {
+//       "name": "SUMMER SOLACE",
+//       "company": null,
+//       "street1": null,
+//       "street2": null,
+//       "street3": null,
+//       "city": null,
+//       "state": null,
+//       "postalCode": null,
+//       "country": null,
+//       "phone": null,
+//       "residential": null,
+//       "addressVerified": null
+//     },
+//     "shipTo": {
+//       "name": "MEGAN BRE CAMP",
+//       "company": "SUMMER SOLACE",
+//       "street1": "5507 SHATTUCK AVE",
+//       "street2": "",
+//       "street3": null,
+//       "city": "OAKLAND",
+//       "state": "CA",
+//       "postalCode": "94609-1621",
+//       "country": "US",
+//       "phone": "5107721496",
+//       "residential": false,
+//       "addressVerified": "Address validated successfully"
+//     },
+//     "items": [
+//       {
+//         "orderItemId": 788607839,
+//         "lineItemKey": null,
+//         "sku": "860008498144",
+//         "name": "New! Organic Elderberry Extract Unsweetened",
+//         "imageUrl": null,
+//         "weight": null,
+//         "quantity": 6,
+//         "unitPrice": 20,
+//         "taxAmount": 0,
+//         "shippingAmount": 0,
+//         "warehouseLocation": null,
+//         "options": [],
+//         "productId": 38369089,
+//         "fulfillmentSku": null,
+//         "adjustment": false,
+//         "upc": null,
+//         "createDate": "2024-09-20T11:49:10.923",
+//         "modifyDate": "2024-09-20T11:49:10.923"
+//       }
+//     ],
+//     "orderTotal": 120,
+//     "amountPaid": 0,
+//     "taxAmount": 0,
+//     "shippingAmount": 0,
+//     "customerNotes": null,
+//     "internalNotes": null,
+//     "gift": false,
+//     "giftMessage": null,
+//     "paymentMethod": null,
+//     "requestedShippingService": null,
+//     "carrierCode": null,
+//     "serviceCode": null,
+//     "packageCode": null,
+//     "confirmation": "none",
+//     "shipDate": null,
+//     "holdUntilDate": null,
+//     "weight": {
+//       "value": 0,
+//       "units": "ounces",
+//       "WeightUnits": 1
+//     },
+//     "dimensions": null,
+//     "insuranceOptions": {
+//       "provider": null,
+//       "insureShipment": false,
+//       "insuredValue": 0
+//     },
+//     "internationalOptions": {
+//       "contents": null,
+//       "customsItems": null,
+//       "nonDelivery": null
+//     },
+//     "advancedOptions": {
+//       "warehouseId": 499995,
+//       "nonMachinable": false,
+//       "saturdayDelivery": false,
+//       "containsAlcohol": false,
+//       "mergedOrSplit": false,
+//       "mergedIds": [],
+//       "parentId": null,
+//       "storeId": 809765,
+//       "customField1": null,
+//       "customField2": null,
+//       "customField3": null,
+//       "source": "faire",
+//       "billToParty": null,
+//       "billToAccount": null,
+//       "billToPostalCode": null,
+//       "billToCountryCode": null,
+//       "billToMyOtherAccount": null
+//     },
+//     "tagIds": null,
+//     "userId": null,
+//     "externallyFulfilled": false,
+//     "externallyFulfilledBy": null,
+//     "externallyFulfilledById": null,
+//     "externallyFulfilledByName": null,
+//     "labelMessages": null
+//   }
+// ]
+
+// const orders = [
+//   {
+//     "orderId": 471433898,
+//     "orderNumber": "11242",
+//     "orderKey": "96f893ca-7416-49ed-a01c-335aa716ddeb",
+//     "orderDate": "2024-09-17T19:36:17.2100000",
+//     "createDate": "2024-09-17T13:29:45.0530000",
+//     "modifyDate": "2024-09-17T13:29:46.1770000",
+//     "paymentDate": "2024-09-17T19:36:19.9900000",
+//     "shipByDate": null,
+//     "orderStatus": "awaiting_shipment",
+//     "customerId": 221414228,
+//     "customerUsername": "dhcarr88@gmail.com",
+//     "customerEmail": "dhcarr88@gmail.com",
+//     "billTo": {
+//       "name": "David Carr",
+//       "company": null,
+//       "street1": "4510A Illinois Ave",
+//       "street2": null,
+//       "street3": null,
+//       "city": "Nashville",
+//       "state": "TN",
+//       "postalCode": "37209-2304",
+//       "country": "US",
+//       "phone": "5047155350",
+//       "residential": null,
+//       "addressVerified": null
+//     },
+//     "shipTo": {
+//       "name": "David Carr",
+//       "company": null,
+//       "street1": "4510A ILLINOIS AVE",
+//       "street2": "",
+//       "street3": null,
+//       "city": "NASHVILLE",
+//       "state": "TN",
+//       "postalCode": "37209-2304",
+//       "country": "US",
+//       "phone": "5047155350",
+//       "residential": true,
+//       "addressVerified": "Address validated successfully"
+//     },
+//     "items": [
+//       {
+//         "orderItemId": 786353947,
+//         "lineItemKey": "1",
+//         "sku": "GF1GS30CAN",
+//         "name": "Ballast Electrolyte Drink Mix | Keto & Paleo Friendly (Grapefruit)",
+//         "imageUrl": "https://static.wixstatic.com/media/201502_cc4afcf9ddbc4f319ec31803231c09b9~mv2.jpg/v1/fit/w_6000,h_4000,q_90/file.jpg",
+//         "weight": {
+//           "value": 9.6,
+//           "units": "ounces",
+//           "WeightUnits": 1
+//         },
+//         "quantity": 1,
+//         "unitPrice": 14.99,
+//         "taxAmount": 1.46,
+//         "shippingAmount": null,
+//         "warehouseLocation": null,
+//         "options": [],
+//         "productId": 30553028,
+//         "fulfillmentSku": null,
+//         "adjustment": false,
+//         "upc": null,
+//         "createDate": "2024-09-17T13:29:44.81",
+//         "modifyDate": "2024-09-17T13:29:44.81"
+//       }
+//     ],
+//     "orderTotal": 16.45,
+//     "amountPaid": 16.45,
+//     "taxAmount": 1.46,
+//     "shippingAmount": 0,
+//     "customerNotes": null,
+//     "internalNotes": null,
+//     "gift": false,
+//     "giftMessage": null,
+//     "paymentMethod": "Square",
+//     "requestedShippingService": "Free Shipping 3-5 Business Days",
+//     "carrierCode": null,
+//     "serviceCode": null,
+//     "packageCode": null,
+//     "confirmation": "none",
+//     "shipDate": null,
+//     "holdUntilDate": null,
+//     "weight": {
+//       "value": 9.6,
+//       "units": "ounces",
+//       "WeightUnits": 1
+//     },
+//     "dimensions": null,
+//     "insuranceOptions": {
+//       "provider": null,
+//       "insureShipment": false,
+//       "insuredValue": 0
+//     },
+//     "internationalOptions": {
+//       "contents": null,
+//       "customsItems": null,
+//       "nonDelivery": null
+//     },
+//     "advancedOptions": {
+//       "warehouseId": 499995,
+//       "nonMachinable": false,
+//       "saturdayDelivery": false,
+//       "containsAlcohol": false,
+//       "mergedOrSplit": false,
+//       "mergedIds": [],
+//       "parentId": null,
+//       "storeId": 788753,
+//       "customField1": null,
+//       "customField2": null,
+//       "customField3": null,
+//       "source": "WEB",
+//       "billToParty": null,
+//       "billToAccount": null,
+//       "billToPostalCode": null,
+//       "billToCountryCode": null,
+//       "billToMyOtherAccount": null
+//     },
+//     "tagIds": null,
+//     "userId": null,
+//     "externallyFulfilled": false,
+//     "externallyFulfilledBy": null,
+//     "externallyFulfilledById": null,
+//     "externallyFulfilledByName": null,
+//     "labelMessages": null
+//   }
+// ]
 
 // const fetchedOrders = [
 //   {
