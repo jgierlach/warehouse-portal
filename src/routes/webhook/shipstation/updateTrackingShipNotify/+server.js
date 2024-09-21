@@ -49,6 +49,7 @@ export async function POST({ request, locals }) {
         .from('Outbound_Shipments')
         .select('Client_Id')
         .eq('Shipment_Number', orderNumber)
+        .eq('Status', 'Pending')
 
       console.log("Payload to get Client Id", data)
 
