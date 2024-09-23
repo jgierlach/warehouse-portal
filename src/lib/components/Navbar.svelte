@@ -8,14 +8,13 @@
 <nav class="navbar flex flex-none bg-base-100 px-4 py-2 shadow-lg">
   <div class="flex flex-1 items-center">
     {#if isUserLoggedIn}
-      <!-- <a href="/app" class="btn btn-ghost text-xl normal-case">Warehouse Portal</a> -->
-      <div class="flex-1">
-        <!-- Logo and Text Wrapper -->
+      <a href="/app" class="btn btn-ghost text-xl normal-case">Warehouse Portal</a>
+      <!-- <div class="flex-1">
         <a href="/app" class="flex items-center space-x-2">
           <img src="logo.png" alt="Logo" class="h-12 w-12" />
           <span class="text-xl font-bold">Warehouse Portal</span>
         </a>
-      </div>
+      </div> -->
       <div class="ml-4 hidden space-x-4 md:flex">
         <a href="/app" class={`btn btn-ghost`} class:btn-active={$page.url.pathname === '/app'}
           >Inventory</a
@@ -35,11 +34,6 @@
           class={`btn btn-ghost`}
           class:btn-active={$page.url.pathname === '/app/clients'}>Clients</a
         >
-        <!-- <a
-          href="/app/about"
-          class={`btn btn-ghost`}
-          class:btn-active={$page.url.pathname === '/app/about'}>About</a
-        > -->
       </div>
     {:else}
       <a href="/" class="btn btn-ghost text-xl normal-case">Home</a>
