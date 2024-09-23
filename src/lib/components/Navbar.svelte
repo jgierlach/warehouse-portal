@@ -8,7 +8,14 @@
 <nav class="navbar flex flex-none bg-base-100 px-4 py-2 shadow-lg">
   <div class="flex flex-1 items-center">
     {#if isUserLoggedIn}
-      <a href="/app" class="btn btn-ghost text-xl normal-case">Warehouse Portal</a>
+      <!-- <a href="/app" class="btn btn-ghost text-xl normal-case">Warehouse Portal</a> -->
+      <div class="flex-1">
+        <!-- Logo and Text Wrapper -->
+        <a href="/app" class="flex items-center space-x-2">
+          <img src="logo.png" alt="Logo" class="h-12 w-12" />
+          <span class="text-xl font-bold">Warehouse Portal</span>
+        </a>
+      </div>
       <div class="ml-4 hidden space-x-4 md:flex">
         <a href="/app" class={`btn btn-ghost`} class:btn-active={$page.url.pathname === '/app'}
           >Inventory</a
@@ -70,11 +77,23 @@
   <div
     class="absolute left-0 right-0 top-14 z-50 flex flex-col items-start bg-base-100 p-4 shadow-lg md:hidden"
   >
-    <a href="/app" class={`btn btn-ghost`} class:btn-active={$page.url.pathname === '/app'}>Home</a>
+    <a href="/app" class={`btn btn-ghost`} class:btn-active={$page.url.pathname === '/app'}
+      >Inventory</a
+    >
     <a
-      href="/app/about"
+      href="/app/outboundshipments"
       class={`btn btn-ghost`}
-      class:btn-active={$page.url.pathname === '/app/about'}>About</a
+      class:btn-active={$page.url.pathname === '/app/outboundshipments'}>Outbound Shipments</a
+    >
+    <a
+      href="/app/inboundshipments"
+      class={`btn btn-ghost`}
+      class:btn-active={$page.url.pathname === '/app/inboundshipments'}>Inbound Shipments</a
+    >
+    <a
+      href="/app/clients"
+      class={`btn btn-ghost`}
+      class:btn-active={$page.url.pathname === '/app/clients'}>Clients</a
     >
     {#if isUserLoggedIn}
       <form method="post" action="/logout">

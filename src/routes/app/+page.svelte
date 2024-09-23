@@ -301,17 +301,20 @@
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Edit Inventory</h1>
     <form on:submit={editInventory}>
-      <!-- Client ID -->
+      <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="clientId">Client Id</label>
-        <input
+        <select
           required
-          class="input input-bordered bg-base-200"
-          type="text"
+          class="select select-bordered bg-base-200"
           id="clientId"
           bind:value={clientId}
-          placeholder="Client Id"
-        />
+        >
+          <option value="" disabled>Select Client Id</option>
+          {#each clientIds as clientIdOption}
+            <option value={clientIdOption}>{clientIdOption}</option>
+          {/each}
+        </select>
       </div>
 
       <!-- Name -->
