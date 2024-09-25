@@ -4,9 +4,6 @@ import { formatDate } from "$lib/utils"
 
 export async function POST({ request, locals }) {
 
-  const myDate = new Date();
-  const formattedDate = formatDate(myDate);
-
   const {
     clientId,
     shipmentNumber,
@@ -19,6 +16,7 @@ export async function POST({ request, locals }) {
     productTitle,
     sku,
     status,
+    dateOfLastChange,
     productImageUrl,
     quantity,
     buyerName,
@@ -29,7 +27,11 @@ export async function POST({ request, locals }) {
     recipientCity,
     recipientState,
     recipientPostalCode,
+    country
   } = await request.json();
+
+  const myDate = new Date(dateOfLastChange);
+  const formattedDate = formatDate(myDate);
 
   const row = {
     // Inventory_Id: Inventory_Id,
@@ -56,6 +58,7 @@ export async function POST({ request, locals }) {
     Recipient_City: recipientCity,
     Recipient_State: recipientState,
     Recipient_Postal_Code: recipientPostalCode,
+    Recipient_Country: country,
     Notes: ''
   };
 

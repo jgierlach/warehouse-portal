@@ -29,6 +29,7 @@ export async function PUT({ request, locals }) {
     recipientCity,
     recipientState,
     recipientPostalCode,
+    country
   } = await request.json();
 
   const row = {
@@ -57,7 +58,8 @@ export async function PUT({ request, locals }) {
     Recipient_Address_Line_1: recipientAddressLine1,
     Recipient_City: recipientCity,
     Recipient_State: recipientState,
-    Recipient_Postal_Code: recipientPostalCode
+    Recipient_Postal_Code: recipientPostalCode,
+    Recipient_Country: country
   };
 
   const { data, error } = await locals.supabase

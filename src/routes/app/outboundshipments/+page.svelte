@@ -76,6 +76,7 @@
   let recipientCity = ''
   let recipientState = ''
   let recipientPostalCode = ''
+  let country = 'US'
 
   let showCreateOutboundShipment = false
   async function createOutboundShipment() {
@@ -92,6 +93,7 @@
         destination,
         requiresAmazonLabeling,
         status,
+        dateOfLastChange,
         asin,
         productTitle,
         sku,
@@ -105,6 +107,7 @@
         recipientCity,
         recipientState,
         recipientPostalCode,
+        country,
       }),
     })
     if (response.ok) {
@@ -119,6 +122,8 @@
       asin = ''
       productTitle = ''
       sku = ''
+      status = ''
+      dateOfLastChange = ''
       productImageUrl = ''
       quantity = 0
       buyerName = ''
@@ -129,6 +134,7 @@
       recipientCity = ''
       recipientState = ''
       recipientPostalCode = ''
+      country = 'US'
     } else {
       const errorData = await response.json()
       alert(`Failed to create outbound shipment: ${errorData.message}`)
@@ -184,6 +190,7 @@
         recipientCity,
         recipientState,
         recipientPostalCode,
+        country,
       }),
     })
     if (response.ok) {
@@ -215,6 +222,7 @@
       recipientCity = ''
       recipientState = ''
       recipientPostalCode = ''
+      country = ''
     } else {
       const errorData = await response.json()
       alert(`Failed to edit outbound shipment: ${errorData.message}`)
@@ -305,7 +313,34 @@
 
     <div class="mb-5 flex justify-center">
       <button
-        on:click={() => (showCreateOutboundShipment = !showCreateOutboundShipment)}
+        on:click={() => {
+          showCreateOutboundShipment = !showCreateOutboundShipment
+          // Clear the cache of all the field specific variables
+          clientId = ''
+          shipmentNumber = ''
+          carrier = ''
+          trackingNumber = ''
+          poNumber = ''
+          destination = ''
+          requiresAmazonLabeling = ''
+          asin = ''
+          productTitle = ''
+          sku = ''
+          status = ''
+          dateOfLastChange = ''
+          costOfShipment = 0.0
+          productImageUrl = ''
+          quantity = 0
+          buyerName = ''
+          buyerEmail = ''
+          recipientName = ''
+          recipientCompany = ''
+          recipientAddressLine1 = ''
+          recipientCity = ''
+          recipientState = ''
+          recipientPostalCode = ''
+          country = ''
+        }}
         class="btn btn-primary">Create Outbound Shipment</button
       >
     </div>
@@ -426,6 +461,7 @@
                       recipientCity = shipment.Recipient_City
                       recipientState = shipment.Recipient_State
                       recipientPostalCode = shipment.Recipient_Postal_Code
+                      country = shipment.Recipient_Country
                     }}
                     class="btn btn-info btn-xs mb-2">Edit</button
                   >
@@ -790,6 +826,19 @@
         />
       </div>
 
+      <!-- Recipient Country -->
+      <!-- Recipient Country -->
+      <div class="form-control mb-4">
+        <label class="label" for="country">Recipient Country</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="country"
+          bind:value={country}
+          placeholder="Recipient Country"
+        />
+      </div>
+
       <!-- Submit Button -->
       <div class="mt-4 flex justify-center">
         <button class="btn btn-info" type="submit">Save</button>
@@ -881,6 +930,7 @@
           id="destination"
           bind:value={destination}
         >
+          <option value="" disabled>Select Destination</option>
           {#each destinations as destinationOption}
             <option value={destinationOption}>{destinationOption}</option>
           {/each}
@@ -890,36 +940,25 @@
       <!-- Requires Amazon Labeling -->
       <div class="form-control mb-4">
         <label class="label" for="requiresAmazonLabeling">Requires Amazon Labeling</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="text"
+        <select
+          class="select select-bordered bg-base-200"
           id="requiresAmazonLabeling"
           bind:value={requiresAmazonLabeling}
-        />
-      </div>
-
-      <!-- Shipment Type -->
-      <div class="form-control mb-4">
-        <label class="label" for="shipmentType">Shipment Type</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="text"
-          id="shipmentType"
-          bind:value={shipmentType}
-          placeholder="Shipment Type"
-        />
+        >
+          <!-- <option value="" disabled>Yes or No?</option> -->
+          <option value={'No'}>No</option>
+          <option value={'Yes'}>Yes</option>
+        </select>
       </div>
 
       <!-- Status -->
       <div class="form-control mb-4">
         <label class="label" for="status">Status</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="text"
-          id="status"
-          bind:value={status}
-          placeholder="Status"
-        />
+        <select class="select select-bordered bg-base-200" id="status" bind:value={status}>
+          <!-- <option value="" disabled>Yes or No?</option> -->
+          <option value={'Pending'}>Pending</option>
+          <option value={'Shipped'}>Shipped</option>
+        </select>
       </div>
 
       <!-- Date of Last Change -->
@@ -1102,6 +1141,18 @@
           id="recipientPostalCode"
           bind:value={recipientPostalCode}
           placeholder="Recipient Postal Code"
+        />
+      </div>
+
+      <!-- Recipient Country -->
+      <div class="form-control mb-4">
+        <label class="label" for="country">Recipient Country</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="country"
+          bind:value={country}
+          placeholder="Recipient Country"
         />
       </div>
 
