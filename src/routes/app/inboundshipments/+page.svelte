@@ -201,18 +201,18 @@
   async function confirmCountAndSendNotification() {
     loading = true
     // Send email notifying that a client has created a shipment
-    await fetch('/app/api/notifications/sendCountConfirmation', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        clientId,
-        shipmentNumber,
-        sku,
-        productTitle,
-        quantity,
-        countedQuantity,
-      }),
-    })
+    // await fetch('/app/api/notifications/sendCountConfirmation', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     clientId,
+    //     shipmentNumber,
+    //     sku,
+    //     productTitle,
+    //     quantity,
+    //     countedQuantity,
+    //   }),
+    // })
     // Update counted quantity field
     const response = await fetch('/app/api/inboundshipments/confirmCount', {
       method: 'PUT',
