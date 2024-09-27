@@ -37,6 +37,7 @@
   let company_name = ''
   let username = ''
   let password = ''
+  let hasLotNumbers = false
   let isadmin = false
   let isclient = true
   let per_order_fee = 1.3
@@ -53,6 +54,7 @@
         company_name,
         username,
         password,
+        hasLotNumbers,
         isadmin,
         isclient,
         per_order_fee,
@@ -68,6 +70,7 @@
       company_name = ''
       username = ''
       password = ''
+      hasLotNumbers = false
       isadmin = false
       isclient = true
       per_order_fee = 1.3
@@ -116,6 +119,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id: userToEdit.id,
+        hasLotNumbers,
         per_order_fee,
         per_order_unit_fee,
         per_unit_fba_pack_prep,
@@ -126,6 +130,7 @@
     if (response.ok) {
       loadClients(data.supabase)
       showEditUserModal = false
+      hasLotNumbers = false
       per_order_fee = 1.3
       per_order_unit_fee = 0.3
       per_unit_fba_pack_prep = 0.25
@@ -159,6 +164,7 @@
           <th>Company Name</th>
           <th>Username</th>
           <th>Password</th>
+          <th>Has Lot #s</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -168,6 +174,7 @@
             <td>{client.company_name}</td>
             <td>{client.username}</td>
             <td>{client.password}</td>
+            <td>{client.has_lot_numbers}</td>
             <td
               ><div class="flex space-x-1">
                 <button
@@ -175,7 +182,7 @@
                     showEditUserModal = true
                     userToEdit = client
                   }}
-                  class="btn btn-info btn-sm">Edit Billing Terms</button
+                  class="btn btn-info btn-sm">Edit</button
                 >
                 <button
                   on:click={() => {
@@ -251,7 +258,15 @@
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <form on:submit={editUser}>
-      <h3 class="text-center text-xl font-bold">Edit Client Billing Details</h3>
+      <h3 class="text-center text-xl font-bold">Edit Client Details</h3>
+      <div class="form-control mt-4">
+        <label class="label" for="hasLotNumbers">Has Lot Numbers</label>
+        <select class="select select-bordered bg-base-200" bind:value={hasLotNumbers}>
+          <option value={true}>TRUE</option>
+          <option value={false}>FALSE</option>
+        </select>
+      </div>
+
       <div class="form-control mt-4">
         <label class="label" for="perOrderFee">Per Order Fee</label>
         <input
@@ -333,6 +348,13 @@
           bind:value={password}
           class="input input-bordered mb-2 bg-base-200"
         />
+        <!-- <div class="form-control mt-4"> -->
+        <label class="label" for="hasLotNumbers">Has Lot Numbers</label>
+        <select class="select select-bordered bg-base-200" bind:value={hasLotNumbers}>
+          <option value={true}>TRUE</option>
+          <option value={false}>FALSE</option>
+        </select>
+        <!-- </div> -->
         <label class="label" for="perOrderFee">Per Order Fee</label>
         <input
           type="number"
