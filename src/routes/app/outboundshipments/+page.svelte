@@ -77,6 +77,7 @@
   let recipientState = ''
   let recipientPostalCode = ''
   let country = 'US'
+  let lotNumber = ''
 
   let showCreateOutboundShipment = false
   async function createOutboundShipment() {
@@ -108,6 +109,7 @@
         recipientState,
         recipientPostalCode,
         country,
+        lotNumber,
       }),
     })
     if (response.ok) {
@@ -135,6 +137,7 @@
       recipientState = ''
       recipientPostalCode = ''
       country = 'US'
+      lotNumber = ''
     } else {
       const errorData = await response.json()
       alert(`Failed to create outbound shipment: ${errorData.message}`)
@@ -173,7 +176,6 @@
         poNumber,
         destination,
         requiresAmazonLabeling,
-        shipmentType,
         status,
         dateOfLastChange,
         asin,
@@ -191,6 +193,7 @@
         recipientState,
         recipientPostalCode,
         country,
+        lotNumber,
       }),
     })
     if (response.ok) {
@@ -205,7 +208,6 @@
       poNumber = ''
       destination = ''
       requiresAmazonLabeling = ''
-      shipmentType = ''
       status = ''
       dateOfLastChange = ''
       asin = ''
@@ -223,6 +225,7 @@
       recipientState = ''
       recipientPostalCode = ''
       country = ''
+      lotNumber = ''
     } else {
       const errorData = await response.json()
       alert(`Failed to edit outbound shipment: ${errorData.message}`)
@@ -340,6 +343,7 @@
           recipientState = ''
           recipientPostalCode = ''
           country = ''
+          lotNumber = ''
         }}
         class="btn btn-primary">Create Outbound Shipment</button
       >
@@ -462,6 +466,7 @@
                       recipientState = shipment.Recipient_State
                       recipientPostalCode = shipment.Recipient_Postal_Code
                       country = shipment.Recipient_Country
+                      lotNumber = shipment.Lot_Number
                     }}
                     class="btn btn-info btn-xs mb-2">Edit</button
                   >
@@ -621,7 +626,7 @@
       </div>
 
       <!-- Shipment Type -->
-      <div class="form-control mb-4">
+      <!-- <div class="form-control mb-4">
         <label class="label" for="shipmentType">Shipment Type</label>
         <input
           class="input input-bordered bg-base-200"
@@ -630,18 +635,16 @@
           bind:value={shipmentType}
           placeholder="Shipment Type"
         />
-      </div>
+      </div> -->
 
       <!-- Status -->
       <div class="form-control mb-4">
         <label class="label" for="status">Status</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="text"
-          id="status"
-          bind:value={status}
-          placeholder="Status"
-        />
+        <select class="select select-bordered bg-base-200" id="status" bind:value={status}>
+          <!-- <option value="" disabled>Yes or No?</option> -->
+          <option value={'Pending'}>Pending</option>
+          <option value={'Shipped'}>Shipped</option>
+        </select>
       </div>
 
       <!-- Date of Last Change -->
@@ -827,7 +830,6 @@
       </div>
 
       <!-- Recipient Country -->
-      <!-- Recipient Country -->
       <div class="form-control mb-4">
         <label class="label" for="country">Recipient Country</label>
         <input
@@ -836,6 +838,18 @@
           id="country"
           bind:value={country}
           placeholder="Recipient Country"
+        />
+      </div>
+
+      <!-- Lot Number -->
+      <div class="form-control mb-4">
+        <label class="label" for="lotNumber">Lot Number</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="lotNumber"
+          bind:value={lotNumber}
+          placeholder="Lot Number"
         />
       </div>
 
@@ -1033,7 +1047,6 @@
         />
       </div>
 
-      <!-- Quantity -->
       <!-- Cost of Shipment -->
       <div class="form-control mb-4">
         <label class="label" for="costOfShipment">Cost Of Shipment</label>
@@ -1153,6 +1166,18 @@
           id="country"
           bind:value={country}
           placeholder="Recipient Country"
+        />
+      </div>
+
+      <!-- Lot Number -->
+      <div class="form-control mb-4">
+        <label class="label" for="lotNumber">Lot Number</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="lotNumber"
+          bind:value={lotNumber}
+          placeholder="Lot Number"
         />
       </div>
 

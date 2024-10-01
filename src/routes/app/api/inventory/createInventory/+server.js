@@ -13,7 +13,7 @@ export async function POST({ request, locals }) {
     pending,
     quantity,
     expirationDate,
-    lotNumbers
+    lotNumber
   } = await request.json();
 
   const row = {
@@ -26,7 +26,7 @@ export async function POST({ request, locals }) {
     Pending: pending,
     Quantity: quantity,
     Product_Expiration: expirationDate,
-    Lot_Numbers: lotNumbers,
+    Lot_Number: lotNumber,
   };
 
   const { data, error } = await locals.supabase

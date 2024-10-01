@@ -27,7 +27,8 @@ export async function POST({ request, locals }) {
     recipientCity,
     recipientState,
     recipientPostalCode,
-    country
+    country,
+    lotNumber
   } = await request.json();
 
   const myDate = new Date(dateOfLastChange);
@@ -59,6 +60,7 @@ export async function POST({ request, locals }) {
     Recipient_State: recipientState,
     Recipient_Postal_Code: recipientPostalCode,
     Recipient_Country: country,
+    Lot_Number: lotNumber,
     Notes: ''
   };
 

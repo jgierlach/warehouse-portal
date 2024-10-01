@@ -12,7 +12,6 @@ export async function PUT({ request, locals }) {
     poNumber,
     destination,
     requiresAmazonLabeling,
-    shipmentType,
     status,
     dateOfLastChange,
     asin,
@@ -29,7 +28,8 @@ export async function PUT({ request, locals }) {
     recipientCity,
     recipientState,
     recipientPostalCode,
-    country
+    country,
+    lotNumber
   } = await request.json();
 
   const row = {
@@ -42,7 +42,7 @@ export async function PUT({ request, locals }) {
     PO_Number: poNumber,
     Destination: destination,
     Requires_Amazon_Labeling: requiresAmazonLabeling,
-    Shipment_Type: shipmentType,
+    Shipment_Type: "Outbound",
     Status: status,
     Date_Of_Last_Change: dateOfLastChange,
     Asin: asin,
@@ -59,7 +59,8 @@ export async function PUT({ request, locals }) {
     Recipient_City: recipientCity,
     Recipient_State: recipientState,
     Recipient_Postal_Code: recipientPostalCode,
-    Recipient_Country: country
+    Recipient_Country: country,
+    Lot_Number: lotNumber
   };
 
   const { data, error } = await locals.supabase

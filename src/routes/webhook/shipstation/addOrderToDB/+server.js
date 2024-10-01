@@ -165,6 +165,7 @@ export async function POST({ request, locals }) {
           Recipient_City: shipTo?.city || null,
           Recipient_State: shipTo?.state || null,
           Recipient_Postal_Code: shipTo?.postalCode || null,
+          Recipient_Country: shipTo?.country || null,
           Notes: customerNotes || null,  // Any internal notes provided
           Cost_Of_Shipment: null,
         }

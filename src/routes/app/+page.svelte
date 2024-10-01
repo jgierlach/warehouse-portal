@@ -68,7 +68,7 @@
   let pending = 0
   let quantity = 0
   let expirationDate = ''
-  let lotNumbers = ''
+  let lotNumber = ''
 
   let showEditInventory = false
   let inventoryToEdit = {}
@@ -92,7 +92,7 @@
         pending,
         quantity,
         expirationDate,
-        lotNumbers,
+        lotNumber,
       }),
     })
     if (response.ok) {
@@ -109,7 +109,7 @@
       pending = 0
       quantity = 0
       expirationDate = ''
-      lotNumbers = ''
+      lotNumber = ''
     } else {
       const errorData = await response.json()
       alert(`Failed to edit inventory: ${errorData.message}`)
@@ -134,7 +134,7 @@
         pending,
         quantity,
         expirationDate,
-        lotNumbers,
+        lotNumber,
       }),
     })
     if (response.ok) {
@@ -149,7 +149,7 @@
       pending = 0
       quantity = 0
       expirationDate = ''
-      lotNumbers = ''
+      lotNumber = ''
     } else {
       const errorData = await response.json()
       alert(`Failed to Create inventory: ${errorData.message}`)
@@ -253,7 +253,7 @@
                     pending = product.Pending
                     quantity = product.Quantity
                     expirationDate = product.Product_Expiration
-                    lotNumbers = product.Lot_Numbers
+                    lotNumber = product.Lot_Number
                   }}
                   class="btn btn-info btn-sm mr-2">Edit</button
                 >
@@ -426,12 +426,12 @@
 
       <!-- Lot Numbers -->
       <div class="form-control mb-4">
-        <label class="label" for="lotNumbers">Lot Numbers</label>
+        <label class="label" for="lotNumber">Lot Numbers</label>
         <input
           class="input input-bordered bg-base-200"
           type="text"
-          id="lotNumbers"
-          bind:value={lotNumbers}
+          id="lotNumber"
+          bind:value={lotNumber}
           placeholder="Lot Numbers"
         />
       </div>
@@ -573,12 +573,12 @@
 
       <!-- Lot Numbers -->
       <div class="form-control mb-4">
-        <label class="label" for="lotNumbers">Lot Numbers</label>
+        <label class="label" for="lotNumber">Lot Numbers</label>
         <input
           class="input input-bordered bg-base-200"
           type="text"
-          id="lotNumbers"
-          bind:value={lotNumbers}
+          id="lotNumber"
+          bind:value={lotNumber}
           placeholder="Lot Numbers"
         />
       </div>
