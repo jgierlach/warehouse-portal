@@ -819,7 +819,7 @@
       </div>
 
       <!-- Shipment Type -->
-      <div class="form-control mb-4">
+      <!-- <div class="form-control mb-4">
         <label class="label" for="shipmentType">Shipment Type</label>
         <input
           class="input input-bordered bg-base-200"
@@ -828,7 +828,7 @@
           bind:value={shipmentType}
           placeholder="Shipment Type"
         />
-      </div>
+      </div> -->
 
       <!-- Status -->
       <div class="form-control mb-4">
