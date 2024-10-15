@@ -178,7 +178,19 @@
     <h1 class="mb-2 text-center text-3xl font-bold">Client Inventory</h1>
     <div class="mb-4 flex justify-center">
       <button
-        on:click={() => (showCreateInventory = true)}
+        on:click={() => {
+          showCreateInventory = true
+          clientId = ''
+          name = ''
+          asin = ''
+          productTitle = ''
+          sku = ''
+          productImageUrl = ''
+          pending = 0
+          quantity = 0
+          expirationDate = ''
+          lotNumber = ''
+        }}
         class="btn btn-outline btn-primary btn-sm"
         >Add Product <i class="fas fa-plus"></i>
       </button>
