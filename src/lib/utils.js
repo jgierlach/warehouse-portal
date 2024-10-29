@@ -35,6 +35,10 @@ export const assignClientIdBasedOnStoreName = (storeName) => {
   if (storeName === 'Dog Rocks Website') {
     return 'operations@podiumpetproducts.com'
   }
+  // Bessies Best categorization
+  if (storeName === `Bessies Best Amazon`) {
+    return 'jen@bessiesbest.com'
+  }
   // Dr. Appleseed categorization
   if (storeName === 'Dr. Appleseed Amazon') {
     return 'drappleseedextracts@gmail.com'
