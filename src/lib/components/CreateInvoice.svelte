@@ -119,17 +119,17 @@
     },
     {
       servicesProvided: 'Shipment Of Customer Orders',
-      cost: `${formatDollarValue(totalCostOfCustomerShipments)}`,
+      cost: totalCostOfCustomerShipments,
       billingTerms: `${formatDollarValue(perOrderFee)} an order + ${formatDollarValue(perOrderUnitFee)} a unit`,
     },
     {
       servicesProvided: 'FBA Pack and Prep',
-      cost: `${formatDollarValue(totalCostOfFBAPackAndPrep)}`,
+      cost: totalCostOfFBAPackAndPrep,
       billingTerms: `${formatDollarValue(perUnitFBAPackAndPrep)} a unit`,
     },
     {
       servicesProvided: 'WFS Pack and Prep',
-      cost: `${formatDollarValue(totalCostOfWFSPackAndPrep)}`,
+      cost: totalCostOfWFSPackAndPrep,
       billingTerms: `${formatDollarValue(perUnitFBAPackAndPrep)} a unit`,
     },
     {

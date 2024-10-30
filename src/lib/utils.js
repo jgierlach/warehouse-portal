@@ -120,7 +120,7 @@ export const generateShipmentLineItems = (shipments, perOrderFee, perOrderUnitFe
   // Step 1: Group items by Shipment_Number
   shipments.forEach(item => {
     const shipmentNumber = item.Shipment_Number;
-    const shipmentCostMarkup = (b2bFreightPercentageMarkup / 100) * item.Cost_Of_Shipment
+    const shipmentCostMarkup = Math.round((b2bFreightPercentageMarkup / 100) * item.Cost_Of_Shipment)
 
     if (!groupedShipments[shipmentNumber]) {
       groupedShipments[shipmentNumber] = {
