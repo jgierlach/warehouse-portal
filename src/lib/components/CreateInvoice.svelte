@@ -161,6 +161,20 @@
     lineItemsToDisplay = lineItemsToDisplay.filter((_, i) => i !== index)
   }
 
+  // Line item fields
+  let servicesProvided = ''
+  let cost = 0
+  let billingTerms = ''
+
+  let openAddLineItemModal = false
+  function addLineItem() {
+    const newLineItem = { servicesProvided, cost, billingTerms }
+    lineItemsToDisplay = [...lineItemsToDisplay, newLineItem]
+  }
+
+  let openEditLineItemModal = false
+  function editLineItem(index) {}
+
   $: totalPrice = lineItemsToDisplay.reduce((a, b) => a + b.cost, 0)
 
   let autoPay = false
@@ -220,7 +234,121 @@
   <div class="flex flex-wrap">
     <div class="w-full p-4 md:w-1/2">
       <h1 class="text-center text-2xl font-semibold">Invoice Line Items</h1>
-      <table class="table table-zebra mt-2 w-full">
+      <div class="mt-2 flex justify-center">
+        <button
+          on:click={() => {
+            openAddLineItemModal = true
+            servicesProvided = ''
+            cost = 0
+            billingTerms = ''
+          }}
+          class="btn btn-primary btn-sm">Add Line Item</button
+        >
+      </div>
+
+      <!-- ADD LINE ITEM MODAL BEGINS -->
+      <div class={`modal ${openAddLineItemModal ? 'modal-open' : ''}`}>
+        <div class="modal-box relative">
+          <button
+            on:click={() => (openAddLineItemModal = false)}
+            class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+          >
+          <h1 class="mb-5 text-center text-xl font-semibold">Add Line Item</h1>
+          <form on:submit={addLineItem}>
+            <!-- Services Provided -->
+            <div class="form-control mb-4">
+              <label class="label" for="servicesProvided">Services Provided</label>
+              <input
+                required
+                class="input input-bordered bg-base-200"
+                id="servicesProvided"
+                bind:value={servicesProvided}
+                placeholder="Services Provided"
+              />
+            </div>
+            <!-- Cost -->
+            <div class="form-control mb-4">
+              <label class="label" for="cost">Cost</label>
+              <input
+                type="number"
+                step="0.01"
+                placeholder=""
+                bind:value={cost}
+                class="input input-bordered bg-base-200"
+              />
+            </div>
+            <!-- Billing Terms -->
+            <div class="form-control mb-4">
+              <label class="label" for="servicesProvided">Billing Terms</label>
+              <input
+                required
+                class="input input-bordered bg-base-200"
+                id="servicesProvided"
+                bind:value={billingTerms}
+                placeholder="Billing Terms"
+              />
+            </div>
+            <!-- Submit Button -->
+            <div class="mt-4 flex justify-center">
+              <button class="btn btn-info" type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- ADD LINE ITEM MODAL ENDS -->
+
+      <!-- EDIT LINE ITEM MODAL BEGINS -->
+      <div class={`modal ${openEditLineItemModal ? 'modal-open' : ''}`}>
+        <div class="modal-box relative">
+          <button
+            on:click={() => (openEditLineItemModal = false)}
+            class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+          >
+          <h1 class="mb-5 text-center text-xl font-semibold">Edit Line Items</h1>
+          <form on:submit={editLineItem}>
+            <!-- Services Provided -->
+            <div class="form-control mb-4">
+              <label class="label" for="servicesProvided">Services Provided</label>
+              <input
+                required
+                class="input input-bordered bg-base-200"
+                id="servicesProvided"
+                bind:value={servicesProvided}
+                placeholder="Services Provided"
+              />
+            </div>
+            <!-- Cost -->
+            <div class="form-control mb-4">
+              <label class="label" for="cost">Cost</label>
+              <input
+                type="number"
+                step="0.01"
+                placeholder=""
+                bind:value={cost}
+                class="input input-bordered bg-base-200"
+              />
+            </div>
+            <!-- Billing Terms -->
+            <div class="form-control mb-4">
+              <label class="label" for="servicesProvided">Billing Terms</label>
+              <input
+                required
+                class="input input-bordered bg-base-200"
+                id="servicesProvided"
+                bind:value={billingTerms}
+                placeholder="Billing Terms"
+              />
+            </div>
+            <!-- Submit Button -->
+            <div class="mt-4 flex justify-center">
+              <button class="btn btn-info" type="submit">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- EDIT LINE ITEM MODAL ENDS -->
+
+      <table class="table table-zebra mt-2 w-full p-4 shadow-lg">
         <thead>
           <tr>
             <th>Service Provided</th>
@@ -235,7 +363,17 @@
               <td>{item.cost}</td>
               <td>{item.billingTerms}</td>
               <td class="flex space-x-1">
-                <button class="btn btn-info btn-sm"> Edit </button>
+                <button
+                  on:click={() => {
+                    openEditLineItemModal = true
+                    servicesProvided = item.servicesProvided
+                    cost = item.cost
+                    billingTerms = item.billingTerms
+                  }}
+                  class="btn btn-info btn-sm"
+                >
+                  Edit
+                </button>
                 <button on:click={() => deleteLineItem(index)} class="btn btn-error btn-sm"
                   >Delete</button
                 >
