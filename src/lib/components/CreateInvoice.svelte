@@ -20,11 +20,10 @@
 
   // Import props
   export let supabase
-  // export let selectedClient
 
   // Import stores
   import { outboundShipments, loadOutboundShipments } from '$lib/stores/outboundShipments'
-  import { selectedSection, setSelectedSection } from '$lib/stores/selectedSection'
+  import { setSelectedSection } from '$lib/stores/selectedSection'
   import { selectedClientToInvoice } from '$lib/stores/selectedClientToInvoice'
 
   // Component specific variables and business logic
