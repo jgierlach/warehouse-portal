@@ -20,31 +20,26 @@
 
   // Import props
   export let supabase
-  export let selectedClient
+  // export let selectedClient
 
   // Import stores
   import { outboundShipments, loadOutboundShipments } from '$lib/stores/outboundShipments'
   import { selectedSection, setSelectedSection } from '$lib/stores/selectedSection'
+  import { selectedClientToInvoice } from '$lib/stores/selectedClientToInvoice'
 
   // Component specific variables and business logic
 
   // Company variables
-  $: clientName = selectedClient.company_name
-  $: clientId = selectedClient.username
-  $: perOrderFee = selectedClient.per_order_fee
-  $: perOrderUnitFee = selectedClient.per_order_unit_fee
-  $: perUnitFBAPackAndPrep = selectedClient.per_unit_fba_pack_prep
-  $: perUnitWFSPackAndPrep = selectedClient.per_unit_wfs_pack_prep
-  $: b2bFreightPercentageMarkup = selectedClient.b2b_freight_percentage_markup
-  $: perPalletMonthlyStorageFee = selectedClient.per_pallet_monthly_storage_fee
-
-  // Field variables
-  let companyName = ''
-  // let billingMonthAndYear = ''
-  // let servicesProvided = ''
-  // let actualContractValue = 0
-  // let billingTerms = ''
-  let billingContactEmail = ''
+  let clientName = $selectedClientToInvoice.company_name
+  let companyName = $selectedClientToInvoice.company_name
+  let clientId = $selectedClientToInvoice.username
+  let billingContactEmail = $selectedClientToInvoice.username
+  let perOrderFee = $selectedClientToInvoice.per_order_fee
+  let perOrderUnitFee = $selectedClientToInvoice.per_order_unit_fee
+  let perUnitFBAPackAndPrep = $selectedClientToInvoice.per_unit_fba_pack_prep
+  let perUnitWFSPackAndPrep = $selectedClientToInvoice.per_unit_wfs_pack_prep
+  let b2bFreightPercentageMarkup = $selectedClientToInvoice.b2b_freight_percentage_markup
+  let perPalletMonthlyStorageFee = $selectedClientToInvoice.per_pallet_monthly_storage_fee
 
   const now = new Date()
   const currentYear = now.getFullYear()
@@ -158,7 +153,7 @@
 
   $: {
     console.log(shipmentLineItems)
-    console.log('selectedClient', selectedClient)
+    console.log('selectedClientToInvoice', $selectedClientToInvoice)
     console.log('Total cost of FBA', totalCostOfFBAPackAndPrep)
   }
 
@@ -166,8 +161,8 @@
   onMount(() => {
     loadOutboundShipments(supabase)
     lineItemsToDisplay = lineItems
-    companyName = clientName
-    billingContactEmail = clientId
+    // companyName = clientName
+    // billingContactEmail = clientId
   })
 </script>
 

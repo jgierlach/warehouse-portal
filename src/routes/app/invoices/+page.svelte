@@ -14,6 +14,10 @@
   // Import stores
   import { clients, loadClients } from '$lib/stores/clients.js'
   import { selectedSection, setSelectedSection } from '$lib/stores/selectedSection.js'
+  import {
+    selectedClientToInvoice,
+    setSelectedClientToInvoice,
+  } from '$lib/stores/selectedClientToInvoice.js'
 
   // Component specific variables and business logic
   $: activeClients = $clients.filter(
@@ -53,6 +57,7 @@
                   <button
                     on:click={() => {
                       selectedClient = client
+                      setSelectedClientToInvoice(client)
                       setSelectedSection('Create Invoice')
                     }}
                     class="btn btn-primary btn-sm">Create Invoice</button
@@ -68,5 +73,5 @@
 {/if}
 
 {#if $selectedSection === 'Create Invoice'}
-  <CreateInvoice supabase={data.supabase} {selectedClient} />
+  <CreateInvoice supabase={data.supabase} />
 {/if}
