@@ -1,3 +1,58 @@
+export const addInvoiceTerms = (inputDate, daysUntilDue) => {
+  // Parse the input date
+  let parts = inputDate.split('/');
+  let month = parseInt(parts[0], 10);
+  let day = parseInt(parts[1], 10);
+  let year = parseInt(parts[2], 10);
+
+  // If the year is in short format, convert it to full format
+  if (year < 1000) {
+    year += 2000;
+  }
+
+  // Create a date object
+  let date = new Date(year, month - 1, day);
+
+  // Add 14 days to the date
+  date.setDate(date.getDate() + daysUntilDue);
+
+  // Format the new date to MM/DD/YY
+  let newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+  let newDay = date.getDate().toString().padStart(2, '0');
+  let newYear = date.getFullYear().toString();
+
+  return `${newMonth}/${newDay}/${newYear}`;
+}
+
+export const getCurrentDateFormatted = () => {
+  const date = new Date();
+
+  let month = date.getMonth() + 1; // getMonth returns months indexed from 0
+  let day = date.getDate();
+  let year = date.getFullYear();
+
+  // Ensuring that the month and day are always two digits
+  month = month < 10 ? '0' + month : month;
+  day = day < 10 ? '0' + day : day;
+
+  return `${month}/${day}/${year}`;
+}
+
+// Expected format month/day/year
+export const generateInvoiceNumber = () => {
+  const date = new Date();
+
+  let month = date.getMonth() + 1; // getMonth returns months indexed from 0
+  let day = date.getDate();
+  let year = date.getFullYear();
+
+  // Ensuring that the month and day are always two digits
+  month = month < 10 ? '0' + month : month;
+  day = day < 10 ? '0' + day : day;
+
+  return `${month}${year}`;
+}
+
 export const csvGenerator = (totalData, actualHeaderKey, headerToShow, fileName) => {
   let data = totalData || null;
   if (data == null || !data.length) {

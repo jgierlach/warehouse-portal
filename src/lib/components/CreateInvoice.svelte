@@ -13,6 +13,9 @@
     formatDate,
     formatDollarValue,
     csvGenerator,
+    generateInvoiceNumber,
+    addInvoiceTerms,
+    getCurrentDateFormatted,
   } from '$lib/utils'
 
   // Import props
@@ -36,12 +39,12 @@
   $: perPalletMonthlyStorageFee = selectedClient.per_pallet_monthly_storage_fee
 
   // Field variables
-  let companyName = clientName
-  let billingMonthAndYear = ''
-  let servicesProvided = ''
-  let actualContractValue = 0
-  let billingTerms = ''
-  let billingContactEmail = clientId
+  let companyName = ''
+  // let billingMonthAndYear = ''
+  // let servicesProvided = ''
+  // let actualContractValue = 0
+  // let billingTerms = ''
+  let billingContactEmail = ''
 
   const now = new Date()
   const currentYear = now.getFullYear()
@@ -148,6 +151,11 @@
 
   let lineItemsToDisplay = []
 
+  let autoPay = false
+
+  let dateIssued = getCurrentDateFormatted()
+  $: dateDue = addInvoiceTerms(dateIssued, 7)
+
   $: {
     console.log(shipmentLineItems)
     console.log('selectedClient', selectedClient)
@@ -158,6 +166,8 @@
   onMount(() => {
     loadOutboundShipments(supabase)
     lineItemsToDisplay = lineItems
+    companyName = clientName
+    billingContactEmail = clientId
   })
 </script>
 
@@ -295,7 +305,299 @@
       {/if} -->
 
       {#if showInvoicePreview}
-        <center> </center>
+        <center>
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+              <td align="center" style="text-align: center;">
+                <table
+                  id="pdfContent"
+                  width="100%"
+                  border="0"
+                  cellspacing="0"
+                  cellpadding="0"
+                  style="margin-top: 16px; background-color: #fafafa"
+                >
+                  <tr>
+                    <td align="center">
+                      <table
+                        width="600"
+                        border="0"
+                        cellspacing="0"
+                        cellpadding="0"
+                        style="border-collapse: collapse;"
+                      >
+                        <tr>
+                          <td style="padding: 20px; background-color: #fafafa;">
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tr>
+                                <td style="font-weight: bold;">Sender:</td>
+                                <td align="right" style="font-size: 18px; font-weight: bold;"
+                                  >{autoPay ? 'RECEIPT' : 'INVOICE'}</td
+                                >
+                              </tr>
+                              <tr>
+                                <td colspan="2" style="padding-top: 10px;">
+                                  <address>
+                                    Numble LLC (dba Hometown Industries)<br />
+                                    5505 O Street<br />
+                                    Lincoln, NE, 68510<br />
+                                    Phone: +1 (402) 413-8754<br />
+                                    Email: accountsreceivables@hometown-industries.com
+                                  </address>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td colspan="2" style="padding-top: 10px;">
+                                  <strong>Bill To:</strong>
+                                  <address>
+                                    {companyName}<br />
+                                    Email: {billingContactEmail}
+                                  </address>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="right" colspan="2">
+                                  <p>
+                                    <strong>Invoice #:</strong>
+                                    {generateInvoiceNumber()}
+                                  </p>
+                                  <p>
+                                    <strong>Billing Month:</strong>
+                                    {'FILL THIS OUT'}
+                                  </p>
+                                  <p>
+                                    <strong>Date Issued:</strong>
+                                    {dateIssued}
+                                  </p>
+                                  <p>
+                                    <strong>Date Due:</strong>
+                                    <span style="background: yellow;"
+                                      >{autoPay ? dateIssued : dateDue}</span
+                                    >
+                                  </p>
+                                </td>
+                              </tr>
+                            </table>
+                            <!-- Repeat for each line item -->
+                            <table
+                              width="100%"
+                              border="1"
+                              cellspacing="0"
+                              cellpadding="5"
+                              style="margin-top: 20px; border-collapse: collapse; background: #ffffff; border: none;"
+                            >
+                              <thead>
+                                <tr>
+                                  <th>Service Provided</th>
+                                  <th>Price</th>
+                                  <th>Billing Terms</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {#each lineItemsToDisplay as lineItem}
+                                  <tr>
+                                    <td>{lineItem.servicesProvided}</td>
+                                    <td>{lineItem.cost}</td>
+                                    <td style="white-space: pre-line;"
+                                      >{`The price for ${lineItem.servicesProvided} was calculated according to the terms of ${lineItem.billingTerms}.`}
+                                    </td>
+                                  </tr>
+                                {/each}
+                                <!-- {#if passCardFeesOn}<tr>
+                                    <td>{billingMonthAndYear}</td>
+                                    <td>Card Processing Fees</td>
+                                    <td>{formatDollarValue(totalPrice * 0.034)}</td>
+                                    <td
+                                      >The price for card processing fees was calculated as 3.4% of
+                                      the total invoice.</td
+                                    >
+                                  </tr>{/if} -->
+                              </tbody>
+                            </table>
+                            <!-- End repeat -->
+
+                            <!-- {#if passCardFeesOn} -->
+                            <p
+                              style="font-size: 16px; font-weight: bold; margin-top: 20px; color:
+                              red;"
+                            >
+                              CARD FEES HAVE BEEN APPLIED TO YOUR INVOICE TOTAL.
+                            </p>
+                            <p
+                              style="font-size: 16px; font-weight: bold; margin-top: 10px; color:
+                            red;"
+                            >
+                              Contact accountsreceivables@hometown-industries.com if you'd like to
+                              change your payment method on file.
+                            </p>
+                            <!-- {/if} -->
+
+                            <p style="margin-top: 20px; font-size: 25px;">
+                              <strong>Total: 500</strong>
+                              <!-- <span style="background: yellow;">
+                                {passCardFeesOn
+                                  ? formatDollarValue(totalPrice * 1.034)
+                                  : formatDollarValue(totalPrice)}
+                              </span> -->
+                            </p>
+
+                            <!-- PROMPT TO PAY BY CREDIT CARD BEGINS -->
+                            <!-- {#if autoPay === false && stripeInvoiceLink !== null && stripeInvoiceLink !== ''} -->
+                            <table
+                              width="100%"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              style="margin-top: 20px;"
+                            >
+                              <tr>
+                                <td style="text-align: center;">
+                                  <p
+                                    style="font-size: 20px; font-weight: bold; margin-bottom: 12px;"
+                                  >
+                                    If paying by credit card, click the button below.
+                                  </p>
+                                  <a
+                                    href={'stripeInvoiceLink'}
+                                    target="_blank"
+                                    style="display: inline-block; background-color: #00449E; color: #ffffff; padding: 10px 20px; font-weight: bold; text-decoration: none; border-radius: 5px;"
+                                    >Pay By Card</a
+                                  >
+                                  <!-- {#if passCardFeesOn} -->
+                                  <p
+                                    style="font-size: 16px; font-weight: bold; margin-bottom: 12px; margin-top: 12px; color: red;"
+                                  >
+                                    CARD FEES HAVE BEEN APPLIED TO THIS INVOICE
+                                  </p>
+                                  <p
+                                    style="font-size: 16px; font-weight: bold; margin-bottom: 12px; color: red;"
+                                  >
+                                    Please pay by ACH/WIRE to avoid the processing surcharge
+                                  </p>
+                                  <!-- {/if} -->
+                                </td>
+                              </tr>
+                            </table>
+                            <!-- {/if} -->
+                            <!-- PROMPT TO PAY BY CREDIT CARD ENDS -->
+
+                            <!-- BEGINNING OF ACH/WIRE SECTION -->
+                            <!-- {#if autoPay === false} -->
+                            <table
+                              width="100%"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              style="margin-top: 20px;"
+                            >
+                              <tr>
+                                <td style="padding: 20px; background-color: #ffffff;">
+                                  <p
+                                    style="font-size: 20px; font-weight: bold; margin-top: 20px; text-align: center;"
+                                  >
+                                    Payment By ACH/Wire to avoid card fees
+                                  </p>
+                                  <p style="margin-bottom: 10px;">
+                                    If paying by ACH or Wire, please use the following information:
+                                  </p>
+
+                                  <table
+                                    width="100%"
+                                    border="0"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    style="margin-top: 10px;"
+                                  >
+                                    <tr>
+                                      <td valign="top">
+                                        <p style="margin: 0; font-weight: bold; font-size: 20px;">
+                                          Beneficiary Details:
+                                        </p>
+                                        <p style="margin: 5px 0;">
+                                          <strong>Name:</strong> Numble LLC<br />
+                                          <strong>Type of Account:</strong>
+                                          Checking<br />
+                                          <strong>Address:</strong> 5505 O Street, Ste #4, Lincoln, NE
+                                          68510, USA
+                                        </p>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td valign="top">
+                                        <p style="margin: 0; font-weight: bold; font-size: 20px;">
+                                          Receiving Bank Details
+                                        </p>
+                                        <p style="margin: 5px 0;">
+                                          <strong>Bank Name:</strong> Choice Financial Group<br />
+                                          <strong>Bank Address:</strong> 4501 23rd Avenue S, Fargo,
+                                          ND 58104<br />
+                                          <strong>Routing Number:</strong>
+                                          091311229<br />
+                                          <strong>Account Number:</strong> 202456848094
+                                        </p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+                            <!-- {/if} -->
+                            <!-- END OF ACH/WIRE SECTION -->
+
+                            <!-- {#if autoPay === false} -->
+                            <!-- BEGINNING OF ENROLL IN AUTOMATIC ACH PAYMENTS -->
+                            <table
+                              width="100%"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              style="margin-top: 20px;"
+                            >
+                              <tr>
+                                <td style="padding: 20px; background-color: #ffffff;">
+                                  <p
+                                    style="font-size: 20px; font-weight: bold; margin-top: 20px; text-align: center;"
+                                  >
+                                    Enroll In Automatic ACH Billing
+                                  </p>
+                                  <p style="margin-bottom: 15px;">
+                                    Each month you will be automatically charged for the balance of
+                                    your invoice using ACH.
+                                    <!-- {#if passCardFeesOn} -->
+                                    By enrolling in ACH billing you will pay no card fees.
+                                    <!-- {/if} -->
+                                  </p>
+
+                                  <div style="text-align: center;">
+                                    <a
+                                      href="https://billing.stripe.com/p/login/aEU170e8zgEM6nCaEE"
+                                      target="_blank"
+                                      style="display: inline-block; background-color: #00449E; color: #ffffff; padding: 10px 20px; font-weight: bold; text-decoration: none; border-radius: 5px;"
+                                      >Enroll In Automatic ACH Billing</a
+                                    >
+                                  </div>
+
+                                  <p style="text-align: center; margin-top: 10px;">
+                                    <strong
+                                      >** Log in using email: {billingContactEmail}
+                                      **</strong
+                                    >
+                                  </p>
+                                </td>
+                              </tr>
+                            </table>
+                            <!-- END OF ENROLL IN AUTOMATIC ACH PAYMENTS -->
+                            <!-- {/if} -->
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </center>
       {:else}
         <div class="mt-4 flex justify-center">
           <img src="/green-check-mark.png" class="w-32" alt="green check mark" />
