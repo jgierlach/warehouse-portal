@@ -59,7 +59,7 @@ export const csvGenerator = (totalData, actualHeaderKey, headerToShow, fileName)
   }
 };
 
-export const generateLineItems = (shipments, perOrderFee, perOrderUnitFee, perUnitFBAPackAndPrep, perUnitWFSPackAndPrep, b2bFreightPercentageMarkup) => {
+export const generateShipmentLineItems = (shipments, perOrderFee, perOrderUnitFee, perUnitFBAPackAndPrep, perUnitWFSPackAndPrep, b2bFreightPercentageMarkup) => {
   const groupedShipments = {};
 
   // Step 1: Group items by Shipment_Number

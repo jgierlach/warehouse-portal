@@ -9,7 +9,7 @@
   import {
     formatDateInDateRange,
     isWithinDateRange,
-    generateLineItems,
+    generateShipmentLineItems,
     formatDate,
     formatDollarValue,
     csvGenerator,
@@ -42,8 +42,29 @@
   let billingTerms = ''
   let billingContactEmail = clientId
 
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth()
+  let startDate = formatDateInDateRange(new Date(currentYear, currentMonth, 1))
+  let endDate = formatDateInDateRange(now)
+
+  async function yearToDate() {
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    startDate = formatDateInDateRange(new Date(currentYear, 0, 1))
+    endDate = formatDateInDateRange(now)
+  }
+
+  async function monthToDate() {
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    const currentMonth = now.getMonth()
+    startDate = formatDateInDateRange(new Date(currentYear, currentMonth, 1))
+    endDate = formatDateInDateRange(now)
+  }
+
   // Variables for email
-  let subjectLine = `${companyName} - Invoice for 3PL services for work done in ${billingMonthAndYear}`
+  let subjectLine = `${clientName} - Invoice for 3PL services for work done from ${formatDate(startDate)} to ${formatDate(endDate)}`
 
   let showCc = false
 
@@ -131,7 +152,7 @@
     isWithinDateRange(shipment.Date_Of_Last_Change, startDate, endDate),
   )
 
-  $: lineItems = generateLineItems(
+  $: shipmentLineItems = generateShipmentLineItems(
     clientShipmentsInDateRange,
     perOrderFee,
     perOrderUnitFee,
@@ -140,29 +161,22 @@
     b2bFreightPercentageMarkup,
   )
 
-  const now = new Date()
-  const currentYear = now.getFullYear()
-  const currentMonth = now.getMonth()
-  let startDate = formatDateInDateRange(new Date(currentYear, currentMonth, 1))
-  let endDate = formatDateInDateRange(now)
-
-  async function yearToDate() {
-    const now = new Date()
-    const currentYear = now.getFullYear()
-    startDate = formatDateInDateRange(new Date(currentYear, 0, 1))
-    endDate = formatDateInDateRange(now)
-  }
-
-  async function monthToDate() {
-    const now = new Date()
-    const currentYear = now.getFullYear()
-    const currentMonth = now.getMonth()
-    startDate = formatDateInDateRange(new Date(currentYear, currentMonth, 1))
-    endDate = formatDateInDateRange(now)
-  }
+  $: lineItems = [
+    {
+      servicesProvided: 'Shipment Of Customer Orders',
+      cost: 0,
+      billingTerms: `${formatDollarValue(perOrderFee)} an order + ${formatDollarValue(perOrderUnitFee)} a unit`,
+    },
+    {
+      servicesProvided: 'Pallet Storage',
+      cost: 0,
+      billingTerms: `$20 a month per pallet`,
+    },
+  ]
 
   $: {
-    console.log(lineItems)
+    console.log(shipmentLineItems)
+    console.log('selectedClient', selectedClient)
   }
 
   // Execute onMount
@@ -205,49 +219,129 @@
 
 <div id="#top" class="card ml-6 mr-6 mt-6 bg-base-100 shadow-lg">
   <div class="flex flex-wrap">
+    <div class="w-full p-4 md:w-1/2">
+      <table class="table table-zebra w-full">
+        <thead>
+          <tr>
+            <th>Service Provided</th>
+            <th>Cost</th>
+            <th>Billing Terms</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each lineItems as item, index}
+            <tr>
+              <td>{item.servicesProvided}</td>
+              <td>{item.cost}</td>
+              <td>{item.billingTerms}</td>
+              <td class="flex space-x-1">
+                <button class="btn btn-info btn-sm"> Edit </button>
+                <button class="btn btn-error btn-sm"> Delete </button>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="w-full p-4 md:w-1/2">
+      <div class="mb-4 mt-3 flex items-center">
+        <strong class="mr-2">To:</strong>
+        <input class="input input-bordered mr-2 w-full bg-base-200" bind:value={clientId} />
+        <button on:click={() => (showCc = !showCc)} class="btn btn-outline btn-info">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+
+      {#if showCc}
+        <div class="mb-4 flex items-center">
+          <strong class="mr-2">Cc:</strong>
+          <input class="input input-bordered w-full bg-base-200" bind:value={cc} />
+        </div>
+        <div class="mt-2 flex flex-wrap space-x-2">
+          {#each ccArray as email}
+            <button class="btn btn-outline btn-info btn-sm rounded-full">
+              {email.email}
+            </button>
+          {/each}
+        </div>
+      {/if}
+
+      <div class="mt-4 flex items-center">
+        <strong class="mr-2">Subject:</strong>
+        <input class="input input-bordered w-full bg-base-200" bind:value={subjectLine} />
+      </div>
+
+      <!-- <div class="mt-4 flex justify-center space-x-2">
+        <button
+          class="btn btn-outline btn-primary"
+          on:click={generateAndUploadPDF}
+          disabled={isPDFGeneratingAndUploading}
+        >
+          Generate PDF Invoice
+          {#if invoiceLink !== '' && invoiceLink !== null}
+            <i class="fas fa-check ml-2 text-green-500"></i>
+          {/if}
+        </button>
+
+        <button on:click={createStripeInvoice} class="btn btn-outline btn-warning">
+          Generate Stripe Invoice
+          {#if stripeInvoiceLink !== '' && stripeInvoiceLink !== null}
+            <i class="fas fa-check ml-2 text-green-500"></i>
+          {/if}
+        </button>
+
+        <button
+          on:click={() => {
+            showNotes = !showNotes
+          }}
+          class="btn btn-outline"
+        >
+          View Notes
+        </button>
+
+        <button
+          on:click={() => {
+            setInvoiceToEdit($invoiceToCreate)
+            setSelectedTabValue('Edit Invoice')
+          }}
+          class="btn btn-outline btn-info"
+        >
+          Edit
+        </button>
+      </div>
+
+      {#if showStripeCustomerIdWarning}
+        <p class="mt-4 text-center text-red-500">
+          <strong>WARNING:</strong> No stripe customer ID found. Stripe Invoice creation will fail.
+        </p>
+      {/if} -->
+
+      {#if showInvoicePreview}
+        <center> </center>
+      {:else}
+        <div class="mt-4 flex justify-center">
+          <img src="/green-check-mark.png" class="w-32" alt="green check mark" />
+        </div>
+      {/if}
+
+      <div class="mt-4 flex justify-end">
+        <button on:click={() => 'Eat poop'} class="btn btn-primary"> Send Invoice Email </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card ml-6 mr-6 mt-6 bg-base-100 shadow-lg">
+  <div class="flex flex-wrap">
     <div class="w-full p-4">
-      <!-- <div class="flex flex-wrap">
-        <div class="w-1/2 p-2">
-          <label class="label">Company Name</label>
-          <input class="input input-bordered w-full bg-gray-100" bind:value={companyName} />
-        </div>
-        <div class="w-1/2 p-2">
-          <label class="label">Billing Month And Year</label>
-          <input class="input input-bordered w-full bg-gray-100" bind:value={billingMonthAndYear} />
-        </div>
-      </div>
-      <div class="flex flex-wrap">
-        <div class="w-1/2 p-2">
-          <label class="label">Services Provided</label>
-          <input class="input input-bordered w-full bg-gray-100" bind:value={servicesProvided} />
-        </div>
-        <div class="w-1/2 p-2">
-          <label class="label">Actual Contract Value</label>
-          <input class="input input-bordered w-full bg-gray-100" bind:value={actualContractValue} />
-        </div>
-      </div>
-      <div class="flex flex-wrap">
-        <div class="w-full p-2">
-          <label class="label">Billing Terms</label>
-          <textarea
-            class="textarea textarea-bordered h-24 w-full bg-gray-100"
-            bind:value={billingTerms}
-          ></textarea>
-        </div>
-      </div> -->
-
-      <!-- <button on:click={addLineItem} class="btn btn-outline btn-primary mt-2">
-        {#if isEditMode}Update Line Item{:else}Add Line Item{/if}
-      </button> -->
-
       <h1 class="text-center text-2xl font-semibold">{clientName} Shipments</h1>
-
       <div class="mt-3 flex justify-center">
         <button
           on:click={csvGenerator(
-            lineItems,
-            Object.keys(lineItems[0]),
-            Object.keys(lineItems[0]),
+            shipmentLineItems,
+            Object.keys(shipmentLineItems[0]),
+            Object.keys(shipmentLineItems[0]),
             `${clientName}-Shipment-Line-Items.csv`,
           )}
           class="btn btn-primary btn-sm">Export Line Items To CSV</button
@@ -271,7 +365,7 @@
             </tr>
           </thead>
           <tbody>
-            {#each lineItems as item, index}
+            {#each shipmentLineItems as item, index}
               <tr>
                 <td>{formatDate(item.orderDate)}</td>
                 <td>{item.shipmentNumber}</td>
