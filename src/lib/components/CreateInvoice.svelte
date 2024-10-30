@@ -95,6 +95,18 @@
     b2bFreightPercentageMarkup,
   )
 
+  $: shipmentLineItemsForClientExport = shipmentLineItems.map((shipment) => {
+    return {
+      orderDate: shipment.orderDate,
+      shipmentNumber: shipment.shipmentNumber,
+      recipientName: shipment.recipientName,
+      poNumber: shipment.poNumber,
+      orderSource: shipment.orderSource,
+      unitsShipped: shipment.unitsShipped,
+      totalCost: shipment.totalCost,
+    }
+  })
+
   $: totalCostOfFBAPackAndPrep = shipmentLineItems
     .filter((shipment) => shipment.orderSource === 'Amazon FBA')
     .reduce((a, b) => a + b.totalCost, 0)
@@ -623,6 +635,18 @@
             `${clientName}-Shipment-Line-Items.csv`,
           )}
           class="btn btn-primary btn-sm">Export Line Items To CSV</button
+        >
+      </div>
+
+      <div class="mt-2 flex justify-center">
+        <button
+          on:click={csvGenerator(
+            shipmentLineItemsForClientExport,
+            Object.keys(shipmentLineItemsForClientExport[0]),
+            Object.keys(shipmentLineItemsForClientExport[0]),
+            `${clientName}-Shipment-Line-Items.csv`,
+          )}
+          class="btn btn-primary btn-sm">Export Line Items For Client To CSV</button
         >
       </div>
 

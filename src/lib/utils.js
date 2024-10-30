@@ -121,7 +121,6 @@ export const generateShipmentLineItems = (shipments, perOrderFee, perOrderUnitFe
   shipments.forEach(item => {
     const shipmentNumber = item.Shipment_Number;
     const shipmentCostMarkup = Number(((b2bFreightPercentageMarkup / 100) * item.Cost_Of_Shipment).toFixed(2))
-    console.log('shipmentCostMarkup', shipmentCostMarkup)
 
     if (!groupedShipments[shipmentNumber]) {
       groupedShipments[shipmentNumber] = {
@@ -156,7 +155,7 @@ export const generateShipmentLineItems = (shipments, perOrderFee, perOrderUnitFe
     }
 
     // Calculate total cost
-    const totalCost = shipmentCost + markup;
+    const totalCost = Number((shipmentCost + markup).toFixed(2));
 
     // Return new structure with calculated fields
     return {
