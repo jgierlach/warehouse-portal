@@ -1,3 +1,76 @@
+export const generateLineItems = (shipments, perOrderFee, perOrderUnitFee, perUnitFBAPackAndPrep, perUnitWFSPackAndPrep, b2bFreightPercentageMarkup) => {
+  const groupedShipments = {};
+
+  // Step 1: Group items by Shipment_Number
+  shipments.forEach(item => {
+    const shipmentNumber = item.Shipment_Number;
+
+    if (!groupedShipments[shipmentNumber]) {
+      groupedShipments[shipmentNumber] = {
+        orderDate: item.Date_Of_Last_Change,
+        shipmentNumber: item.Shipment_Number,
+        recipientName: item.Recipient_Name,
+        poNumber: item.PO_Number,
+        orderSource: item.Destination,
+        unitsShipped: 0,
+        shipmentCost: item.Cost_Of_Shipment,
+        markup: 0,
+        totalCost: 0
+      };
+    }
+
+    // Increment unitsShipped
+    groupedShipments[shipmentNumber].unitsShipped += item.Quantity;
+  });
+
+  // Step 2: Calculate markup and totalCost
+  const transformedData = Object.values(groupedShipments).map(shipment => {
+    const { orderSource, unitsShipped, shipmentCost } = shipment;
+
+    // Calculate markup based on Destination
+    let markup;
+    if (orderSource === 'Amazon FBA') {
+      markup = perUnitFBAPackAndPrep * unitsShipped;
+    } else if (orderSource === 'Walmart Fulfillment Services') {
+      markup = perUnitWFSPackAndPrep * unitsShipped;
+    } else {
+      markup = perOrderFee + (perOrderUnitFee * unitsShipped);
+    }
+
+    // Calculate total cost
+    const totalCost = shipmentCost + markup;
+
+    // Return new structure with calculated fields
+    return {
+      ...shipment,
+      markup,
+      totalCost
+    };
+  });
+
+  return transformedData;
+}
+
+export const isWithinDateRange = (shipmentDate, start, end) => {
+  // Parse the dates to ensure we compare them as date objects
+  const shipmentTime = new Date(shipmentDate).getTime();
+
+  // Set start time to the beginning of the day (00:00:00.000)
+  const startTime = new Date(new Date(start).setHours(0, 0, 0, 0)).getTime();
+
+  // Set end time to the end of the day (23:59:59.999) + 1 ms
+  const endTime = new Date(new Date(end).setHours(23, 59, 59, 999)).getTime() + 1;
+
+  return shipmentTime >= startTime && shipmentTime <= endTime;
+};
+
+export const formatDateInDateRange = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const fetchStores = async () => {
   const res = await fetch('/app/api/shipstation/listStores');
   if (res.ok) {

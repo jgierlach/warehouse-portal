@@ -3,6 +3,14 @@
   import { page } from '$app/stores'
 
   let menuOpen = false
+
+  let theme = 'light' // Default to light mode
+
+  // Toggle between light and dark themes
+  function toggleTheme() {
+    theme = theme === 'light' ? 'dark' : 'light'
+    document.documentElement.setAttribute('data-theme', theme)
+  }
 </script>
 
 <nav class="navbar flex flex-none bg-base-100 px-4 py-2 shadow-lg">
@@ -34,6 +42,11 @@
           class={`btn btn-ghost`}
           class:btn-active={$page.url.pathname === '/app/clients'}>Clients</a
         >
+        <a
+          href="/app/invoices"
+          class={`btn btn-ghost`}
+          class:btn-active={$page.url.pathname === '/app/invoices'}>Invoices</a
+        >
       </div>
     {:else}
       <a href="/" class="btn btn-ghost text-xl normal-case">Home</a>
@@ -57,12 +70,21 @@
     </button>
   </div>
   <div class="hidden items-center space-x-4 md:flex">
+    <div>
+      <button class="btn" on:click={toggleTheme}>
+        {#if theme === 'light'}
+          🌙
+        {:else}
+          ☀️
+        {/if}
+      </button>
+    </div>
     {#if isUserLoggedIn}
       <form method="post" action="/logout">
-        <button type="submit" class="btn btn-primary mb-2">Logout</button>
+        <button type="submit" class="btn btn-primary">Logout</button>
       </form>
     {:else}
-      <a href="/login" class="btn btn-secondary mb-2"> Log in </a>
+      <a href="/login" class="btn btn-secondary">Log in</a>
     {/if}
   </div>
 </nav>
@@ -88,6 +110,11 @@
       href="/app/clients"
       class={`btn btn-ghost`}
       class:btn-active={$page.url.pathname === '/app/clients'}>Clients</a
+    >
+    <a
+      href="/app/invoices"
+      class={`btn btn-ghost`}
+      class:btn-active={$page.url.pathname === '/app/invoices'}>Invoices</a
     >
     {#if isUserLoggedIn}
       <form method="post" action="/logout">
