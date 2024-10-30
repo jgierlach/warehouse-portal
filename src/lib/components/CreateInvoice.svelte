@@ -12,6 +12,7 @@
     generateLineItems,
     formatDate,
     formatDollarValue,
+    csvGenerator,
   } from '$lib/utils'
 
   // Import props
@@ -238,6 +239,20 @@
       <!-- <button on:click={addLineItem} class="btn btn-outline btn-primary mt-2">
         {#if isEditMode}Update Line Item{:else}Add Line Item{/if}
       </button> -->
+
+      <h1 class="text-center text-2xl font-semibold">{clientName} Shipments</h1>
+
+      <div class="mt-3 flex justify-center">
+        <button
+          on:click={csvGenerator(
+            lineItems,
+            Object.keys(lineItems[0]),
+            Object.keys(lineItems[0]),
+            `${clientName}-Shipment-Line-Items.csv`,
+          )}
+          class="btn btn-primary btn-sm">Export Line Items To CSV</button
+        >
+      </div>
 
       <div class="mt-4 flex justify-center overflow-x-auto">
         <table class="table table-zebra w-full">
