@@ -157,6 +157,10 @@
 
   let lineItemsToDisplay = []
 
+  function deleteLineItem(index) {
+    lineItemsToDisplay = lineItemsToDisplay.filter((_, i) => i !== index)
+  }
+
   $: totalPrice = lineItemsToDisplay.reduce((a, b) => a + b.cost, 0)
 
   let autoPay = false
@@ -232,7 +236,9 @@
               <td>{item.billingTerms}</td>
               <td class="flex space-x-1">
                 <button class="btn btn-info btn-sm"> Edit </button>
-                <button class="btn btn-error btn-sm"> Delete </button>
+                <button on:click={() => deleteLineItem(index)} class="btn btn-error btn-sm"
+                  >Delete</button
+                >
               </td>
             </tr>
           {/each}
