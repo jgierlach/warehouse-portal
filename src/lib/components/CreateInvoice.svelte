@@ -146,7 +146,10 @@
 
   let lineItemsToDisplay = []
 
+  $: totalPrice = lineItemsToDisplay.reduce((a, b) => a + b.cost, 0)
+
   let autoPay = false
+  let passCardFeesOn = true
 
   let dateIssued = getCurrentDateFormatted()
   $: dateDue = addInvoiceTerms(dateIssued, 7)
@@ -392,21 +395,22 @@
                                 {#each lineItemsToDisplay as lineItem}
                                   <tr>
                                     <td>{lineItem.servicesProvided}</td>
-                                    <td>{lineItem.cost}</td>
+                                    <td>{formatDollarValue(lineItem.cost)}</td>
                                     <td style="white-space: pre-line;"
                                       >{`The price for ${lineItem.servicesProvided} was calculated according to the terms of ${lineItem.billingTerms}.`}
                                     </td>
                                   </tr>
                                 {/each}
-                                <!-- {#if passCardFeesOn}<tr>
-                                    <td>{billingMonthAndYear}</td>
+                                {#if passCardFeesOn}
+                                  <tr>
                                     <td>Card Processing Fees</td>
                                     <td>{formatDollarValue(totalPrice * 0.034)}</td>
                                     <td
                                       >The price for card processing fees was calculated as 3.4% of
                                       the total invoice.</td
                                     >
-                                  </tr>{/if} -->
+                                  </tr>
+                                {/if}
                               </tbody>
                             </table>
                             <!-- End repeat -->
@@ -428,12 +432,12 @@
                             <!-- {/if} -->
 
                             <p style="margin-top: 20px; font-size: 25px;">
-                              <strong>Total: 500</strong>
-                              <!-- <span style="background: yellow;">
+                              <strong>Total:</strong>
+                              <span style="background: yellow;">
                                 {passCardFeesOn
                                   ? formatDollarValue(totalPrice * 1.034)
                                   : formatDollarValue(totalPrice)}
-                              </span> -->
+                              </span>
                             </p>
 
                             <!-- PROMPT TO PAY BY CREDIT CARD BEGINS -->
