@@ -50,13 +50,6 @@
               <td>{client.username}</td>
               <td
                 ><div class="flex space-x-1">
-                  <!-- <button
-                    on:click={() => {
-                      showClientBillingTermsModal = true
-                      clientBillingTermsToDisplay = client
-                    }}
-                    class="btn btn-sm">View Billing Terms</button
-                  > -->
                   <button
                     on:click={() => {
                       selectedClient = client
