@@ -27,6 +27,7 @@
   // Execute onMount
   onMount(() => {
     loadClients(data.supabase)
+    setSelectedSection('Invoices')
   })
 </script>
 
