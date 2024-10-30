@@ -33,6 +33,7 @@
   $: perUnitFBAPackAndPrep = selectedClient.per_unit_fba_pack_prep
   $: perUnitWFSPackAndPrep = selectedClient.per_unit_wfs_pack_prep
   $: b2bFreightPercentageMarkup = selectedClient.b2b_freight_percentage_markup
+  $: perPalletMonthlyStorageFee = selectedClient.per_pallet_monthly_storage_fee
 
   // Field variables
   let companyName = clientName
@@ -77,72 +78,7 @@
           return { email: email.trim() }
         })
 
-  // Edit line items
-  let isEditMode = false
-  let editIndex = -1
-
-  function editLineItem(index) {
-    editIndex = index
-    ;({ billingMonthAndYear, companyName, servicesProvided, actualContractValue, billingTerms } =
-      lineItems[index])
-    isEditMode = true
-  }
-
-  function updateLineItem() {
-    if (editIndex !== -1) {
-      lineItems[editIndex] = {
-        billingMonthAndYear,
-        companyName,
-        servicesProvided,
-        actualContractValue,
-        billingTerms,
-      }
-      resetForm()
-      isEditMode = false
-    }
-  }
-
-  function resetForm() {
-    billingMonthAndYear = ''
-    companyName = clientName
-    servicesProvided = ''
-    actualContractValue = 0
-    billingTerms = ''
-    editIndex = -1
-  }
-
-  // Add line items
-  function addLineItem() {
-    if (!isEditMode) {
-      lineItems = [
-        ...lineItems,
-        {
-          billingMonthAndYear,
-          companyName,
-          servicesProvided,
-          actualContractValue,
-          billingTerms,
-        },
-      ]
-      resetForm()
-    } else {
-      updateLineItem()
-    }
-  }
-
-  // Delete line item
-  const deleteLineItem = (lineItem) => {
-    const index = lineItems.findIndex(
-      (item) =>
-        item.billingMonthAndYear === lineItem.billingMonthAndYear &&
-        item.servicesProvided === lineItem.servicesProvided &&
-        item.actualContractValue === lineItem.actualContractValue,
-    )
-    if (index !== -1) {
-      lineItems.splice(index, 1)
-    }
-    lineItems = [...lineItems]
-  }
+  function resetForm() {}
 
   let showInvoicePreview = true
 
@@ -161,27 +97,67 @@
     b2bFreightPercentageMarkup,
   )
 
+  $: totalCostOfFBAPackAndPrep = shipmentLineItems
+    .filter((shipment) => shipment.orderSource === 'Amazon FBA')
+    .reduce((a, b) => a + b.totalCost, 0)
+
+  $: totalCostOfWFSPackAndPrep = shipmentLineItems
+    .filter((shipment) => shipment.orderSource === 'Walmart Fulfillment Services')
+    .reduce((a, b) => a + b.totalCost, 0)
+
+  $: totalCostOfCustomerShipments = shipmentLineItems
+    .filter(
+      (shipment) =>
+        shipment.orderSource !== 'Amazon FBA' &&
+        shipment.orderSource !== 'Walmart Fulfillment Services',
+    )
+    .reduce((a, b) => a + b.totalCost, 0)
+
   $: lineItems = [
-    {
-      servicesProvided: 'Shipment Of Customer Orders',
-      cost: 0,
-      billingTerms: `${formatDollarValue(perOrderFee)} an order + ${formatDollarValue(perOrderUnitFee)} a unit`,
-    },
     {
       servicesProvided: 'Pallet Storage',
       cost: 0,
-      billingTerms: `$20 a month per pallet`,
+      billingTerms: `${formatDollarValue(perPalletMonthlyStorageFee)} a month per pallet`,
+    },
+    {
+      servicesProvided: 'Shipment Of Customer Orders',
+      cost: `${formatDollarValue(totalCostOfCustomerShipments)}`,
+      billingTerms: `${formatDollarValue(perOrderFee)} an order + ${formatDollarValue(perOrderUnitFee)} a unit`,
+    },
+    {
+      servicesProvided: 'FBA Pack and Prep',
+      cost: `${formatDollarValue(totalCostOfFBAPackAndPrep)}`,
+      billingTerms: `${formatDollarValue(perUnitFBAPackAndPrep)} a unit`,
+    },
+    {
+      servicesProvided: 'WFS Pack and Prep',
+      cost: `${formatDollarValue(totalCostOfWFSPackAndPrep)}`,
+      billingTerms: `${formatDollarValue(perUnitFBAPackAndPrep)} a unit`,
+    },
+    {
+      servicesProvided: 'Pallet Out Fee',
+      cost: 0,
+      billingTerms: '$10 a pallet',
+    },
+    {
+      servicesProvided: 'Receiving Fees',
+      cost: 0,
+      billingTerms: '$30 an hour',
     },
   ]
+
+  let lineItemsToDisplay = []
 
   $: {
     console.log(shipmentLineItems)
     console.log('selectedClient', selectedClient)
+    console.log('Total cost of FBA', totalCostOfFBAPackAndPrep)
   }
 
   // Execute onMount
   onMount(() => {
     loadOutboundShipments(supabase)
+    lineItemsToDisplay = lineItems
   })
 </script>
 
@@ -220,7 +196,8 @@
 <div id="#top" class="card ml-6 mr-6 mt-6 bg-base-100 shadow-lg">
   <div class="flex flex-wrap">
     <div class="w-full p-4 md:w-1/2">
-      <table class="table table-zebra w-full">
+      <h1 class="text-center text-2xl font-semibold">Invoice Line Items</h1>
+      <table class="table table-zebra mt-2 w-full">
         <thead>
           <tr>
             <th>Service Provided</th>
@@ -229,7 +206,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each lineItems as item, index}
+          {#each lineItemsToDisplay as item, index}
             <tr>
               <td>{item.servicesProvided}</td>
               <td>{item.cost}</td>
@@ -245,7 +222,7 @@
     </div>
 
     <div class="w-full p-4 md:w-1/2">
-      <div class="mb-4 mt-3 flex items-center">
+      <div class="mb-4 mt-1 flex items-center">
         <strong class="mr-2">To:</strong>
         <input class="input input-bordered mr-2 w-full bg-base-200" bind:value={clientId} />
         <button on:click={() => (showCc = !showCc)} class="btn btn-outline btn-info">
