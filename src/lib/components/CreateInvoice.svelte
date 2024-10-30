@@ -170,10 +170,23 @@
   function addLineItem() {
     const newLineItem = { servicesProvided, cost, billingTerms }
     lineItemsToDisplay = [...lineItemsToDisplay, newLineItem]
+    openAddLineItemModal = false
   }
 
   let openEditLineItemModal = false
-  function editLineItem(index) {}
+  let editIndex = null
+  function editLineItem(index) {
+    // Update the line item in lineItemsToDisplay with new values
+    lineItemsToDisplay[editIndex] = {
+      servicesProvided,
+      cost,
+      billingTerms,
+    }
+
+    // Close the modal and reset the editIndex
+    openEditLineItemModal = false
+    editIndex = null
+  }
 
   $: totalPrice = lineItemsToDisplay.reduce((a, b) => a + b.cost, 0)
 
@@ -193,8 +206,6 @@
   onMount(() => {
     loadOutboundShipments(supabase)
     lineItemsToDisplay = lineItems
-    // companyName = clientName
-    // billingContactEmail = clientId
   })
 </script>
 
@@ -237,10 +248,10 @@
       <div class="mt-2 flex justify-center">
         <button
           on:click={() => {
-            openAddLineItemModal = true
             servicesProvided = ''
             cost = 0
             billingTerms = ''
+            openAddLineItemModal = true
           }}
           class="btn btn-primary btn-sm">Add Line Item</button
         >
@@ -365,10 +376,11 @@
               <td class="flex space-x-1">
                 <button
                   on:click={() => {
-                    openEditLineItemModal = true
                     servicesProvided = item.servicesProvided
                     cost = item.cost
                     billingTerms = item.billingTerms
+                    editIndex = index
+                    openEditLineItemModal = true
                   }}
                   class="btn btn-info btn-sm"
                 >
