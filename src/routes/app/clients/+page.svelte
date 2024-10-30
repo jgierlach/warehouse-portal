@@ -45,6 +45,8 @@
   let per_unit_fba_pack_prep = 0.25
   let per_unit_wfs_pack_prep = 0.25
   let b2b_freight_percentage_markup = 10.0
+  let per_pallet_monthly_storage_fee = 20.0
+  let stripe_customer_id = ''
 
   async function createUser() {
     const response = await fetch('/app/api/users/createUser', {
@@ -62,6 +64,8 @@
         per_unit_fba_pack_prep,
         per_unit_wfs_pack_prep,
         b2b_freight_percentage_markup,
+        per_pallet_monthly_storage_fee,
+        stripe_customer_id,
       }),
     })
     if (response.ok) {
@@ -78,6 +82,8 @@
       per_unit_fba_pack_prep = 0.25
       per_unit_wfs_pack_prep = 0.25
       b2b_freight_percentage_markup = 10.0
+      per_pallet_monthly_storage_fee = 20.0
+      stripe_customer_id = ''
     } else {
       const errorData = await response.json()
       alert(`Failed to Create inventory: ${errorData.message}`)
@@ -125,6 +131,8 @@
         per_unit_fba_pack_prep,
         per_unit_wfs_pack_prep,
         b2b_freight_percentage_markup,
+        per_pallet_monthly_storage_fee,
+        stripe_customer_id,
       }),
     })
     if (response.ok) {
@@ -136,6 +144,8 @@
       per_unit_fba_pack_prep = 0.25
       per_unit_wfs_pack_prep = 0.25
       b2b_freight_percentage_markup = 10.0
+      per_pallet_monthly_storage_fee = 20.0
+      stripe_customer_id = ''
     } else {
       const errorData = await response.json()
       alert(`Failed to Create inventory: ${errorData.message}`)
@@ -181,6 +191,14 @@
                   on:click={() => {
                     showEditUserModal = true
                     userToEdit = client
+                    hasLotNumbers = client.has_lot_numbers
+                    per_order_fee = client.per_order_fee
+                    per_order_unit_fee = client.per_order_unit_fee
+                    per_unit_fba_pack_prep = client.per_unit_fba_pack_prep
+                    per_unit_wfs_pack_prep = client.per_unit_wfs_pack_prep
+                    b2b_freight_percentage_markup = client.b2b_freight_percentage_markup
+                    per_pallet_monthly_storage_fee = client.per_pallet_monthly_storage_fee
+                    stripe_customer_id = client.stripe_customer_id
                   }}
                   class="btn btn-info btn-sm">Edit</button
                 >
@@ -242,6 +260,11 @@
         <li>
           B2B Freight Percentage Markup: <strong
             >{clientBillingTermsToDisplay.b2b_freight_percentage_markup}%</strong
+          >
+        </li>
+        <li>
+          Per Pallet Monthly Storage: <strong
+            >{formatDollarValue(clientBillingTermsToDisplay.per_pallet_monthly_storage_fee)}</strong
           >
         </li>
       </ul>
@@ -306,6 +329,21 @@
           step="0.01"
           placeholder="B2B Freight Percentage Markup"
           bind:value={b2b_freight_percentage_markup}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="perPalletMonthlyStorageFee">Per Pallet Monthly Storage Fee</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Pallet Monthly Storage Fee"
+          bind:value={per_pallet_monthly_storage_fee}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="stripeCustomerId">Stripe Customer Id</label>
+        <input
+          type="text"
+          placeholder="Stripe Customer Id"
+          bind:value={stripe_customer_id}
           class="input input-bordered mb-2 bg-base-200"
         />
         <div class="mt-4 flex justify-center">
@@ -393,6 +431,21 @@
           step="0.01"
           placeholder="B2B Freight Percentage Markup"
           bind:value={b2b_freight_percentage_markup}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="perPalletMonthlyStorageFee">Per Pallet Monthly Storage Fee</label>
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Per Pallet Monthly Storage Fee"
+          bind:value={per_pallet_monthly_storage_fee}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="stripeCustomerId">Stripe Customer Id</label>
+        <input
+          type="text"
+          placeholder="Stripe Customer Id"
+          bind:value={stripe_customer_id}
           class="input input-bordered mb-2 bg-base-200"
         />
         <div class="mt-4 flex justify-center">

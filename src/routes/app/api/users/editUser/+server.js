@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 
 export async function PUT({ request }) {
-  const { id, hasLotNumbers, per_order_fee, per_order_unit_fee, per_unit_fba_pack_prep, per_unit_wfs_pack_prep, b2b_freight_percentage_markup } = await request.json();
+  const { id, hasLotNumbers, per_order_fee, per_order_unit_fee, per_unit_fba_pack_prep, per_unit_wfs_pack_prep, b2b_freight_percentage_markup, per_pallet_monthly_storage_fee, stripe_customer_id } = await request.json();
 
   // Initialize Supabase client with service role key
   const supabaseAdmin = createClient(
@@ -20,7 +20,9 @@ export async function PUT({ request }) {
         per_order_unit_fee,
         per_unit_fba_pack_prep,
         per_unit_wfs_pack_prep,
-        b2b_freight_percentage_markup
+        b2b_freight_percentage_markup,
+        per_pallet_monthly_storage_fee,
+        stripe_customer_id,
       })
       .eq('id', id);
 

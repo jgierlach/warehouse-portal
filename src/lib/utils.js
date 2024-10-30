@@ -211,6 +211,9 @@ export const assignClientIdBasedOnStoreName = (storeName) => {
 }
 
 export const formatDollarValue = (number) => {
+  if (number === null || number === undefined) {
+    number = 0
+  }
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
