@@ -42,11 +42,11 @@
           class={`btn btn-ghost`}
           class:btn-active={$page.url.pathname === '/app/clients'}>Clients</a
         >
-        <a
+        <!-- <a
           href="/app/invoices"
           class={`btn btn-ghost`}
           class:btn-active={$page.url.pathname === '/app/invoices'}>Invoices</a
-        >
+        > -->
       </div>
     {:else}
       <a href="/" class="btn btn-ghost text-xl normal-case">Home</a>
@@ -111,11 +111,11 @@
       class={`btn btn-ghost`}
       class:btn-active={$page.url.pathname === '/app/clients'}>Clients</a
     >
-    <a
+    <!-- <a
       href="/app/invoices"
       class={`btn btn-ghost`}
       class:btn-active={$page.url.pathname === '/app/invoices'}>Invoices</a
-    >
+    > -->
     {#if isUserLoggedIn}
       <form method="post" action="/logout">
         <button type="submit" class="btn btn-primary mb-2">Logout</button>

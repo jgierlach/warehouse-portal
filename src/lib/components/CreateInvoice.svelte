@@ -213,9 +213,9 @@
   <div class="mb-4 flex justify-center">
     <button
       on:click={() => {
-        setSelectedSection('Invoices')
+        setSelectedSection('Clients')
       }}
-      class="btn btn-primary">Return To Invoices</button
+      class="btn btn-primary">View All Clients</button
     >
   </div>
   <div class="rounded-lg bg-base-100 p-4 shadow-md">
