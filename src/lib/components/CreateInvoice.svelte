@@ -75,8 +75,6 @@
           return { email: email.trim() }
         })
 
-  function resetForm() {}
-
   let showInvoicePreview = true
 
   // Shipments filtered by client and date range
