@@ -81,6 +81,7 @@
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        inventoryToEdit,
         id,
         createdAt,
         clientId,

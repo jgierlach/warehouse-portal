@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 
 export async function PUT({ request, locals }) {
   const {
+    inventoryToEdit,
     id,
     createdAt,
     clientId,
@@ -16,6 +17,28 @@ export async function PUT({ request, locals }) {
     expirationDate,
     lotNumber
   } = await request.json();
+
+  // Execute inventory changelog
+  const log = {
+    client_id: clientId,
+    name,
+    asin,
+    sku,
+    previous_quantity: inventoryToEdit.Quantity,
+    new_quantity: quantity,
+    previous_pending: inventoryToEdit.Pending,
+    new_pending: pending
+  };
+
+  const { logData, logError } = await locals.supabase
+    .from('inventory_changelog')
+    .insert([log])
+    .select();
+
+  if (logError) {
+    console.error(logError);
+    return;
+  }
 
   const row = {
     id: id,

@@ -1,3 +1,32 @@
+export const formatTimeStampForChangelog = (dateString) => {
+  const options = {
+    timeZone: 'America/Chicago',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  };
+
+  const date = new Date(dateString);
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  const [monthDay, time] = formatter.format(date).split(', ');
+
+  // Extract day suffix
+  const day = new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'America/Chicago' }).format(date);
+  const suffix = getDaySuffix(day);
+
+  return `${monthDay}${suffix}, ${time} CT`;
+}
+
+export const getDaySuffix = (day) => {
+  if (day.endsWith('1') && !day.endsWith('11')) return 'st';
+  if (day.endsWith('2') && !day.endsWith('12')) return 'nd';
+  if (day.endsWith('3') && !day.endsWith('13')) return 'rd';
+  return 'th';
+}
+
 export const addInvoiceTerms = (inputDate, daysUntilDue) => {
   // Parse the input date
   let parts = inputDate.split('/');
