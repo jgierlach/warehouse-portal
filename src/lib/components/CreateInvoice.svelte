@@ -40,6 +40,7 @@
   let b2bFreightPercentageMarkup = $selectedClientToInvoice.b2b_freight_percentage_markup
   let perPalletMonthlyStorageFee = $selectedClientToInvoice.per_pallet_monthly_storage_fee
 
+  // Toggling date range specific variables and functions
   const now = new Date()
   const currentYear = now.getFullYear()
   const currentMonth = now.getMonth()
