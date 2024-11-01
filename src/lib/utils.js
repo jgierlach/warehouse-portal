@@ -17,7 +17,7 @@ export const formatTimeStampForChangelog = (dateString) => {
   const day = new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'America/Chicago' }).format(date);
   const suffix = getDaySuffix(day);
 
-  return `${monthDay}${suffix}, ${time} CT`;
+  return `${monthDay}${suffix}, ${time} CST`;
 }
 
 export const getDaySuffix = (day) => {
