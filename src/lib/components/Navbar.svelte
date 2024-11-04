@@ -45,7 +45,7 @@
         <a
           href="/app/inventorychangelog"
           class={`btn btn-ghost`}
-          class:btn-active={$page.url.pathname === '/app/clients'}>Changelog</a
+          class:btn-active={$page.url.pathname === '/app/inventorychangelog'}>Changelog</a
         >
         <!-- <a
           href="/app/invoices"
@@ -119,7 +119,7 @@
     <a
       href="/app/inventorychangelog"
       class={`btn btn-ghost`}
-      class:btn-active={$page.url.pathname === '/app/clients'}>Changelog</a
+      class:btn-active={$page.url.pathname === '/app/inventorychangelog'}>Changelog</a
     >
     <!-- <a
       href="/app/invoices"
