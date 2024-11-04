@@ -183,7 +183,7 @@
             <th>Company Name</th>
             <th>Username</th>
             <th>Password</th>
-            <th>Has Lot #s</th>
+            <!-- <th>Has Lot #s</th> -->
             <th>Actions</th>
           </tr>
         </thead>
@@ -193,7 +193,7 @@
               <td>{client.company_name}</td>
               <td>{client.username}</td>
               <td>{client.password}</td>
-              <td>{client.has_lot_numbers}</td>
+              <!-- <td>{client.has_lot_numbers}</td> -->
               <td
                 ><div class="flex space-x-1">
                   <button
@@ -232,7 +232,7 @@
                       showClientBillingTermsModal = true
                       clientBillingTermsToDisplay = client
                     }}
-                    class="btn btn-sm">View Billing Terms</button
+                    class="btn btn-outline btn-sm">View Billing Terms</button
                   >
                 </div></td
               >
