@@ -317,7 +317,7 @@
             billingTerms = ''
             openAddLineItemModal = true
           }}
-          class="btn btn-primary btn-sm">Add Line Item</button
+          class="btn btn-primary btn-sm">Add Line Item <i class="fas fa-plus"></i></button
         >
       </div>
 
