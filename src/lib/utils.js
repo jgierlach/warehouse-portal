@@ -198,14 +198,15 @@ export const generateShipmentLineItems = (shipments, perOrderFee, perOrderUnitFe
 }
 
 export const isWithinDateRange = (shipmentDate, start, end) => {
-  // Parse the dates to ensure we compare them as date objects
-  const shipmentTime = new Date(shipmentDate).getTime();
+  // Convert all dates to a consistent format: YYYY-MM-DD
+  const formattedShipmentDate = new Date(shipmentDate).toISOString().split('T')[0];
+  const formattedStartDate = new Date(start).toISOString().split('T')[0];
+  const formattedEndDate = new Date(end).toISOString().split('T')[0];
 
-  // Set start time to the beginning of the day (00:00:00.000)
-  const startTime = new Date(new Date(start).setHours(0, 0, 0, 0)).getTime();
-
-  // Set end time to the end of the day (23:59:59.999) + 1 ms
-  const endTime = new Date(new Date(end).setHours(23, 59, 59, 999)).getTime() + 1;
+  // Convert the formatted dates back to timestamps
+  const shipmentTime = new Date(formattedShipmentDate).getTime();
+  const startTime = new Date(formattedStartDate).getTime();
+  const endTime = new Date(formattedEndDate).setHours(23, 59, 59, 999);
 
   return shipmentTime >= startTime && shipmentTime <= endTime;
 };
