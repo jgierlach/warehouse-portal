@@ -154,29 +154,27 @@
     },
   ]
 
-  let lineItemsToDisplay = []
-
-  function deleteLineItem(index) {
-    lineItemsToDisplay = lineItemsToDisplay.filter((_, i) => i !== index)
-  }
-
   // Line item fields
   let servicesProvided = ''
   let cost = 0
   let billingTerms = ''
 
+  function deleteLineItem(index) {
+    lineItems = lineItems.filter((_, i) => i !== index)
+  }
+
   let openAddLineItemModal = false
   function addLineItem() {
     const newLineItem = { servicesProvided, cost, billingTerms }
-    lineItemsToDisplay = [...lineItemsToDisplay, newLineItem]
+    lineItems = [...lineItems, newLineItem]
     openAddLineItemModal = false
   }
 
   let openEditLineItemModal = false
   let editIndex = null
   function editLineItem(index) {
-    // Update the line item in lineItemsToDisplay with new values
-    lineItemsToDisplay[editIndex] = {
+    // Update the line item in lineItems with new values
+    lineItems[editIndex] = {
       servicesProvided,
       cost,
       billingTerms,
@@ -187,7 +185,74 @@
     editIndex = null
   }
 
-  $: totalPrice = lineItemsToDisplay.reduce((a, b) => a + b.cost, 0)
+  $: totalPrice = lineItems.reduce((a, b) => a + b.cost, 0)
+
+  // Shipment line items fields
+  let orderDate = ''
+  let shipmentNumber = ''
+  let recipientName = ''
+  let poNumber = ''
+  let orderSource = ''
+  let unitsShipped = 0
+  let shipmentCost = 0.0
+  let markup = 0.0
+  $: totalCost = shipmentCost + markup
+
+  function deleteShipmentLineItem(index) {
+    shipmentLineItems = shipmentLineItems.filter((_, i) => i !== index)
+  }
+
+  let editShipmentIndex = null
+
+  function editShipmentLineItem() {
+    if (editShipmentIndex !== null) {
+      shipmentLineItems[editShipmentIndex] = {
+        orderDate,
+        shipmentNumber,
+        recipientName,
+        poNumber,
+        orderSource,
+        unitsShipped,
+        shipmentCost,
+        markup,
+        totalCost,
+      }
+      editShipmentIndex = null
+    }
+  }
+
+  let openAddShipmentLineItemModal = false
+  function addShipmentLineItem() {
+    const newShipmentLineItem = {
+      orderDate,
+      shipmentNumber,
+      recipientName,
+      poNumber,
+      orderSource,
+      unitsShipped,
+      shipmentCost,
+      markup,
+      totalCost,
+    }
+    shipmentLineItems = [...shipmentLineItems, newShipmentLineItem]
+    openAddShipmentLineItemModal = false
+  }
+
+  // To trigger edit modal and set fields for the selected shipment line item
+  function openEditShipmentLineItemModal(index) {
+    const item = shipmentLineItems[index]
+    orderDate = item.orderDate
+    shipmentNumber = item.shipmentNumber
+    recipientName = item.recipientName
+    poNumber = item.poNumber
+    orderSource = item.orderSource
+    unitsShipped = item.unitsShipped
+    shipmentCost = item.shipmentCost
+    markup = item.markup
+    totalCost = item.totalCost
+    editShipmentIndex = index
+    openEditLineItemModal = true
+  }
 
   let autoPay = false
   let passCardFeesOn = true
@@ -204,7 +269,7 @@
   // Execute onMount
   onMount(() => {
     loadOutboundShipments(supabase)
-    lineItemsToDisplay = lineItems
+    // lineItems = lineItems
   })
 </script>
 
@@ -367,7 +432,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each lineItemsToDisplay as item, index}
+          {#each lineItems as item, index}
             <tr>
               <td>{item.servicesProvided}</td>
               <td>{item.cost}</td>
@@ -558,7 +623,7 @@
                                 </tr>
                               </thead>
                               <tbody>
-                                {#each lineItemsToDisplay as lineItem}
+                                {#each lineItems as lineItem}
                                   <tr>
                                     <td>{lineItem.servicesProvided}</td>
                                     <td>{formatDollarValue(lineItem.cost)}</td>
@@ -788,11 +853,8 @@
             Object.keys(shipmentLineItems[0]),
             `${clientName}-Shipment-Line-Items.csv`,
           )}
-          class="btn btn-primary btn-sm">Export Line Items To CSV</button
+          class="btn btn-primary btn-sm mr-2">Export Line Items To CSV</button
         >
-      </div>
-
-      <div class="mt-2 flex justify-center">
         <button
           on:click={csvGenerator(
             shipmentLineItemsForClientExport,
@@ -802,6 +864,14 @@
           )}
           class="btn btn-primary btn-sm">Export Line Items For Client To CSV</button
         >
+      </div>
+
+      <div class="mb-4 mt-2 flex justify-center">
+        <button
+          on:click={() => (openAddShipmentLineItemModal = true)}
+          class="btn btn-outline btn-primary btn-sm"
+          >Add Shipment Line Item <i class="fas fa-plus"></i>
+        </button>
       </div>
 
       <div class="mt-4 flex justify-center overflow-x-auto">
@@ -833,8 +903,11 @@
                 <td>{formatDollarValue(item.markup)}</td>
                 <td>{formatDollarValue(item.totalCost)}</td>
                 <td class="flex space-x-1">
-                  <button class="btn btn-info btn-sm"> Edit </button>
-                  <button class="btn btn-error btn-sm"> Delete </button>
+                  <button class="btn btn-info btn-sm">Edit</button>
+                  <button
+                    on:click={() => deleteShipmentLineItem(index)}
+                    class="btn btn-error btn-sm">Delete</button
+                  >
                 </td>
               </tr>
             {/each}
@@ -845,6 +918,117 @@
   </div>
 </div>
 
+<!-- ADD SHIPMENT Line ITEM MODAL BEGINS -->
+<div class={`modal ${openAddShipmentLineItemModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (openAddShipmentLineItemModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mb-5 text-center text-xl font-semibold">Add Shipment Line Item</h1>
+    <form on:submit={addShipmentLineItem}>
+      <!-- Order Date -->
+      <div class="form-control mb-4">
+        <label class="label" for="servicesProvided">Order Date</label>
+        <input
+          required
+          class="input input-bordered bg-base-200"
+          id="orderDate"
+          bind:value={orderDate}
+          placeholder="MM/DD/YYYY"
+        />
+      </div>
+      <!-- Shipment Number -->
+      <div class="form-control mb-4">
+        <label class="label" for="shipmentNumber">Shipment Number</label>
+        <input
+          type="text"
+          placeholder="Shipment Number"
+          bind:value={shipmentNumber}
+          class="input input-bordered bg-base-200"
+        />
+      </div>
+      <!-- Recipient Name -->
+      <div class="form-control mb-4">
+        <label class="label" for="recipientName">Recipient Name</label>
+        <input
+          class="input input-bordered bg-base-200"
+          id="recipientName"
+          bind:value={recipientName}
+          placeholder="Recipient Name"
+        />
+      </div>
+      <!-- PO Number -->
+      <div class="form-control mb-4">
+        <label class="label" for="poNumber">PO Number</label>
+        <input
+          class="input input-bordered bg-base-200"
+          id="poNumber"
+          bind:value={poNumber}
+          placeholder="PO Number"
+        />
+      </div>
+      <!-- Order Source -->
+      <div class="form-control mb-4">
+        <label class="label" for="orderSource">Order Source</label>
+        <input
+          class="input input-bordered bg-base-200"
+          id="orderSource"
+          bind:value={orderSource}
+          placeholder="Order Source"
+        />
+      </div>
+      <!-- Units Shipped -->
+      <div class="form-control mb-4">
+        <label class="label" for="unitsShipped">Units Shipped</label>
+        <input
+          type="number"
+          step="1.0"
+          class="input input-bordered bg-base-200"
+          id="unitsShipped"
+          bind:value={unitsShipped}
+          placeholder="Units Shipped"
+        />
+      </div>
+      <!-- Shipment Cost -->
+      <div class="form-control mb-4">
+        <label class="label" for="shipmentCost">Shipment Cost</label>
+        <input
+          id="shipmentCost"
+          type="number"
+          step="0.01"
+          placeholder="Shipment Cost"
+          bind:value={shipmentCost}
+          class="input input-bordered bg-base-200"
+        />
+      </div>
+      <!-- Mark Up -->
+      <div class="form-control mb-4">
+        <label class="label" for="markup">Markup</label>
+        <input
+          id="markup"
+          type="number"
+          step="0.01"
+          placeholder="Mark Up"
+          bind:value={markup}
+          class="input input-bordered bg-base-200"
+        />
+      </div>
+      <!-- Total Cost -->
+      <div class="form-control mb-4">
+        <label class="label" for="totalCost">Total Cost</label>
+        <h1 class="">{totalCost}</h1>
+      </div>
+      <!-- Submit Button -->
+      <div class="mt-4 flex justify-center">
+        <button class="btn btn-info" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ADD SHIPMENT LINE ITEM MODAL ENDS -->
+
 <style>
   .column {
     /* height: 100vh; */
@@ -854,14 +1038,5 @@
   .content {
     padding: 1rem;
     border-left: 1px solid #dbdbdb;
-  }
-
-  textarea.textarea {
-    height: calc(100% - 36px);
-    resize: none;
-  }
-
-  button.button {
-    margin-top: 8px;
   }
 </style>
