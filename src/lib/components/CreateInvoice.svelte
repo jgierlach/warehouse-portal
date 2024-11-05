@@ -3,7 +3,7 @@
   import { onMount } from 'svelte'
 
   // Import components
-  import Navbar from '$lib/components/Navbar.svelte'
+  import Loading from '$lib/components/Loading.svelte'
 
   // Import utility functions
   import {
@@ -16,6 +16,8 @@
     generateInvoiceNumber,
     addInvoiceTerms,
     getCurrentDateFormatted,
+    formatDateInSubjectLine,
+    abbreviateString,
   } from '$lib/utils'
 
   // Import props
@@ -39,6 +41,7 @@
   let perUnitWFSPackAndPrep = $selectedClientToInvoice.per_unit_wfs_pack_prep
   let b2bFreightPercentageMarkup = $selectedClientToInvoice.b2b_freight_percentage_markup
   let perPalletMonthlyStorageFee = $selectedClientToInvoice.per_pallet_monthly_storage_fee
+  let stripeCustomerId = $selectedClientToInvoice.stripe_customer_id
 
   // Toggling date range specific variables and functions
   const now = new Date()
@@ -63,7 +66,9 @@
   }
 
   // Variables for email
-  let subjectLine = `${clientName} - Invoice for 3PL services for work done from ${formatDate(startDate)} to ${formatDate(endDate)}`
+  let subjectLine = `${clientName} - Invoice for 3PL services for work done from ${formatDateInSubjectLine(startDate)} to ${formatDateInSubjectLine(endDate)}`
+
+  $: billingPeriod = `For work done ${formatDateInSubjectLine(startDate)} to ${formatDateInSubjectLine(endDate)}`
 
   let showCc = false
 
@@ -269,7 +274,53 @@
   let passCardFeesOn = true
 
   let dateIssued = getCurrentDateFormatted()
-  $: dateDue = addInvoiceTerms(dateIssued, 7)
+  let daysUntilDue = 7
+  $: dateDue = addInvoiceTerms(dateIssued, daysUntilDue)
+
+  let isPDFGeneratingAndUploading = false
+
+  $: showStripeCustomerIdWarning = stripeCustomerId === null
+
+  let loading = false
+
+  let invoicePDFLink = ''
+
+  function generateAndUploadPDF() {
+    // Some code
+  }
+
+  let stripeInvoiceLink = ''
+
+  async function createStripeInvoice() {
+    loading = true
+    const response = await fetch('/app/api/stripe/createInvoice', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        stripeCustomerId,
+        lineItems,
+        passCardFeesOn,
+        billingPeriod,
+        daysUntilDue,
+      }),
+    })
+
+    if (!response.ok) {
+      alert('Failed to create Stripe invoice link')
+      throw new Error('Failed to create invoice')
+    }
+
+    const result = await response.json()
+    const stripeInvoiceUrl = result.body.stripeInvoiceUrl
+    const stripeInvoiceId = result.body.invoiceId
+
+    // Set the stripe invoice link displayed to the newly created stripe invoice url
+    stripeInvoiceLink = stripeInvoiceUrl
+
+    loading = false
+  }
 
   $: {
     console.log('selectedClientToInvoice', $selectedClientToInvoice)
@@ -281,6 +332,7 @@
   })
 </script>
 
+<Loading {loading} />
 <div class="mt-6 flex flex-col items-center">
   <div class="mb-4 flex justify-center">
     <button
@@ -496,42 +548,24 @@
         <input class="input input-bordered w-full bg-base-200" bind:value={subjectLine} />
       </div>
 
-      <!-- <div class="mt-4 flex justify-center space-x-2">
+      <!-- BUTTONS SECTION BEGINS -->
+      <div class="mt-4 flex justify-center space-x-2">
         <button
-          class="btn btn-outline btn-primary"
+          class="btn btn-primary btn-sm"
           on:click={generateAndUploadPDF}
           disabled={isPDFGeneratingAndUploading}
         >
           Generate PDF Invoice
-          {#if invoiceLink !== '' && invoiceLink !== null}
+          {#if invoicePDFLink !== '' && invoicePDFLink !== null}
             <i class="fas fa-check ml-2 text-green-500"></i>
           {/if}
         </button>
 
-        <button on:click={createStripeInvoice} class="btn btn-outline btn-warning">
+        <button on:click={createStripeInvoice} class="btn btn-warning btn-sm">
           Generate Stripe Invoice
           {#if stripeInvoiceLink !== '' && stripeInvoiceLink !== null}
             <i class="fas fa-check ml-2 text-green-500"></i>
           {/if}
-        </button>
-
-        <button
-          on:click={() => {
-            showNotes = !showNotes
-          }}
-          class="btn btn-outline"
-        >
-          View Notes
-        </button>
-
-        <button
-          on:click={() => {
-            setInvoiceToEdit($invoiceToCreate)
-            setSelectedTabValue('Edit Invoice')
-          }}
-          class="btn btn-outline btn-info"
-        >
-          Edit
         </button>
       </div>
 
@@ -539,7 +573,35 @@
         <p class="mt-4 text-center text-red-500">
           <strong>WARNING:</strong> No stripe customer ID found. Stripe Invoice creation will fail.
         </p>
-      {/if} -->
+      {/if}
+      <!-- BUTTONS SECTION ENDS -->
+
+      <!-- INVOICE LINKS TABLE BEGINS -->
+      <div class="mt-3 flex justify-center">
+        <table class="table w-full bg-base-100 p-4 shadow-lg">
+          <!-- <thead>
+            <tr>
+              <th>Link Type</th>
+              <th>Link Url</th>
+            </tr>
+          </thead> -->
+          <tbody>
+            <tr>
+              <td><strong>Invoice PDF</strong></td>
+              <td><a href="" target="_blank">adsfasfdsafasdfk</a></td>
+            </tr>
+            <tr>
+              <td><strong>Stripe Invoice Link</strong></td>
+              <td
+                ><a href={stripeInvoiceLink} target="_blank"
+                  >{abbreviateString(stripeInvoiceLink)}</a
+                ></td
+              >
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- INVOICE LINKS TABLE ENDS -->
 
       {#if showInvoicePreview}
         <center>
@@ -621,30 +683,33 @@
                               border="1"
                               cellspacing="0"
                               cellpadding="5"
-                              style="margin-top: 20px; border-collapse: collapse; background: #ffffff; border: none; padding-inline: 20px;"
+                              style="margin-top: 20px; border-collapse: collapse; background: #ffffff; border: none;"
                             >
                               <thead>
                                 <tr>
-                                  <th>Service Provided</th>
-                                  <th>Price</th>
-                                  <th>Billing Terms</th>
+                                  <th style="padding: 20px">Service Provided</th>
+                                  <th style="padding: 20px">Price</th>
+                                  <th style="padding: 20px">Billing Terms</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {#each lineItems as lineItem}
                                   <tr>
-                                    <td>{lineItem.servicesProvided}</td>
-                                    <td>{formatDollarValue(lineItem.cost)}</td>
-                                    <td style="white-space: pre-line;"
+                                    <td style="padding: 20px">{lineItem.servicesProvided}</td>
+                                    <td style="padding: 20px">{formatDollarValue(lineItem.cost)}</td
+                                    >
+                                    <td style="white-space: pre-line; padding: 20px"
                                       >{`The price for ${lineItem.servicesProvided} was calculated according to the terms of ${lineItem.billingTerms}.`}
                                     </td>
                                   </tr>
                                 {/each}
                                 {#if passCardFeesOn}
                                   <tr>
-                                    <td>Card Processing Fees</td>
-                                    <td>{formatDollarValue(totalPrice * 0.034)}</td>
-                                    <td
+                                    <td style="padding: 20px">Card Processing Fees</td>
+                                    <td style="padding: 20px"
+                                      >{formatDollarValue(totalPrice * 0.034)}</td
+                                    >
+                                    <td style="padding: 20px"
                                       >The price for card processing fees was calculated as 3.4% of
                                       the total invoice.</td
                                     >
