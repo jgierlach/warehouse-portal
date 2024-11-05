@@ -310,9 +310,9 @@ export const formatDollarValue = (number) => {
 };
 
 export const formatDate = (date) => {
-  date = new Date(date)
+  date = new Date(`${date}T00:00:00`); // Forces the date to local time
   const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0, so we need to add 1
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0, so we add 1
   const year = date.getFullYear();
   return `${month}/${day}/${year}`;
 }
