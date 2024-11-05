@@ -265,22 +265,6 @@
     openAddShipmentLineItemModal = false
   }
 
-  // To trigger edit modal and set fields for the selected shipment line item
-  // function openEditShipmentLineItemModal(index) {
-  //   const item = shipmentLineItems[index]
-  //   orderDate = item.orderDate
-  //   shipmentNumber = item.shipmentNumber
-  //   recipientName = item.recipientName
-  //   poNumber = item.poNumber
-  //   orderSource = item.orderSource
-  //   unitsShipped = item.unitsShipped
-  //   shipmentCost = item.shipmentCost
-  //   markup = item.markup
-  //   totalCost = item.totalCost
-  //   editShipmentIndex = index
-  //   openEditLineItemModal = true
-  // }
-
   let autoPay = false
   let passCardFeesOn = true
 
@@ -296,7 +280,6 @@
   // Execute onMount
   onMount(() => {
     loadOutboundShipments(supabase)
-    // lineItems = lineItems
   })
 </script>
 
