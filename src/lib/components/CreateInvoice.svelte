@@ -272,9 +272,7 @@
   $: dateDue = addInvoiceTerms(dateIssued, 7)
 
   $: {
-    console.log(shipmentLineItems)
     console.log('selectedClientToInvoice', $selectedClientToInvoice)
-    console.log('Total cost of FBA', totalCostOfFBAPackAndPrep)
   }
 
   // Execute onMount
@@ -598,7 +596,7 @@
                                 <td align="right" colspan="2">
                                   <p>
                                     <strong>Invoice #:</strong>
-                                    {generateInvoiceNumber()}
+                                    {`3PL${generateInvoiceNumber()}`}
                                   </p>
                                   <p>
                                     <strong>Billing Month:</strong>
@@ -623,7 +621,7 @@
                               border="1"
                               cellspacing="0"
                               cellpadding="5"
-                              style="margin-top: 20px; border-collapse: collapse; background: #ffffff; border: none;"
+                              style="margin-top: 20px; border-collapse: collapse; background: #ffffff; border: none; padding-inline: 20px;"
                             >
                               <thead>
                                 <tr>
@@ -770,10 +768,10 @@
                                         <p style="margin: 5px 0;">
                                           <strong>Bank Name:</strong> Choice Financial Group<br />
                                           <strong>Bank Address:</strong> 4501 23rd Avenue S, Fargo,
-                                          ND 58104<br />
+                                          ND, 58104<br />
                                           <strong>Routing Number:</strong>
                                           091311229<br />
-                                          <strong>Account Number:</strong>202486516073
+                                          <strong>Account Number:</strong> 202486516073
                                         </p>
                                       </td>
                                     </tr>
