@@ -2,6 +2,10 @@
   // Import svelte specific functions
   import { onMount } from 'svelte'
 
+  // Import packages
+  import html2canvas from 'html2canvas'
+  import jsPDF from 'jspdf'
+
   // Import components
   import Loading from '$lib/components/Loading.svelte'
 
@@ -285,8 +289,116 @@
 
   let invoicePDFLink = ''
 
-  function generateAndUploadPDF() {
-    // Some code
+  // async function generateAndUploadPDF() {
+  //   const element = document.getElementById('pdfContent')
+  //   try {
+  //     loading = true
+  //     isPDFGeneratingAndUploading = true
+  //     const canvas = await html2canvas(element)
+  //     const imgData = canvas.toDataURL('image/png') // Changed to "image/png"
+  //     const pdf = new jsPDF({
+  //       orientation: 'portrait',
+  //       unit: 'px',
+  //       format: [canvas.width, canvas.height],
+  //       compress: true,
+  //     })
+
+  //     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height, 'MEDIUM') // Changed to "PNG"
+  //     const pdfBlob = pdf.output('blob')
+  //     console.log('PDF BLOB', pdfBlob)
+  //     await uploadPDF(pdfBlob)
+  //     loading = false
+  //   } catch (error) {
+  //     console.error('Error in PDF generation or upload:', error)
+  //     loading = false
+  //   } finally {
+  //     isPDFGeneratingAndUploading = false
+  //     loading = false
+  //   }
+  // }
+
+  async function generateAndUploadPDF() {
+    const element = document.getElementById('pdfContent')
+
+    // Inject a temporary global style to override Tailwind/DaisyUI colors within #pdfContent
+    const styleOverride = document.createElement('style')
+    styleOverride.innerHTML = `
+    #pdfContent * {
+      --tw-text-opacity: 1 !important;
+      color: rgb(0, 0, 0) !important; /* Text color fallback */
+      background-color: rgb(255, 255, 255) !important; /* Background color fallback */
+      border-color: rgb(0, 0, 0) !important; /* Border color fallback */
+    }
+
+    /* Override specific DaisyUI variables if themes are involved */
+    [data-theme] #pdfContent * {
+      color: rgb(0, 0, 0) !important;
+      background-color: rgb(255, 255, 255) !important;
+      border-color: rgb(0, 0, 0) !important;
+    }
+  `
+    document.head.appendChild(styleOverride)
+
+    try {
+      // Short delay to ensure styles apply
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      loading = true
+      isPDFGeneratingAndUploading = true
+
+      const canvas = await html2canvas(element)
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height],
+        compress: true,
+      })
+
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height, 'MEDIUM')
+      const pdfBlob = pdf.output('blob')
+      console.log('PDF BLOB', pdfBlob)
+      await uploadPDF(pdfBlob)
+      loading = false
+    } catch (error) {
+      console.error('Error in PDF generation or upload:', error)
+      loading = false
+    } finally {
+      // Remove the temporary style override
+      document.head.removeChild(styleOverride)
+      isPDFGeneratingAndUploading = false
+      loading = false
+    }
+  }
+
+  async function uploadPDF(pdfBlob) {
+    const fileName = `invoice-${companyName}-${generateInvoiceNumber()}.pdf`
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9- .]/g, '')
+      .replace(/ /g, '-') // Unique file name
+
+    console.log('FILENAME', fileName)
+    console.log('PDF BLOB', pdfBlob)
+    try {
+      const { error } = await supabase.storage.from('invoice-pdfs').upload(`${fileName}`, pdfBlob, {
+        contentType: 'application/pdf',
+        cacheControl: '3600',
+        upsert: true,
+      })
+
+      if (error) {
+        console.log('Error', error)
+        throw error
+      }
+
+      const { data } = await supabase.storage.from('invoice-pdfs').getPublicUrl(fileName)
+
+      // Set invoice link to the newly created Invoice PDF
+      invoicePDFLink = data.publicUrl
+      console.log('PDF uploaded successfully:', data, res)
+    } catch (error) {
+      console.error('Error uploading PDF:', error.message)
+    }
   }
 
   let stripeInvoiceLink = ''
@@ -579,16 +691,14 @@
       <!-- INVOICE LINKS TABLE BEGINS -->
       <div class="mt-3 flex justify-center">
         <table class="table w-full bg-base-100 p-4 shadow-lg">
-          <!-- <thead>
-            <tr>
-              <th>Link Type</th>
-              <th>Link Url</th>
-            </tr>
-          </thead> -->
           <tbody>
             <tr>
               <td><strong>Invoice PDF</strong></td>
-              <td><a href="" class="link link-primary" target="_blank">adsfasfdsafasdfk</a></td>
+              <td
+                ><a href={invoicePDFLink} class="link link-primary" target="_blank"
+                  >{abbreviateString(invoicePDFLink, 35)}</a
+                ></td
+              >
             </tr>
             <tr>
               <td><strong>Stripe Invoice Link</strong></td>
@@ -775,43 +885,43 @@
                             </p>
 
                             <!-- PROMPT TO PAY BY CREDIT CARD BEGINS -->
-                            <!-- {#if autoPay === false && stripeInvoiceLink !== null && stripeInvoiceLink !== ''} -->
-                            <table
-                              width="100%"
-                              border="0"
-                              cellspacing="0"
-                              cellpadding="0"
-                              style="margin-top: 20px;"
-                            >
-                              <tr>
-                                <td style="text-align: center;">
-                                  <p
-                                    style="font-size: 20px; font-weight: bold; margin-bottom: 12px;"
-                                  >
-                                    If paying by credit card, click the button below.
-                                  </p>
-                                  <a
-                                    href={'stripeInvoiceLink'}
-                                    target="_blank"
-                                    style="display: inline-block; background-color: #00449E; color: #ffffff; padding: 10px 20px; font-weight: bold; text-decoration: none; border-radius: 5px;"
-                                    >Pay By Card</a
-                                  >
-                                  {#if passCardFeesOn}
+                            {#if autoPay === false && stripeInvoiceLink !== null && stripeInvoiceLink !== ''}
+                              <table
+                                width="100%"
+                                border="0"
+                                cellspacing="0"
+                                cellpadding="0"
+                                style="margin-top: 20px;"
+                              >
+                                <tr>
+                                  <td style="text-align: center;">
                                     <p
-                                      style="font-size: 16px; font-weight: bold; margin-bottom: 12px; margin-top: 12px; color: red;"
+                                      style="font-size: 20px; font-weight: bold; margin-bottom: 12px;"
                                     >
-                                      CARD FEES HAVE BEEN APPLIED TO THIS INVOICE
+                                      If paying by credit card, click the button below.
                                     </p>
-                                    <p
-                                      style="font-size: 16px; font-weight: bold; margin-bottom: 12px; color: red;"
+                                    <a
+                                      href={'stripeInvoiceLink'}
+                                      target="_blank"
+                                      style="display: inline-block; background-color: #00449E; color: #ffffff; padding: 10px 20px; font-weight: bold; text-decoration: none; border-radius: 5px;"
+                                      >Pay By Card</a
                                     >
-                                      Please pay by ACH/WIRE to avoid the processing surcharge
-                                    </p>
-                                  {/if}
-                                </td>
-                              </tr>
-                            </table>
-                            <!-- {/if} -->
+                                    {#if passCardFeesOn}
+                                      <p
+                                        style="font-size: 16px; font-weight: bold; margin-bottom: 12px; margin-top: 12px; color: red;"
+                                      >
+                                        CARD FEES HAVE BEEN APPLIED TO THIS INVOICE
+                                      </p>
+                                      <p
+                                        style="font-size: 16px; font-weight: bold; margin-bottom: 12px; color: red;"
+                                      >
+                                        Please pay by ACH/WIRE to avoid the processing surcharge
+                                      </p>
+                                    {/if}
+                                  </td>
+                                </tr>
+                              </table>
+                            {/if}
                             <!-- PROMPT TO PAY BY CREDIT CARD ENDS -->
 
                             <!-- BEGINNING OF ACH/WIRE SECTION -->
@@ -1262,5 +1372,14 @@
   .content {
     padding: 1rem;
     border-left: 1px solid #dbdbdb;
+  }
+
+  /* Override DaisyUI colors to avoid `oklch` */
+  .bg-base-100 {
+    background-color: rgb(255, 255, 255) !important; /* Substitute with a desired RGB color */
+  }
+
+  .bg-base-200 {
+    background-color: rgb(245, 245, 245) !important; /* Substitute with a desired RGB color */
   }
 </style>
