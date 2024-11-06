@@ -715,89 +715,91 @@
         <input class="input input-bordered w-full bg-base-200" bind:value={subjectLine} />
       </div>
 
-      <!-- BUTTONS SECTION BEGINS -->
-      <div class="mt-4 flex justify-center space-x-2">
-        <button
-          class="btn btn-primary btn-sm"
-          on:click={generateAndUploadPDF}
-          disabled={isPDFGeneratingAndUploading}
-        >
-          Generate PDF Invoice Attachment
-          {#if invoicePDFLink !== '' && invoicePDFLink !== null}
-            <i class="fas fa-check ml-2 text-green-500"></i>
-          {/if}
-        </button>
-        <button on:click={createStripeInvoice} class="btn btn-warning btn-sm">
-          Generate Stripe Invoice
-          {#if stripeInvoiceLink !== '' && stripeInvoiceLink !== null}
-            <i class="fas fa-check ml-2 text-green-500"></i>
-          {/if}
-        </button>
-      </div>
+      {#if showInvoicePreview}
+        <!-- BUTTONS SECTION BEGINS -->
+        <div class="mt-4 flex justify-center space-x-2">
+          <!-- <button
+            class="btn btn-primary btn-sm"
+            on:click={generateAndUploadPDF}
+            disabled={isPDFGeneratingAndUploading}
+          >
+            Generate PDF Invoice Attachment
+            {#if invoicePDFLink !== '' && invoicePDFLink !== null}
+              <i class="fas fa-check ml-2 text-green-500"></i>
+            {/if}
+          </button> -->
+          <button on:click={createStripeInvoice} class="btn btn-warning btn-sm">
+            Generate Stripe Invoice
+            {#if stripeInvoiceLink !== '' && stripeInvoiceLink !== null}
+              <i class="fas fa-check ml-2 text-green-500"></i>
+            {/if}
+          </button>
+        </div>
 
-      {#if showStripeCustomerIdWarning}
-        <p class="mt-4 text-center text-red-500">
-          <strong>WARNING:</strong> No stripe customer ID found. Stripe Invoice creation will fail.
-        </p>
-      {/if}
-      <!-- BUTTONS SECTION ENDS -->
+        {#if showStripeCustomerIdWarning}
+          <p class="mt-4 text-center text-red-500">
+            <strong>WARNING:</strong> No stripe customer ID found. Stripe Invoice creation will fail.
+          </p>
+        {/if}
+        <!-- BUTTONS SECTION ENDS -->
 
-      <!-- INVOICE LINKS TABLE BEGINS -->
-      <div class="mt-3 flex justify-center">
-        <table class="table w-full bg-base-100 p-4 shadow-lg">
-          <tbody>
-            <tr>
+        <!-- INVOICE LINKS TABLE BEGINS -->
+        {#if stripeInvoiceLink !== '' && stripeInvoiceLink !== null}
+          <div class="mt-3 flex justify-center">
+            <table class="table w-full bg-base-100 p-4 shadow-lg">
+              <tbody>
+                <!-- <tr>
               <td><strong>Invoice PDF</strong></td>
               <td
                 ><a href={invoicePDFLink} class="link link-primary" target="_blank"
                   >{abbreviateString(invoicePDFLink, 35)}</a
                 ></td
               >
-            </tr>
-            <tr>
-              <td><strong>Stripe Invoice Link</strong></td>
-              <td
-                ><a href={stripeInvoiceLink} class="link link-primary" target="_blank"
-                  >{abbreviateString(stripeInvoiceLink, 35)}</a
-                ></td
-              >
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- INVOICE LINKS TABLE ENDS -->
+            </tr> -->
+                <tr>
+                  <td><strong>Stripe Invoice Link</strong></td>
+                  <td
+                    ><a href={stripeInvoiceLink} class="link link-primary" target="_blank"
+                      >{abbreviateString(stripeInvoiceLink, 45)}</a
+                    ></td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        {/if}
+        <!-- INVOICE LINKS TABLE ENDS -->
 
-      <!-- INVOICE CONTROLS BEGINS -->
-      <div class="mt-2 flex justify-center space-x-2">
-        <div class="form-control">
-          <label class="label" for="daysUntilDue"><strong>Days Until Due</strong></label>
-          <input
-            type="number"
-            step="1.0"
-            class="input input-bordered bg-base-200"
-            id="daysUntilDue"
-            bind:value={daysUntilDue}
-            placeholder="Days Until Due"
-          />
+        <!-- INVOICE CONTROLS BEGINS -->
+        <div class="mt-2 flex justify-center space-x-2">
+          <div class="form-control">
+            <label class="label" for="daysUntilDue"><strong>Days Until Due</strong></label>
+            <input
+              type="number"
+              step="1.0"
+              class="input input-bordered bg-base-200"
+              id="daysUntilDue"
+              bind:value={daysUntilDue}
+              placeholder="Days Until Due"
+            />
+          </div>
+          <div class="form-control">
+            <label class="label" for="autoPay"><strong>Auto Pay</strong></label>
+            <select class="select select-bordered bg-base-200" bind:value={autoPay}>
+              <option value={true}>TRUE</option>
+              <option value={false}>FALSE</option>
+            </select>
+          </div>
+          <div class="form-control">
+            <label class="label" for="passCardFeesOn"><strong>Pass Card Fees On</strong></label>
+            <select class="select select-bordered bg-base-200" bind:value={passCardFeesOn}>
+              <option value={true}>TRUE</option>
+              <option value={false}>FALSE</option>
+            </select>
+          </div>
         </div>
-        <div class="form-control">
-          <label class="label" for="autoPay"><strong>Auto Pay</strong></label>
-          <select class="select select-bordered bg-base-200" bind:value={autoPay}>
-            <option value={true}>TRUE</option>
-            <option value={false}>FALSE</option>
-          </select>
-        </div>
-        <div class="form-control">
-          <label class="label" for="passCardFeesOn"><strong>Pass Card Fees On</strong></label>
-          <select class="select select-bordered bg-base-200" bind:value={passCardFeesOn}>
-            <option value={true}>TRUE</option>
-            <option value={false}>FALSE</option>
-          </select>
-        </div>
-      </div>
-      <!-- INVOICE CONTROLS ENDS -->
+        <!-- INVOICE CONTROLS ENDS -->
 
-      {#if showInvoicePreview}
         <center>
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
@@ -955,7 +957,7 @@
                                       If paying by credit card, click the button below.
                                     </p>
                                     <a
-                                      href={'stripeInvoiceLink'}
+                                      href={stripeInvoiceLink}
                                       target="_blank"
                                       style="display: inline-block; background-color: #00449E; color: #ffffff; padding: 10px 20px; font-weight: bold; text-decoration: none; border-radius: 5px;"
                                       >Pay By Card</a
@@ -1428,14 +1430,5 @@
   .content {
     padding: 1rem;
     border-left: 1px solid #dbdbdb;
-  }
-
-  /* Override DaisyUI colors to avoid `oklch` */
-  .bg-base-100 {
-    background-color: rgb(255, 255, 255) !important; /* Substitute with a desired RGB color */
-  }
-
-  .bg-base-200 {
-    background-color: rgb(245, 245, 245) !important; /* Substitute with a desired RGB color */
   }
 </style>
