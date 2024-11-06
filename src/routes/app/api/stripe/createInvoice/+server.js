@@ -45,7 +45,7 @@ export async function POST({ request, locals }) {
 
     // Create an invoice item for each line item provided
     const invoiceItemPromises = lineItems.map(item => {
-      let amount = convertStrToCents(item.actualContractValue, passCardFeesOn)
+      let amount = convertStrToCents(item.cost, passCardFeesOn)
       let description = generateDescription(item, passCardFeesOn)
       return stripe.invoiceItems.create({
         customer: stripeCustomerId,

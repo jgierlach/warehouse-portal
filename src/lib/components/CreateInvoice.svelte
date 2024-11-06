@@ -68,7 +68,7 @@
   // Variables for email
   let subjectLine = `${clientName} - Invoice for 3PL services for work done from ${formatDateInSubjectLine(startDate)} to ${formatDateInSubjectLine(endDate)}`
 
-  $: billingPeriod = `For work done ${formatDateInSubjectLine(startDate)} to ${formatDateInSubjectLine(endDate)}`
+  $: billingPeriod = `For work done ${formatDateInSubjectLine(startDate)} - ${formatDateInSubjectLine(endDate)}`
 
   let showCc = false
 
@@ -323,6 +323,7 @@
   }
 
   $: {
+    console.log('stripeInvoiceLink', stripeInvoiceLink)
     console.log('selectedClientToInvoice', $selectedClientToInvoice)
   }
 
@@ -587,13 +588,13 @@
           <tbody>
             <tr>
               <td><strong>Invoice PDF</strong></td>
-              <td><a href="" target="_blank">adsfasfdsafasdfk</a></td>
+              <td><a href="" class="link link-primary" target="_blank">adsfasfdsafasdfk</a></td>
             </tr>
             <tr>
               <td><strong>Stripe Invoice Link</strong></td>
               <td
-                ><a href={stripeInvoiceLink} target="_blank"
-                  >{abbreviateString(stripeInvoiceLink)}</a
+                ><a href={stripeInvoiceLink} class="link link-primary" target="_blank"
+                  >{abbreviateString(stripeInvoiceLink, 35)}</a
                 ></td
               >
             </tr>
