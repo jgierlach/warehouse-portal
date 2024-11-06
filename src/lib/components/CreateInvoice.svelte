@@ -271,7 +271,7 @@
   }
 
   let autoPay = false
-  let passCardFeesOn = true
+  let passCardFeesOn = false
 
   let dateIssued = getCurrentDateFormatted()
   let daysUntilDue = 7
@@ -555,12 +555,11 @@
           on:click={generateAndUploadPDF}
           disabled={isPDFGeneratingAndUploading}
         >
-          Generate PDF Invoice
+          Generate PDF Invoice Attachment
           {#if invoicePDFLink !== '' && invoicePDFLink !== null}
             <i class="fas fa-check ml-2 text-green-500"></i>
           {/if}
         </button>
-
         <button on:click={createStripeInvoice} class="btn btn-warning btn-sm">
           Generate Stripe Invoice
           {#if stripeInvoiceLink !== '' && stripeInvoiceLink !== null}
@@ -602,6 +601,36 @@
         </table>
       </div>
       <!-- INVOICE LINKS TABLE ENDS -->
+
+      <!-- INVOICE CONTROLS BEGINS -->
+      <div class="mt-2 flex justify-center space-x-2">
+        <div class="form-control">
+          <label class="label" for="daysUntilDue"><strong>Days Until Due</strong></label>
+          <input
+            type="number"
+            step="1.0"
+            class="input input-bordered bg-base-200"
+            id="daysUntilDue"
+            bind:value={daysUntilDue}
+            placeholder="Days Until Due"
+          />
+        </div>
+        <div class="form-control">
+          <label class="label" for="autoPay"><strong>Auto Pay</strong></label>
+          <select class="select select-bordered bg-base-200" bind:value={autoPay}>
+            <option value={true}>TRUE</option>
+            <option value={false}>FALSE</option>
+          </select>
+        </div>
+        <div class="form-control">
+          <label class="label" for="passCardFeesOn"><strong>Pass Card Fees On</strong></label>
+          <select class="select select-bordered bg-base-200" bind:value={passCardFeesOn}>
+            <option value={true}>TRUE</option>
+            <option value={false}>FALSE</option>
+          </select>
+        </div>
+      </div>
+      <!-- INVOICE CONTROLS ENDS -->
 
       {#if showInvoicePreview}
         <center>
@@ -661,8 +690,8 @@
                                     {`3PL${generateInvoiceNumber()}`}
                                   </p>
                                   <p>
-                                    <strong>Billing Month:</strong>
-                                    {'FILL THIS OUT'}
+                                    <strong>Billing Period:</strong>
+                                    {`${formatDateInSubjectLine(startDate)} - ${formatDateInSubjectLine(endDate)}`}
                                   </p>
                                   <p>
                                     <strong>Date Issued:</strong>
@@ -719,21 +748,21 @@
                             </table>
                             <!-- End repeat -->
 
-                            <!-- {#if passCardFeesOn} -->
-                            <p
-                              style="font-size: 16px; font-weight: bold; margin-top: 20px; color:
+                            {#if passCardFeesOn}
+                              <p
+                                style="font-size: 16px; font-weight: bold; margin-top: 20px; color:
                               red;"
-                            >
-                              CARD FEES HAVE BEEN APPLIED TO YOUR INVOICE TOTAL.
-                            </p>
-                            <p
-                              style="font-size: 16px; font-weight: bold; margin-top: 10px; color:
+                              >
+                                CARD FEES HAVE BEEN APPLIED TO YOUR INVOICE TOTAL.
+                              </p>
+                              <p
+                                style="font-size: 16px; font-weight: bold; margin-top: 10px; color:
                             red;"
-                            >
-                              Contact accountsreceivables@hometown-industries.com if you'd like to
-                              change your payment method on file.
-                            </p>
-                            <!-- {/if} -->
+                              >
+                                Contact accountsreceivables@hometown-industries.com if you'd like to
+                                change your payment method on file.
+                              </p>
+                            {/if}
 
                             <p style="margin-top: 20px; font-size: 25px;">
                               <strong>Total:</strong>
@@ -766,18 +795,18 @@
                                     style="display: inline-block; background-color: #00449E; color: #ffffff; padding: 10px 20px; font-weight: bold; text-decoration: none; border-radius: 5px;"
                                     >Pay By Card</a
                                   >
-                                  <!-- {#if passCardFeesOn} -->
-                                  <p
-                                    style="font-size: 16px; font-weight: bold; margin-bottom: 12px; margin-top: 12px; color: red;"
-                                  >
-                                    CARD FEES HAVE BEEN APPLIED TO THIS INVOICE
-                                  </p>
-                                  <p
-                                    style="font-size: 16px; font-weight: bold; margin-bottom: 12px; color: red;"
-                                  >
-                                    Please pay by ACH/WIRE to avoid the processing surcharge
-                                  </p>
-                                  <!-- {/if} -->
+                                  {#if passCardFeesOn}
+                                    <p
+                                      style="font-size: 16px; font-weight: bold; margin-bottom: 12px; margin-top: 12px; color: red;"
+                                    >
+                                      CARD FEES HAVE BEEN APPLIED TO THIS INVOICE
+                                    </p>
+                                    <p
+                                      style="font-size: 16px; font-weight: bold; margin-bottom: 12px; color: red;"
+                                    >
+                                      Please pay by ACH/WIRE to avoid the processing surcharge
+                                    </p>
+                                  {/if}
                                 </td>
                               </tr>
                             </table>
@@ -785,112 +814,113 @@
                             <!-- PROMPT TO PAY BY CREDIT CARD ENDS -->
 
                             <!-- BEGINNING OF ACH/WIRE SECTION -->
-                            <!-- {#if autoPay === false} -->
-                            <table
-                              width="100%"
-                              border="0"
-                              cellspacing="0"
-                              cellpadding="0"
-                              style="margin-top: 20px;"
-                            >
-                              <tr>
-                                <td style="padding: 20px; background-color: #ffffff;">
-                                  <p
-                                    style="font-size: 20px; font-weight: bold; margin-top: 20px; text-align: center;"
-                                  >
-                                    Payment By ACH/Wire to avoid card fees
-                                  </p>
-                                  <p style="margin-bottom: 10px;">
-                                    If paying by ACH or Wire, please use the following information:
-                                  </p>
+                            {#if autoPay === false}
+                              <table
+                                width="100%"
+                                border="0"
+                                cellspacing="0"
+                                cellpadding="0"
+                                style="margin-top: 20px;"
+                              >
+                                <tr>
+                                  <td style="padding: 20px; background-color: #ffffff;">
+                                    <p
+                                      style="font-size: 20px; font-weight: bold; margin-top: 20px; text-align: center;"
+                                    >
+                                      Payment By ACH/Wire to avoid card fees
+                                    </p>
+                                    <p style="margin-bottom: 10px;">
+                                      If paying by ACH or Wire, please use the following
+                                      information:
+                                    </p>
 
-                                  <table
-                                    width="100%"
-                                    border="0"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    style="margin-top: 10px;"
-                                  >
-                                    <tr>
-                                      <td valign="top">
-                                        <p style="margin: 0; font-weight: bold; font-size: 20px;">
-                                          Beneficiary Details:
-                                        </p>
-                                        <p style="margin: 5px 0;">
-                                          <strong>Name:</strong> Numble LLC<br />
-                                          <strong>Type of Account:</strong>
-                                          Checking<br />
-                                          <strong>Address:</strong> 5505 O Street, Ste #4, Lincoln, NE
-                                          68510, USA
-                                        </p>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td valign="top">
-                                        <p style="margin: 0; font-weight: bold; font-size: 20px;">
-                                          Receiving Bank Details
-                                        </p>
-                                        <p style="margin: 5px 0;">
-                                          <strong>Bank Name:</strong> Choice Financial Group<br />
-                                          <strong>Bank Address:</strong> 4501 23rd Avenue S, Fargo,
-                                          ND, 58104<br />
-                                          <strong>Routing Number:</strong>
-                                          091311229<br />
-                                          <strong>Account Number:</strong> 202486516073
-                                        </p>
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                            </table>
-                            <!-- {/if} -->
+                                    <table
+                                      width="100%"
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      style="margin-top: 10px;"
+                                    >
+                                      <tr>
+                                        <td valign="top">
+                                          <p style="margin: 0; font-weight: bold; font-size: 20px;">
+                                            Beneficiary Details:
+                                          </p>
+                                          <p style="margin: 5px 0;">
+                                            <strong>Name:</strong> Numble LLC<br />
+                                            <strong>Type of Account:</strong>
+                                            Checking<br />
+                                            <strong>Address:</strong> 5505 O Street, Ste #4, Lincoln,
+                                            NE 68510, USA
+                                          </p>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td valign="top">
+                                          <p style="margin: 0; font-weight: bold; font-size: 20px;">
+                                            Receiving Bank Details
+                                          </p>
+                                          <p style="margin: 5px 0;">
+                                            <strong>Bank Name:</strong> Choice Financial Group<br />
+                                            <strong>Bank Address:</strong> 4501 23rd Avenue S,
+                                            Fargo, ND, 58104<br />
+                                            <strong>Routing Number:</strong>
+                                            091311229<br />
+                                            <strong>Account Number:</strong> 202486516073
+                                          </p>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            {/if}
                             <!-- END OF ACH/WIRE SECTION -->
 
-                            <!-- {#if autoPay === false} -->
-                            <!-- BEGINNING OF ENROLL IN AUTOMATIC ACH PAYMENTS -->
-                            <table
-                              width="100%"
-                              border="0"
-                              cellspacing="0"
-                              cellpadding="0"
-                              style="margin-top: 20px;"
-                            >
-                              <tr>
-                                <td style="padding: 20px; background-color: #ffffff;">
-                                  <p
-                                    style="font-size: 20px; font-weight: bold; margin-top: 20px; text-align: center;"
-                                  >
-                                    Enroll In Automatic ACH Billing
-                                  </p>
-                                  <p style="margin-bottom: 15px;">
-                                    Each month you will be automatically charged for the balance of
-                                    your invoice using ACH.
-                                    <!-- {#if passCardFeesOn} -->
-                                    By enrolling in ACH billing you will pay no card fees.
-                                    <!-- {/if} -->
-                                  </p>
-
-                                  <div style="text-align: center;">
-                                    <a
-                                      href="https://billing.stripe.com/p/login/aEU170e8zgEM6nCaEE"
-                                      target="_blank"
-                                      style="display: inline-block; background-color: #00449E; color: #ffffff; padding: 10px 20px; font-weight: bold; text-decoration: none; border-radius: 5px;"
-                                      >Enroll In Automatic ACH Billing</a
+                            {#if autoPay === false}
+                              <!-- BEGINNING OF ENROLL IN AUTOMATIC ACH PAYMENTS -->
+                              <table
+                                width="100%"
+                                border="0"
+                                cellspacing="0"
+                                cellpadding="0"
+                                style="margin-top: 20px;"
+                              >
+                                <tr>
+                                  <td style="padding: 20px; background-color: #ffffff;">
+                                    <p
+                                      style="font-size: 20px; font-weight: bold; margin-top: 20px; text-align: center;"
                                     >
-                                  </div>
+                                      Enroll In Automatic ACH Billing
+                                    </p>
+                                    <p style="margin-bottom: 15px;">
+                                      Each month you will be automatically charged for the balance
+                                      of your invoice using ACH.
+                                      <!-- {#if passCardFeesOn} -->
+                                      By enrolling in ACH billing you will pay no card fees.
+                                      <!-- {/if} -->
+                                    </p>
 
-                                  <p style="text-align: center; margin-top: 10px;">
-                                    <strong
-                                      >** Log in using email: {billingContactEmail}
-                                      **</strong
-                                    >
-                                  </p>
-                                </td>
-                              </tr>
-                            </table>
-                            <!-- END OF ENROLL IN AUTOMATIC ACH PAYMENTS -->
-                            <!-- {/if} -->
+                                    <div style="text-align: center;">
+                                      <a
+                                        href="https://billing.stripe.com/p/login/aEU170e8zgEM6nCaEE"
+                                        target="_blank"
+                                        style="display: inline-block; background-color: #00449E; color: #ffffff; padding: 10px 20px; font-weight: bold; text-decoration: none; border-radius: 5px;"
+                                        >Enroll In Automatic ACH Billing</a
+                                      >
+                                    </div>
+
+                                    <p style="text-align: center; margin-top: 10px;">
+                                      <strong
+                                        >** Log in using email: {billingContactEmail}
+                                        **</strong
+                                      >
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                              <!-- END OF ENROLL IN AUTOMATIC ACH PAYMENTS -->
+                            {/if}
                           </td>
                         </tr>
                       </table>
