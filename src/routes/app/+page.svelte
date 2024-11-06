@@ -241,12 +241,15 @@
               >
                 {abbreviateString(product['Product_Title'], 25)}
                 {#if hoveredTitleId === product['Product_Title']}
-                  <span class="tooltip-text">
-                    {product['Product_Title']}...
-                  </span>
+                  <div
+                    class="absolute left-0 top-full z-50 mt-2 rounded-lg bg-gray-200 p-2 text-gray-800 opacity-100 shadow-lg"
+                    style="opacity: 1; background-color: rgba(229, 231, 235, 1);"
+                  >
+                    {product['Product_Title']}
+                  </div>
                 {/if}
-              </div></td
-            >
+              </div>
+            </td>
             <td>{product.Sku}</td>
             <td>{product.Quantity}</td>
             <td>{product.Pending}</td>
