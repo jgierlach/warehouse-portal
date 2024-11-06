@@ -77,9 +77,7 @@
   $: billingPeriod = `For work done ${formatDateInSubjectLine(startDate)} - ${formatDateInSubjectLine(endDate)}`
 
   // Shipments filtered by client and date range
-  $: clientShipments = $outboundShipments.filter(
-    (shipment) => shipment.Client_Id === $selectedClientToInvoice.username,
-  )
+  $: clientShipments = $outboundShipments.filter((shipment) => shipment.Client_Id === clientId)
   $: clientShipmentsInDateRange = clientShipments.filter((shipment) =>
     isWithinDateRange(shipment.Date_Of_Last_Change, startDate, endDate),
   )
@@ -473,6 +471,7 @@
         emailHtml: htmlContent,
         ccArray,
         pdfURL: '',
+        shipmentLineItemsForClientExport,
       }),
     })
 

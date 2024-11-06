@@ -19,8 +19,15 @@ async function getHTMLTemplate(content) {
   return baseTemplate.replace("{{{content}}}", content);
 }
 
+// Utility function to generate CSV content from data
+function generateCSV(data) {
+  const headers = Object.keys(data[0]).join(",");
+  const rows = data.map(row => Object.values(row).join(","));
+  return [headers, ...rows].join("\n");
+}
+
 export async function POST({ request }) {
-  const { billingContactEmail, subjectLine, emailHtml, ccArray, pdfURL } =
+  const { billingContactEmail, subjectLine, emailHtml, ccArray, pdfURL, shipmentLineItemsForClientExport } =
     await request.json();
 
   const apiKey = import.meta.env.VITE_SEND_GRID_API_KEY;
@@ -64,6 +71,22 @@ export async function POST({ request }) {
         content: pdfBase64,
         filename: "Invoice.pdf",
         type: "application/pdf",
+        disposition: "attachment",
+      },
+    ];
+  }
+
+  // Generate CSV from shipmentLineItemsForClientExport and attach it
+  if (shipmentLineItemsForClientExport && shipmentLineItemsForClientExport.length > 0) {
+    const csvContent = generateCSV(shipmentLineItemsForClientExport);
+    const csvBase64 = Buffer.from(csvContent).toString("base64");
+
+    data.attachments = [
+      ...(data.attachments || []), // Keep existing attachments if any
+      {
+        content: csvBase64,
+        filename: "Client_Shipments.csv",
+        type: "text/csv",
         disposition: "attachment",
       },
     ];
