@@ -1,6 +1,8 @@
 <script>
   // Import svelte specific functions
   import { onMount } from 'svelte'
+  import { goto } from '$app/navigation'
+  import { fade } from 'svelte/transition'
 
   // Import packages
   import html2canvas from 'html2canvas'
@@ -74,21 +76,10 @@
 
   $: billingPeriod = `For work done ${formatDateInSubjectLine(startDate)} - ${formatDateInSubjectLine(endDate)}`
 
-  let showCc = false
-
-  let cc = ''
-
-  $: ccArray =
-    cc === ''
-      ? []
-      : cc.split(',').map((email) => {
-          return { email: email.trim() }
-        })
-
-  let showInvoicePreview = true
-
   // Shipments filtered by client and date range
-  $: clientShipments = $outboundShipments.filter((shipment) => shipment.Client_Id === clientId)
+  $: clientShipments = $outboundShipments.filter(
+    (shipment) => shipment.Client_Id === $selectedClientToInvoice.username,
+  )
   $: clientShipmentsInDateRange = clientShipments.filter((shipment) =>
     isWithinDateRange(shipment.Date_Of_Last_Change, startDate, endDate),
   )
@@ -434,6 +425,66 @@
     loading = false
   }
 
+  let showCc = false
+
+  let cc = ''
+
+  $: ccArray =
+    cc === ''
+      ? []
+      : cc.split(',').map((email) => {
+          return { email: email.trim() }
+        })
+
+  let showInvoicePreview = true
+
+  function toggleInvoicePreview() {
+    showInvoicePreview = !showInvoicePreview
+    setTimeout(() => {
+      showInvoicePreview = !showInvoicePreview
+    }, 3000)
+  }
+
+  const sendInvoiceEmail = async () => {
+    // Perform checks to see if PDF and Stripe Invoice have been generated
+    if (stripeInvoiceLink === '' || stripeInvoiceLink === null) {
+      alert(
+        "You have not generated the invoice in Stripe by clicking the 'Generate Stripe Invoice' button. Please do so before sending to the client.",
+      )
+      return
+    }
+
+    // if (invoiceLink === '' || invoiceLink === null) {
+    //   alert(
+    //     "You have not generated the invoice PDF by clicking the 'Generate PDF Invoice' button. Please do so before sending to the client.",
+    //   )
+    //   return
+    // }
+
+    const container = document.getElementById('pdfContent')
+    const htmlContent = container.innerHTML // Capture the inner HTML
+
+    const response = await fetch('/app/api/notifications/sendInvoiceEmail', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        billingContactEmail,
+        subjectLine,
+        emailHtml: htmlContent,
+        ccArray,
+        pdfURL: '',
+      }),
+    })
+
+    if (response.ok) {
+      goto('/app/clients#top')
+      toggleInvoicePreview()
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to send email: ${errorData.message}`)
+    }
+  }
+
   $: {
     console.log('stripeInvoiceLink', stripeInvoiceLink)
     console.log('selectedClientToInvoice', $selectedClientToInvoice)
@@ -636,7 +687,10 @@
     <div class="w-full p-4 md:w-1/2">
       <div class="mb-4 mt-1 flex items-center">
         <strong class="mr-2">To:</strong>
-        <input class="input input-bordered mr-2 w-full bg-base-200" bind:value={clientId} />
+        <input
+          class="input input-bordered mr-2 w-full bg-base-200"
+          bind:value={billingContactEmail}
+        />
         <button on:click={() => (showCc = !showCc)} class="btn btn-outline btn-info">
           <i class="fas fa-plus"></i>
         </button>
@@ -1044,12 +1098,14 @@
         </center>
       {:else}
         <div class="mt-4 flex justify-center">
-          <img src="/green-check-mark.png" class="w-32" alt="green check mark" />
+          <div transition:fade={{ duration: 500 }}>
+            <img src="/green-check-mark.png" class="w-32" alt="green check mark" />
+          </div>
         </div>
       {/if}
 
       <div class="mt-4 flex justify-end">
-        <button on:click={() => 'Eat poop'} class="btn btn-primary"> Send Invoice Email </button>
+        <button on:click={sendInvoiceEmail} class="btn btn-primary"> Send Invoice Email </button>
       </div>
     </div>
   </div>
