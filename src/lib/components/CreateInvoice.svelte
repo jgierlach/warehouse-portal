@@ -278,34 +278,6 @@
 
   let invoicePDFLink = ''
 
-  // async function generateAndUploadPDF() {
-  //   const element = document.getElementById('pdfContent')
-  //   try {
-  //     loading = true
-  //     isPDFGeneratingAndUploading = true
-  //     const canvas = await html2canvas(element)
-  //     const imgData = canvas.toDataURL('image/png') // Changed to "image/png"
-  //     const pdf = new jsPDF({
-  //       orientation: 'portrait',
-  //       unit: 'px',
-  //       format: [canvas.width, canvas.height],
-  //       compress: true,
-  //     })
-
-  //     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height, 'MEDIUM') // Changed to "PNG"
-  //     const pdfBlob = pdf.output('blob')
-  //     console.log('PDF BLOB', pdfBlob)
-  //     await uploadPDF(pdfBlob)
-  //     loading = false
-  //   } catch (error) {
-  //     console.error('Error in PDF generation or upload:', error)
-  //     loading = false
-  //   } finally {
-  //     isPDFGeneratingAndUploading = false
-  //     loading = false
-  //   }
-  // }
-
   async function generateAndUploadPDF() {
     const element = document.getElementById('pdfContent')
 
