@@ -72,7 +72,7 @@
   }
 
   // Variables for email
-  let subjectLine = `${clientName} - Invoice for 3PL services for work done from ${formatDateInSubjectLine(startDate)} to ${formatDateInSubjectLine(endDate)}`
+  $: subjectLine = `${clientName} - Invoice for 3PL services for work done from ${formatDateInSubjectLine(startDate)} to ${formatDateInSubjectLine(endDate)}`
 
   $: billingPeriod = `For work done ${formatDateInSubjectLine(startDate)} - ${formatDateInSubjectLine(endDate)}`
 
