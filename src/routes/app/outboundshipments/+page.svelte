@@ -7,7 +7,7 @@
   import Loading from '$lib/components/Loading.svelte'
 
   // Import utility functions
-  import { abbreviateString, formatDate } from '$lib/utils'
+  import { abbreviateString, formatDate, generateUniqueShippingNumber } from '$lib/utils'
 
   // Import props
   export let data
@@ -320,7 +320,7 @@
           showCreateOutboundShipment = !showCreateOutboundShipment
           // Clear the cache of all the field specific variables
           clientId = ''
-          shipmentNumber = ''
+          shipmentNumber = generateUniqueShippingNumber()
           carrier = ''
           trackingNumber = ''
           poNumber = ''

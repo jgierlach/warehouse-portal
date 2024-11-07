@@ -82,6 +82,13 @@ export const generateInvoiceNumber = () => {
   return `${month}${year}`;
 }
 
+export const generateUniqueShippingNumber = () => {
+  const timestamp = Date.now(); // Current timestamp in milliseconds
+  const randomPart = Math.floor(Math.random() * 100000); // Random number between 0 and 99999
+  const uniqueShippingNumber = `SHIP-${timestamp}-${randomPart}`;
+  return uniqueShippingNumber;
+}
+
 export const csvGenerator = (totalData, actualHeaderKey, headerToShow, fileName) => {
   let data = totalData || null;
   if (data == null || !data.length) {
