@@ -700,7 +700,7 @@
             {/if}
           </button> -->
           <button on:click={createStripeInvoice} class="btn btn-warning btn-sm">
-            Generate Stripe Invoice
+            Generate Stripe Invoice Link
             {#if stripeInvoiceLink !== '' && stripeInvoiceLink !== null}
               <i class="fas fa-check ml-2 text-green-500"></i>
             {/if}
