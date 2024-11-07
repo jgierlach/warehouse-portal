@@ -121,14 +121,14 @@
 
   $: lineItems = [
     {
-      servicesProvided: 'Pallet Storage',
-      cost: 0,
-      billingTerms: `${formatDollarValue(perPalletMonthlyStorageFee)} a month per pallet`,
-    },
-    {
       servicesProvided: 'Shipment Of Customer Orders',
       cost: totalCostOfCustomerShipments,
       billingTerms: `${formatDollarValue(perOrderFee)} an order + ${formatDollarValue(perOrderUnitFee)} a unit`,
+    },
+    {
+      servicesProvided: 'Pallet Storage',
+      cost: 0,
+      billingTerms: `${formatDollarValue(perPalletMonthlyStorageFee)} a month per pallet`,
     },
     {
       servicesProvided: 'FBA Pack and Prep',
