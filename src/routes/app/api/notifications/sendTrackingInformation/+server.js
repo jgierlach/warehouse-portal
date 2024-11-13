@@ -30,7 +30,8 @@ export async function POST({ request }) {
           <ul>
             <li><strong>Customer Name:</strong> ${recipientName}</li>
             <li><strong>PO Number:</strong> ${poNumber}</li>
-          </ul>`
+          </ul>
+          <p>For more details on the shipment, please login to your <a href="https://3pl-client-portal.vercel.app/app"><strong>Client Portal</strong></a>.</p>`
       }
     ],
   };
