@@ -26,12 +26,11 @@ export async function POST({ request }) {
           <ul>
             <li><strong>Carrier:</strong> ${carrier}</li>
             <li><strong>Tracking Number:</strong> ${trackingNumber}</li>
-          </ul>
-          <ul>
-            <li><strong>Customer Name:</strong> ${recipientName}</li>
+             <li><strong>Customer Name:</strong> ${recipientName}</li>
             <li><strong>PO Number:</strong> ${poNumber}</li>
           </ul>
-          <p>For more details on the shipment, please login to your <a href="https://3pl-client-portal.vercel.app/app"><strong>Client Portal</strong></a>.</p>`
+          <p>For more details on the shipment, please login to your <a href="https://3pl-client-portal.vercel.app/app">Client Portal</a>.</p>
+          `
       }
     ],
   };
