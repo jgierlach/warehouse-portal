@@ -102,7 +102,9 @@ export async function POST({ request, locals }) {
           <ul>
             <li><strong>Carrier:</strong> ${serviceCode}</li>
             <li><strong>Tracking Number:</strong> ${trackingNumber}</li>
-          </ul>`
+            <li><strong>Customer Name:</strong> ${shipTo?.name}</li>
+          </ul>
+           <p>For more details on the shipment, please login to your <a href="https://3pl-client-portal.vercel.app/app"><strong>Client Portal</strong></a>.</p>`
           }
         ],
       };
