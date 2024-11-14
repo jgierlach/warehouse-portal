@@ -265,6 +265,9 @@ export const assignClientIdBasedOnStoreName = (storeName) => {
   if (storeName === 'Dog Rocks Faire') {
     return 'operations@podiumpetproducts.com'
   }
+  if (storeName === 'Dog Rocks Amazon') {
+    return 'operations@podiumpetproducts.com'
+  }
   // Bessies Best categorization
   if (storeName === `Bessies Best Amazon`) {
     return 'jen@bessiesbest.com'
