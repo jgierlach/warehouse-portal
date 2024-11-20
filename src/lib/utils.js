@@ -184,7 +184,7 @@ export const generateShipmentLineItems = (shipments, perOrderFee, perOrderUnitFe
     let markup;
     if (orderSource === 'Amazon FBA') {
       markup = perUnitFBAPackAndPrep * unitsShipped;
-    } else if (orderSource === 'Walmart Fulfillment Services') {
+    } else if (orderSource === 'Walmart Fullfillment Services') {
       markup = perUnitWFSPackAndPrep * unitsShipped;
     } else {
       markup = perOrderFee + (perOrderUnitFee * unitsShipped);

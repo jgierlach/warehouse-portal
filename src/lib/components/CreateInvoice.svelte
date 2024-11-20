@@ -108,7 +108,7 @@
     .reduce((a, b) => a + b.totalCost, 0)
 
   $: totalCostOfWFSPackAndPrep = shipmentLineItems
-    .filter((shipment) => shipment.orderSource === 'Walmart Fulfillment Services')
+    .filter((shipment) => shipment.orderSource === 'Walmart Fullfillment Services')
     .reduce((a, b) => a + b.totalCost, 0)
 
   $: totalCostOfCustomerShipments = Number(
@@ -116,7 +116,7 @@
       .filter(
         (shipment) =>
           shipment.orderSource !== 'Amazon FBA' &&
-          shipment.orderSource !== 'Walmart Fulfillment Services',
+          shipment.orderSource !== 'Walmart Fullfillment Services',
       )
       .reduce((a, b) => a + b.totalCost, 0)
       .toFixed(2),
