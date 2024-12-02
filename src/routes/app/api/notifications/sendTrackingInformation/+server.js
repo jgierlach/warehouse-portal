@@ -7,11 +7,19 @@ export async function POST({ request }) {
   const apiKey = import.meta.env.VITE_SEND_GRID_API_KEY;
   const endpoint = 'https://api.sendgrid.com/v3/mail/send';
 
+  // Assign where tracking notification is sent
+  let clientEmail = ''
+  if (clientId === 'jen@bessiesbest.com') {
+    clientEmail = "storageandfulfillment@hometown-industries.com"
+  } else {
+    clientEmail = clientId
+  }
+
   const data = {
     personalizations: [
       {
         to: [
-          { email: clientId },  // Ensure this email is correctly formatted
+          { email: clientEmail },  // Ensure this email is correctly formatted
           { email: "storageandfulfillment@hometown-industries.com" }
         ],
         subject: `Tracking has been updated for Shipment Number: ${shipmentNumber}`,
