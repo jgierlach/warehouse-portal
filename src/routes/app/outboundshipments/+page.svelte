@@ -78,6 +78,7 @@
   let recipientPostalCode = ''
   let country = 'US'
   let lotNumber = ''
+  let createInShipstation = false
 
   let showCreateOutboundShipment = false
   async function createOutboundShipment() {
@@ -874,6 +875,17 @@
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Create Outbound Shipment</h1>
     <form on:submit={createOutboundShipment}>
+       <!-- Create in Shipstation Toggle -->
+       <div class="form-control mb-4">
+        <label class="label cursor-pointer">
+          <span class="label-text">Create in Shipstation</span>
+          <input 
+            type="checkbox" 
+            class="toggle toggle-primary"
+            bind:checked={createInShipstation} 
+          />
+        </label>
+      </div>
       <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="clientId">Client Id</label>
