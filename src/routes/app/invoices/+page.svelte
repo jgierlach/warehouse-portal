@@ -61,6 +61,7 @@
             <th>Billing Terms</th>
             <th>Cost</th>
             <th>Stripe Invoice Url</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -73,10 +74,16 @@
               <td>{formatDollarValue(lineItem.line_item_cost)}</td>
               <td
                 ><a
-                  class="text-underline link-primary font-semibold"
+                  class="link-primary font-semibold underline"
                   href={lineItem.stripe_invoice_url}
                   target="_blank">Invoice</a
                 ></td
+              >
+              <td>
+                <div class="flex space-x-1">
+                  <button class="btn btn-info btn-sm">Edit</button>
+                  <button class="btn btn-error btn-sm">Delete</button>
+                </div></td
               >
             </tr>
           {/each}
