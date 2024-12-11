@@ -1,3 +1,93 @@
+export const getCurrentBillingMonthAndYear = () => {
+  const date = new Date()
+  const currentMonthAndYear = `${date.toLocaleString('default', { month: 'long' })}, ${date.getFullYear()}`
+  return getPreviousMonthAndYear(currentMonthAndYear)
+}
+
+export const getPreviousMonthAndYear = (monthYear) => {
+  if (!monthYear) return ''
+  const date = parseMonthYear(monthYear)
+  date.setMonth(date.getMonth() - 1)
+  return formatMonthYear(date)
+}
+
+// Example utility function to parse "Month, Year" into a Date object
+function parseMonthYear(monthYear) {
+  const [month, year] = monthYear.split(', ')
+  return new Date(`${month} 1, ${year}`)
+}
+
+// Example utility function to format a Date object back into "Month, Year"
+function formatMonthYear(date) {
+  const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ]
+  const month = monthNames[date.getMonth()]
+  const year = date.getFullYear()
+  return `${month}, ${year}`
+}
+
+export const generateBillingMonthsAndYears = (rows) => {
+  return sortBillingMonthsAndYears([...new Set(rows.map((row) => row.billing_month))])
+}
+
+export const sortBillingMonthsAndYears = (dates) => {
+  return dates.sort((a, b) => {
+    const [monthA, yearA] = a.split(', ').map((str) => str.trim())
+    const [monthB, yearB] = b.split(', ').map((str) => str.trim())
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ]
+    const yearDiff = parseInt(yearA) - parseInt(yearB)
+    if (yearDiff !== 0) {
+      return yearDiff
+    }
+    return months.indexOf(monthA) - months.indexOf(monthB)
+  })
+}
+
+export const formatMonthForLineItem = (input) => {
+  const monthMap = {
+    '01': 'January',
+    '02': 'February',
+    '03': 'March',
+    '04': 'April',
+    '05': 'May',
+    '06': 'June',
+    '07': 'July',
+    '08': 'August',
+    '09': 'September',
+    10: 'October',
+    11: 'November',
+    12: 'December',
+  }
+
+  const [year, month] = input.split('-') // Split by '-' to get year and month
+  return `${monthMap[month]}, ${year}`
+}
+
 export const formatTimeStampForChangelog = (dateString) => {
   const options = {
     timeZone: 'America/Chicago',
@@ -6,157 +96,166 @@ export const formatTimeStampForChangelog = (dateString) => {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
-  };
+    hour12: false,
+  }
 
-  const date = new Date(dateString);
-  const formatter = new Intl.DateTimeFormat('en-US', options);
-  const [monthDay, time] = formatter.format(date).split(', ');
+  const date = new Date(dateString)
+  const formatter = new Intl.DateTimeFormat('en-US', options)
+  const [monthDay, time] = formatter.format(date).split(', ')
 
   // Extract day suffix
-  const day = new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'America/Chicago' }).format(date);
-  const suffix = getDaySuffix(day);
+  const day = new Intl.DateTimeFormat('en-US', {
+    day: 'numeric',
+    timeZone: 'America/Chicago',
+  }).format(date)
+  const suffix = getDaySuffix(day)
 
-  return `${monthDay}${suffix}, ${time} CST`;
+  return `${monthDay}${suffix}, ${time} CST`
 }
 
 export const getDaySuffix = (day) => {
-  if (day.endsWith('1') && !day.endsWith('11')) return 'st';
-  if (day.endsWith('2') && !day.endsWith('12')) return 'nd';
-  if (day.endsWith('3') && !day.endsWith('13')) return 'rd';
-  return 'th';
+  if (day.endsWith('1') && !day.endsWith('11')) return 'st'
+  if (day.endsWith('2') && !day.endsWith('12')) return 'nd'
+  if (day.endsWith('3') && !day.endsWith('13')) return 'rd'
+  return 'th'
 }
 
 export const addInvoiceTerms = (inputDate, daysUntilDue) => {
   // Parse the input date
-  let parts = inputDate.split('/');
-  let month = parseInt(parts[0], 10);
-  let day = parseInt(parts[1], 10);
-  let year = parseInt(parts[2], 10);
+  let parts = inputDate.split('/')
+  let month = parseInt(parts[0], 10)
+  let day = parseInt(parts[1], 10)
+  let year = parseInt(parts[2], 10)
 
   // If the year is in short format, convert it to full format
   if (year < 1000) {
-    year += 2000;
+    year += 2000
   }
 
   // Create a date object
-  let date = new Date(year, month - 1, day);
+  let date = new Date(year, month - 1, day)
 
   // Add 14 days to the date
-  date.setDate(date.getDate() + daysUntilDue);
+  date.setDate(date.getDate() + daysUntilDue)
 
   // Format the new date to MM/DD/YY
-  let newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
-  let newDay = date.getDate().toString().padStart(2, '0');
-  let newYear = date.getFullYear().toString();
+  let newMonth = (date.getMonth() + 1).toString().padStart(2, '0')
+  let newDay = date.getDate().toString().padStart(2, '0')
+  let newYear = date.getFullYear().toString()
 
-  return `${newMonth}/${newDay}/${newYear}`;
+  return `${newMonth}/${newDay}/${newYear}`
 }
 
 export const getCurrentDateFormatted = () => {
-  const date = new Date();
+  const date = new Date()
 
-  let month = date.getMonth() + 1; // getMonth returns months indexed from 0
-  let day = date.getDate();
-  let year = date.getFullYear();
+  let month = date.getMonth() + 1 // getMonth returns months indexed from 0
+  let day = date.getDate()
+  let year = date.getFullYear()
 
   // Ensuring that the month and day are always two digits
-  month = month < 10 ? '0' + month : month;
-  day = day < 10 ? '0' + day : day;
+  month = month < 10 ? '0' + month : month
+  day = day < 10 ? '0' + day : day
 
-  return `${month}/${day}/${year}`;
+  return `${month}/${day}/${year}`
 }
 
 // Expected format month/day/year
 export const generateInvoiceNumber = () => {
-  const date = new Date();
+  const date = new Date()
 
-  let month = date.getMonth() + 1; // getMonth returns months indexed from 0
-  let day = date.getDate();
-  let year = date.getFullYear();
+  let month = date.getMonth() + 1 // getMonth returns months indexed from 0
+  let day = date.getDate()
+  let year = date.getFullYear()
 
   // Ensuring that the month and day are always two digits
-  month = month < 10 ? '0' + month : month;
-  day = day < 10 ? '0' + day : day;
+  month = month < 10 ? '0' + month : month
+  day = day < 10 ? '0' + day : day
 
-  return `${month}${year}`;
+  return `${month}${year}`
 }
 
 export const generateUniqueShippingNumber = () => {
-  const timestamp = Date.now(); // Current timestamp in milliseconds
-  const randomPart = Math.floor(Math.random() * 100000); // Random number between 0 and 99999
-  const uniqueShippingNumber = `SHIP-${timestamp}-${randomPart}`;
-  return uniqueShippingNumber;
+  const timestamp = Date.now() // Current timestamp in milliseconds
+  const randomPart = Math.floor(Math.random() * 100000) // Random number between 0 and 99999
+  const uniqueShippingNumber = `SHIP-${timestamp}-${randomPart}`
+  return uniqueShippingNumber
 }
 
 export const csvGenerator = (totalData, actualHeaderKey, headerToShow, fileName) => {
-  let data = totalData || null;
+  let data = totalData || null
   if (data == null || !data.length) {
-    return null;
+    return null
   }
-  let columnDelimiter = ',';
-  let lineDelimiter = '\n';
-  let keys = headerToShow;
-  let result = '';
-  result += keys.join(columnDelimiter);
-  result += lineDelimiter;
+  let columnDelimiter = ','
+  let lineDelimiter = '\n'
+  let keys = headerToShow
+  let result = ''
+  result += keys.join(columnDelimiter)
+  result += lineDelimiter
   data.forEach(function (item) {
-    let ctr = 0;
+    let ctr = 0
     actualHeaderKey.forEach(function (key) {
-      if (ctr > 0) result += columnDelimiter;
+      if (ctr > 0) result += columnDelimiter
       if (Array.isArray(item[key])) {
-        let arrayItem =
-          item[key] && item[key].length > 0
-            ? '"' + item[key].join(',') + '"'
-            : '-';
-        result += arrayItem;
+        let arrayItem = item[key] && item[key].length > 0 ? '"' + item[key].join(',') + '"' : '-'
+        result += arrayItem
       } else if (typeof item[key] == 'string') {
-        let strItem = item[key] ? '"' + item[key] + '"' : '-';
-        result += strItem ? strItem.replace(/\s{2,}/g, ' ') : strItem;
+        let strItem = item[key] ? '"' + item[key] + '"' : '-'
+        result += strItem ? strItem.replace(/\s{2,}/g, ' ') : strItem
       } else {
-        let strItem = item[key] + '';
-        result += strItem ? strItem.replace(/,/g, '') : strItem;
+        let strItem = item[key] + ''
+        result += strItem ? strItem.replace(/,/g, '') : strItem
       }
 
-      ctr++;
-    });
-    result += lineDelimiter;
-  });
+      ctr++
+    })
+    result += lineDelimiter
+  })
 
-  if (result == null) return;
+  if (result == null) return
 
-  var blob = new Blob([result]);
+  var blob = new Blob([result])
   if (navigator.msSaveBlob) {
     // IE 10+
-    navigator.msSaveBlob(blob, exportedFilenmae);
+    navigator.msSaveBlob(blob, exportedFilenmae)
   } else if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-    var hiddenElement = window.document.createElement('a');
-    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(result);
-    hiddenElement.target = '_blank';
-    hiddenElement.download = fileName;
-    hiddenElement.click();
+    var hiddenElement = window.document.createElement('a')
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(result)
+    hiddenElement.target = '_blank'
+    hiddenElement.download = fileName
+    hiddenElement.click()
   } else {
-    let link = document.createElement('a');
+    let link = document.createElement('a')
     if (link.download !== undefined) {
       // Browsers that support HTML5 download attribute
-      var url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', fileName);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      var url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', fileName)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     }
   }
-};
+}
 
-export const generateShipmentLineItems = (shipments, perOrderFee, perOrderUnitFee, perUnitFBAPackAndPrep, perUnitWFSPackAndPrep, b2bFreightPercentageMarkup) => {
-  const groupedShipments = {};
+export const generateShipmentLineItems = (
+  shipments,
+  perOrderFee,
+  perOrderUnitFee,
+  perUnitFBAPackAndPrep,
+  perUnitWFSPackAndPrep,
+  b2bFreightPercentageMarkup,
+) => {
+  const groupedShipments = {}
 
   // Step 1: Group items by Shipment_Number
-  shipments.forEach(item => {
-    const shipmentNumber = item.Shipment_Number;
-    const shipmentCostMarkup = Number(((b2bFreightPercentageMarkup / 100) * item.Cost_Of_Shipment).toFixed(2))
+  shipments.forEach((item) => {
+    const shipmentNumber = item.Shipment_Number
+    const shipmentCostMarkup = Number(
+      ((b2bFreightPercentageMarkup / 100) * item.Cost_Of_Shipment).toFixed(2),
+    )
 
     if (!groupedShipments[shipmentNumber]) {
       groupedShipments[shipmentNumber] = {
@@ -168,90 +267,90 @@ export const generateShipmentLineItems = (shipments, perOrderFee, perOrderUnitFe
         unitsShipped: 0,
         shipmentCost: item.Cost_Of_Shipment + shipmentCostMarkup,
         markup: 0,
-        totalCost: 0
-      };
+        totalCost: 0,
+      }
     }
 
     // Increment unitsShipped
-    groupedShipments[shipmentNumber].unitsShipped += item.Quantity;
-  });
+    groupedShipments[shipmentNumber].unitsShipped += item.Quantity
+  })
 
   // Step 2: Calculate markup and totalCost
-  const transformedData = Object.values(groupedShipments).map(shipment => {
-    const { orderSource, unitsShipped, shipmentCost } = shipment;
+  const transformedData = Object.values(groupedShipments).map((shipment) => {
+    const { orderSource, unitsShipped, shipmentCost } = shipment
 
     // Calculate markup based on Destination
-    let markup;
+    let markup
     if (orderSource === 'Amazon FBA') {
-      markup = perUnitFBAPackAndPrep * unitsShipped;
+      markup = perUnitFBAPackAndPrep * unitsShipped
     } else if (orderSource === 'Walmart Fullfillment Services') {
-      markup = perUnitWFSPackAndPrep * unitsShipped;
+      markup = perUnitWFSPackAndPrep * unitsShipped
     } else {
-      markup = perOrderFee + (perOrderUnitFee * unitsShipped);
+      markup = perOrderFee + perOrderUnitFee * unitsShipped
     }
 
     // Calculate total cost
-    const totalCost = Number((shipmentCost + markup).toFixed(2));
+    const totalCost = Number((shipmentCost + markup).toFixed(2))
 
     // Return new structure with calculated fields
     return {
       ...shipment,
       markup,
-      totalCost
-    };
-  });
+      totalCost,
+    }
+  })
 
-  return transformedData;
+  return transformedData
 }
 
 export const isWithinDateRange = (shipmentDate, start, end) => {
   // Convert all dates to a consistent format: YYYY-MM-DD
-  const formattedShipmentDate = new Date(shipmentDate).toISOString().split('T')[0];
-  const formattedStartDate = new Date(start).toISOString().split('T')[0];
-  const formattedEndDate = new Date(end).toISOString().split('T')[0];
+  const formattedShipmentDate = new Date(shipmentDate).toISOString().split('T')[0]
+  const formattedStartDate = new Date(start).toISOString().split('T')[0]
+  const formattedEndDate = new Date(end).toISOString().split('T')[0]
 
   // Convert the formatted dates back to timestamps
-  const shipmentTime = new Date(formattedShipmentDate).getTime();
-  const startTime = new Date(formattedStartDate).getTime();
-  const endTime = new Date(formattedEndDate).setHours(23, 59, 59, 999);
+  const shipmentTime = new Date(formattedShipmentDate).getTime()
+  const startTime = new Date(formattedStartDate).getTime()
+  const endTime = new Date(formattedEndDate).setHours(23, 59, 59, 999)
 
-  return shipmentTime >= startTime && shipmentTime <= endTime;
-};
+  return shipmentTime >= startTime && shipmentTime <= endTime
+}
 
 export const formatDateInDateRange = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 export const fetchStores = async () => {
-  const res = await fetch('/app/api/shipstation/listStores');
+  const res = await fetch('/app/api/shipstation/listStores')
   if (res.ok) {
-    const stores = await res.json();
-    return stores.map(store => {
+    const stores = await res.json()
+    return stores.map((store) => {
       return {
         marketplaceName: store.marketplaceName,
         storeId: store.storeId,
-        storeName: store.storeName
+        storeName: store.storeName,
       }
     })
   } else {
-    console.error('Failed to fetch stores');
+    console.error('Failed to fetch stores')
   }
 }
 
 export const findStoreNameBasedOnId = (storeId, stores) => {
   if (storeId === null || storeId === undefined) {
-    console.log("storeId is null or undefined")
-    return ""
+    console.log('storeId is null or undefined')
+    return ''
   }
   if (stores === null || stores === undefined) {
-    console.log("Stores api call came back as null or undefined")
-    return ""
+    console.log('Stores api call came back as null or undefined')
+    return ''
   }
-  const store = stores.find(store => store.storeId === storeId);
-  return store ? store.storeName : null;
+  const store = stores.find((store) => store.storeId === storeId)
+  return store ? store.storeName : null
 }
 
 export const assignClientIdBasedOnStoreName = (storeName) => {
@@ -319,23 +418,23 @@ export const formatDollarValue = (number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-  }).format(number);
-};
+  }).format(number)
+}
 
 export const formatDateInSubjectLine = (date) => {
-  date = new Date(`${date}T00:00:00`); // Forces the date to local time
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0, so we add 1
-  const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
+  date = new Date(`${date}T00:00:00`) // Forces the date to local time
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0') // January is 0, so we add 1
+  const year = date.getFullYear()
+  return `${month}/${day}/${year}`
 }
 
 export const formatDate = (date) => {
   date = new Date(date)
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0, so we need to add 1
-  const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0') // January is 0, so we need to add 1
+  const year = date.getFullYear()
+  return `${month}/${day}/${year}`
 }
 
 export const abbreviateString = (str, maxLength, abbreviationSymbol = '...') => {
@@ -345,17 +444,17 @@ export const abbreviateString = (str, maxLength, abbreviationSymbol = '...') => 
   }
 
   if (str.length <= maxLength) {
-    return str;
+    return str
   }
 
-  const abbreviationLength = abbreviationSymbol.length;
+  const abbreviationLength = abbreviationSymbol.length
   if (maxLength < abbreviationLength + 1) {
-    return str.slice(0, maxLength);
+    return str.slice(0, maxLength)
   }
 
-  return str.slice(0, maxLength - abbreviationLength) + abbreviationSymbol;
+  return str.slice(0, maxLength - abbreviationLength) + abbreviationSymbol
 }
 
 export const test = () => {
-  console.log("TEST")
+  console.log('TEST')
 }

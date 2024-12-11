@@ -24,6 +24,7 @@
     getCurrentDateFormatted,
     formatDateInSubjectLine,
     abbreviateString,
+    formatMonthForLineItem,
   } from '$lib/utils'
 
   // Import props
@@ -37,6 +38,7 @@
   // Component specific variables and business logic
 
   // Company variables
+  let userId = $selectedClientToInvoice.id
   let clientName = $selectedClientToInvoice.company_name
   let companyName = $selectedClientToInvoice.company_name
   let clientId = $selectedClientToInvoice.username
@@ -55,6 +57,8 @@
   const currentMonth = now.getMonth()
   let startDate = formatDateInDateRange(new Date(currentYear, currentMonth, 1))
   let endDate = formatDateInDateRange(now)
+
+  $: formattedMonth = formatMonthForLineItem(startDate)
 
   async function yearToDate() {
     const now = new Date()
@@ -427,13 +431,6 @@
       return
     }
 
-    // if (invoiceLink === '' || invoiceLink === null) {
-    //   alert(
-    //     "You have not generated the invoice PDF by clicking the 'Generate PDF Invoice' button. Please do so before sending to the client.",
-    //   )
-    //   return
-    // }
-
     const container = document.getElementById('pdfContent')
     const htmlContent = container.innerHTML // Capture the inner HTML
 
@@ -453,6 +450,8 @@
     if (response.ok) {
       goto('/app/clients#top')
       toggleInvoicePreview()
+      // If successful create invoice line items
+      await createInvoiceLineItems()
     } else {
       const errorData = await response.json()
       alert(`Failed to send email: ${errorData.message}`)
@@ -462,6 +461,39 @@
   $: {
     console.log('stripeInvoiceLink', stripeInvoiceLink)
     console.log('selectedClientToInvoice', $selectedClientToInvoice)
+  }
+
+  async function createInvoiceLineItems() {
+    // Format the invoice line items to pass on to server
+    const formattedLineItems = lineItems.map((lineItem) => {
+      return {
+        user_id: userId,
+        client_id: clientId,
+        company_name: companyName,
+        line_item_name: lineItem.servicesProvided,
+        line_item_cost: lineItem.cost,
+        line_item_billing_terms: lineItem.billingTerms,
+        billing_month: formatMonthForLineItem(startDate),
+        stripe_invoice_url: stripeInvoiceLink,
+        payment_status: 'Unpaid',
+      }
+    })
+    // Make server api call to create line items
+    const response = await fetch('/app/api/invoices/createLineItems', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        formattedLineItems,
+      }),
+    })
+    if (response.ok) {
+      // Perform application navigation to invoices page
+      goto('/app/invoices')
+    } else {
+      const errorData = await response.json()
+      console.error(errorData)
+      alert(`Failed to create invoice line items: ${errorData.message}`)
+    }
   }
 
   // Execute onMount
