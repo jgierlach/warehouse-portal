@@ -103,8 +103,63 @@
     loading = false
   }
 
+  let billingMonth = ''
+  let companyName = ''
+  let lineItemName = ''
+  let billingTerms = ''
+  let cost = 0
+  let stripeInvoiceUrl = ''
+  let paymentStatus = ''
+
+  let showEditLineItemModal = false
+  let lineItemToEdit = {}
+
   async function editLineItem() {
-    // Edit line item
+    loading = true
+    const response = await fetch('/app/api/invoices/editLineItem', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: lineItemToEdit?.id,
+        billingMonth,
+        companyName,
+        lineItemName,
+        billingTerms,
+        cost,
+        stripeInvoiceUrl,
+        paymentStatus,
+      }),
+    })
+    if (response.ok) {
+      await loadInvoiceLineItems(data.supabase)
+      lineItemToEdit = {}
+      clearLineItemFields()
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to edit line item: ${errorData.message}`)
+    }
+    loading = false
+    showEditLineItemModal = false
+  }
+
+  function clearLineItemFields() {
+    billingMonth = ''
+    companyName = ''
+    lineItemName = ''
+    billingTerms = ''
+    cost = 0
+    stripeInvoiceUrl = ''
+    paymentStatus = ''
+  }
+
+  function setLineItemFields(lineItem) {
+    billingMonth = lineItem.billing_month
+    companyName = lineItem.company_name
+    lineItemName = lineItem.line_item_name
+    billingTerms = lineItem.line_item_billing_terms
+    cost = lineItem.line_item_cost
+    stripeInvoiceUrl = lineItem.stripe_invoice_url
+    paymentStatus = lineItem.payment_status
   }
 </script>
 
@@ -197,7 +252,15 @@
               >
               <td>
                 <div class="flex space-x-1">
-                  <button class="btn btn-info btn-sm">Edit</button>
+                  <button
+                    on:click={() => {
+                      clearLineItemFields()
+                      setLineItemFields(lineItem)
+                      lineItemToEdit = lineItem
+                      showEditLineItemModal = true
+                    }}
+                    class="btn btn-info btn-sm">Edit</button
+                  >
                   <button
                     on:click={() => {
                       showDeleteLineItemModal = true
@@ -239,5 +302,111 @@
 <!-- DELTE LINE ITEM MODAL ENDS -->
 
 <!-- EDIT LINE ITEM MODAL BEGINS -->
+<div class={`modal ${showEditLineItemModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showEditLineItemModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mb-5 text-center text-xl font-semibold">Edit Outbound Shipment</h1>
+    <form on:submit|preventDefault={editLineItem}>
+      <!-- Billing month and year dropdown -->
+      <div class="form-control mb-4">
+        <label class="label" for="billingMonth">Billing Month And Year</label>
+        <select
+          required
+          class="select select-bordered bg-base-200"
+          id="billingMonth"
+          bind:value={billingMonth}
+        >
+          <option value="" disabled>Select Billing Month And Year</option>
+          {#each billingMonthsAndYears as billingMonth}
+            <option value={billingMonth}>{billingMonth}</option>
+          {/each}
+        </select>
+      </div>
 
+      <!-- Company Name -->
+      <div class="form-control mb-4">
+        <label class="label" for="companyName">Company Name</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="companyName"
+          bind:value={companyName}
+          placeholder="Company Name"
+        />
+      </div>
+
+      <!-- Line Item Name -->
+      <div class="form-control mb-4">
+        <label class="label" for="lineItemName">Services Provided</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="lineItemName"
+          bind:value={lineItemName}
+          placeholder="Services Provided"
+        />
+      </div>
+
+      <!-- Billing Terms -->
+      <div class="form-control mb-4">
+        <label class="label" for="billingTerms">Billing Terms</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="billingTerms"
+          bind:value={billingTerms}
+          placeholder="Billing Terms"
+        />
+      </div>
+
+      <!-- Cost -->
+      <div class="form-control mb-4">
+        <label class="label" for="cost">Cost</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="number"
+          id="cost"
+          bind:value={cost}
+          step="0.01"
+          placeholder="0.00"
+          inputmode="decimal"
+        />
+      </div>
+
+      <!-- Stripe Invoice Url -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeInvoiceUrl">Stripe Invoice Url</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="stripeInvoiceUrl"
+          bind:value={stripeInvoiceUrl}
+          placeholder="Stripe Invoice Url"
+        />
+      </div>
+
+      <!-- Status -->
+      <div class="form-control mb-4">
+        <label class="label" for="paymentStatus">Payment Status</label>
+        <select
+          class="select select-bordered bg-base-200"
+          id="paymentStatus"
+          bind:value={paymentStatus}
+        >
+          <!-- <option value="" disabled>Yes or No?</option> -->
+          <option value={'Paid'}>Paid</option>
+          <option value={'Unpaid'}>Unpaid</option>
+        </select>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="mt-4 flex justify-center">
+        <button class="btn btn-info" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
 <!-- EDIT LINE ITEM MODAL ENDS -->
