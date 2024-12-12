@@ -1,3 +1,27 @@
+export const calculateRevenueBilledForSelectedMonth = (invoiceLineItemsForSelectedMonth) => {
+  return invoiceLineItemsForSelectedMonth
+    .map((lineItem) => parseFloat(lineItem.line_item_cost.toString().replace(/,/g, '')))
+    .reduce((a, b) => a + b, 0)
+}
+
+export const alphabetizeByCompanyName = (arr) => {
+  return arr.slice().sort((a, b) => {
+    const nameA = a['company_name'].toUpperCase()
+    const nameB = b['company_name'].toUpperCase()
+    if (nameA < nameB) {
+      return -1
+    }
+    if (nameA > nameB) {
+      return 1
+    }
+    return 0
+  })
+}
+
+export const findInvoiceLineItemsForSelectedMonth = (lineItems, billingMonthAndYear) => {
+  return lineItems.filter((lineItem) => lineItem.billing_month === billingMonthAndYear)
+}
+
 export const getCurrentBillingMonthAndYear = () => {
   const date = new Date()
   const currentMonthAndYear = `${date.toLocaleString('default', { month: 'long' })}, ${date.getFullYear()}`
