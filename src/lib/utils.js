@@ -1,3 +1,10 @@
+export const calculateRevenueCollectedForSelectedMonth = (invoiceLineItemsForSelectedMonth) => {
+  return invoiceLineItemsForSelectedMonth
+    .filter((row) => row.payment_status === 'Paid')
+    .map((contract) => parseFloat(contract.line_item_cost.toString().replace(/,/g, '')))
+    .reduce((a, b) => a + b, 0)
+}
+
 export const calculateRevenueBilledForSelectedMonth = (invoiceLineItemsForSelectedMonth) => {
   return invoiceLineItemsForSelectedMonth
     .map((lineItem) => parseFloat(lineItem.line_item_cost.toString().replace(/,/g, '')))

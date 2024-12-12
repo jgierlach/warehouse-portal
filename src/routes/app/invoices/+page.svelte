@@ -7,7 +7,6 @@
 
   // Import components
   import Loading from '$lib/components/Loading.svelte'
-  import FinancialSummary from '$lib/components/FinancialSummary.svelte'
 
   // Import utils
   import {
@@ -17,11 +16,11 @@
     findInvoiceLineItemsForSelectedMonth,
     alphabetizeByCompanyName,
     calculateRevenueBilledForSelectedMonth,
+    calculateRevenueCollectedForSelectedMonth,
   } from '$lib/utils.js'
 
-  // stores
+  // Stores
   import { invoiceLineItems, loadInvoiceLineItems } from '$lib/stores/invoiceLineItems'
-  import CreateInvoice from '$lib/components/CreateInvoice.svelte'
 
   $: billingMonthsAndYears = generateBillingMonthsAndYears($invoiceLineItems)
 
@@ -45,9 +44,12 @@
     invoiceLineItemsForSelectedMonth,
   )
 
-  $: collectedRevenueForSelectedMonth = 0
+  $: collectedRevenueForSelectedMonth = calculateRevenueCollectedForSelectedMonth(
+    invoiceLineItemsForSelectedMonth,
+  )
 
-  $: accountsReceivableForSelectedMonth = 0
+  $: accountsReceivableForSelectedMonth =
+    revenueBilledForSelectedMonth - collectedRevenueForSelectedMonth
 
   $: percentCollectedForSelectedMonth = 0
 
@@ -75,10 +77,18 @@
       alert(`Failed to update payment status: ${errorData.message}`)
     }
   }
+
+  async function deleteLineItem() {
+    // Delete line item
+  }
+
+  async function editLineItem() {
+    // Edit line item
+  }
 </script>
 
 <div class="mt-10 flex justify-center">
-  <div class="mr-1- ml-10 w-full bg-base-100 p-4 shadow-xl">
+  <div class="ml-10 mr-10 w-full bg-base-100 p-4 shadow-xl">
     <h1 class="text-center text-3xl font-bold">
       {selectedBillingMonthAndYear} - Invoice Line Items
     </h1>
