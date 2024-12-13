@@ -18,6 +18,7 @@
     calculateRevenueBilledForSelectedMonth,
     calculateRevenueCollectedForSelectedMonth,
     generateCompanyNames,
+    generateClientIds,
   } from '$lib/utils.js'
 
   // Stores
@@ -35,6 +36,8 @@
   })
 
   $: companyNames = generateCompanyNames($clients)
+
+  $: clientIds = generateClientIds($clients)
 
   $: invoiceLineItemsForSelectedMonth = findInvoiceLineItemsForSelectedMonth(
     $invoiceLineItems,
@@ -111,8 +114,11 @@
     loading = false
   }
 
-  let billingMonth = ''
+  // Invoice line item fields
   let companyName = ''
+  $: clientId = $clients.find((client) => client?.company_name === companyName)?.username
+  $: userId = $clients.find((client) => client?.username === clientId)?.id
+  let billingMonth = ''
   let lineItemName = ''
   let billingTerms = ''
   let cost = 0
@@ -150,6 +156,41 @@
     showEditLineItemModal = false
   }
 
+  let addLineItemModal = false
+
+  async function addLineItem() {
+    loading = true
+    const formattedLineItems = [
+      {
+        user_id: userId,
+        client_id: clientId,
+        billing_month: billingMonth,
+        company_name: companyName,
+        line_item_name: lineItemName,
+        line_item_cost: cost,
+        line_item_billing_terms: billingTerms,
+        stripe_invoice_url: stripeInvoiceUrl,
+        payment_status: paymentStatus,
+      },
+    ]
+    const response = await fetch('/app/api/invoices/createLineItems', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        formattedLineItems,
+      }),
+    })
+    if (response.ok) {
+      await loadInvoiceLineItems(data.supabase)
+      clearLineItemFields()
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to add line item: ${errorData.message}`)
+    }
+    loading = false
+    addLineItemModal = false
+  }
+
   function clearLineItemFields() {
     billingMonth = ''
     companyName = ''
@@ -178,7 +219,13 @@
       {selectedBillingMonthAndYear} - Invoice Line Items
     </h1>
     <div class="mt-2 flex justify-center">
-      <button class="btn btn-primary btn-sm flex items-center gap-2">
+      <button
+        on:click={() => {
+          clearLineItemFields()
+          addLineItemModal = true
+        }}
+        class="btn btn-primary btn-sm flex items-center gap-2"
+      >
         Add Line Item
         <i class="fas fa-plus"></i>
       </button>
@@ -316,7 +363,7 @@
       on:click={() => (showEditLineItemModal = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
-    <h1 class="mb-5 text-center text-xl font-semibold">Edit Outbound Shipment</h1>
+    <h1 class="mb-5 text-center text-xl font-semibold">Edit Line Item</h1>
     <form on:submit|preventDefault={editLineItem}>
       <!-- Billing month and year dropdown -->
       <div class="form-control mb-4">
@@ -334,9 +381,9 @@
         </select>
       </div>
 
-      <!-- Company Names -->
+      <!-- Company Name -->
       <div class="form-control mb-4">
-        <label class="label" for="billingMonth">Company Names</label>
+        <label class="label" for="billingMonth">Company Name</label>
         <select
           required
           class="select select-bordered bg-base-200"
@@ -422,3 +469,145 @@
   </div>
 </div>
 <!-- EDIT LINE ITEM MODAL ENDS -->
+
+<!-- ADD LINE ITEM MODAL BEGINS -->
+<div class={`modal ${addLineItemModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (addLineItemModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mb-5 text-center text-xl font-semibold">Add Line Item</h1>
+    <form on:submit|preventDefault={addLineItem}>
+      <!-- Billing month and year dropdown -->
+      <div class="form-control mb-4">
+        <label class="label" for="billingMonth">Billing Month And Year</label>
+        <select
+          required
+          class="select select-bordered bg-base-200"
+          id="billingMonth"
+          bind:value={billingMonth}
+        >
+          <option value="" disabled>Select Billing Month And Year</option>
+          {#each billingMonthsAndYears as billingMonth}
+            <option value={billingMonth}>{billingMonth}</option>
+          {/each}
+        </select>
+      </div>
+
+      <!-- Company Names -->
+      <div class="form-control mb-4">
+        <label class="label" for="billingMonth">Company Names</label>
+        <select
+          required
+          class="select select-bordered bg-base-200"
+          id="billingMonth"
+          bind:value={companyName}
+        >
+          <option value="" disabled>Select Company Name</option>
+          {#each companyNames as companyName}
+            <option value={companyName}>{companyName}</option>
+          {/each}
+        </select>
+      </div>
+
+      <!-- Client ID Dropdown -->
+      <!-- <div class="form-control mb-4">
+        <label class="label" for="clientId">Client Id</label>
+        <select
+          required
+          class="select select-bordered bg-base-200"
+          id="clientId"
+          bind:value={clientId}
+        >
+          <option value="" disabled>Select Client Id</option>
+          {#each clientIds as clientIdOption}
+            <option value={clientIdOption}>{clientIdOption}</option>
+          {/each}
+        </select>
+      </div> -->
+
+      <!-- Client Id -->
+      <div class="form-control mb-4">
+        <label class="label" for="clientId">Client Id</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="clientId"
+          bind:value={clientId}
+          placeholder="Client Id"
+        />
+      </div>
+
+      <!-- Line Item Name -->
+      <div class="form-control mb-4">
+        <label class="label" for="lineItemName">Services Provided</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="lineItemName"
+          bind:value={lineItemName}
+          placeholder="Services Provided"
+        />
+      </div>
+
+      <!-- Billing Terms -->
+      <div class="form-control mb-4">
+        <label class="label" for="billingTerms">Billing Terms</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="billingTerms"
+          bind:value={billingTerms}
+          placeholder="Billing Terms"
+        />
+      </div>
+
+      <!-- Cost -->
+      <div class="form-control mb-4">
+        <label class="label" for="cost">Cost</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="number"
+          id="cost"
+          bind:value={cost}
+          step="0.01"
+          placeholder="0.00"
+          inputmode="decimal"
+        />
+      </div>
+
+      <!-- Stripe Invoice Url -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeInvoiceUrl">Stripe Invoice Url</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="stripeInvoiceUrl"
+          bind:value={stripeInvoiceUrl}
+          placeholder="Stripe Invoice Url"
+        />
+      </div>
+
+      <!-- Status -->
+      <div class="form-control mb-4">
+        <label class="label" for="paymentStatus">Payment Status</label>
+        <select
+          class="select select-bordered bg-base-200"
+          id="paymentStatus"
+          bind:value={paymentStatus}
+        >
+          <!-- <option value="" disabled>Yes or No?</option> -->
+          <option value={'Unpaid'}>Unpaid</option>
+          <option value={'Paid'}>Paid</option>
+        </select>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="mt-4 flex justify-center">
+        <button class="btn btn-info" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- ADD LINE ITEM MODAL ENDS -->

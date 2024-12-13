@@ -1,7 +1,18 @@
+export const generateClientIds = (clients) => {
+  const activeClients = clients.filter(
+    (client) =>
+      client.username !== 'jan@hometown-industries.com' &&
+      client.username !== 'susan@hometown-industries.com' &&
+      client.username !== 'wesley@hometown-industries.com' &&
+      client.username !== 'storageandfulfillment@hometown-industries.com',
+  )
+  return activeClients.map((client) => client.username)
+}
+
 export const calculateRevenueCollectedForSelectedMonth = (invoiceLineItemsForSelectedMonth) => {
   return invoiceLineItemsForSelectedMonth
     .filter((row) => row.payment_status === 'Paid')
-    .map((contract) => parseFloat(contract.line_item_cost.toString().replace(/,/g, '')))
+    .map((lineItem) => parseFloat(lineItem.line_item_cost.toString().replace(/,/g, '')))
     .reduce((a, b) => a + b, 0)
 }
 
