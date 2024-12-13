@@ -389,6 +389,7 @@
                 >
                 <td>
                   <div class="flex space-x-1">
+                    <button class="btn btn-sm">View Line Items</button>
                     <button class="btn btn-warning btn-sm">Send Collection Email</button>
                   </div></td
                 >
