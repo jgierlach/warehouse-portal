@@ -362,8 +362,8 @@
               <th>Company Name</th>
               <th>Invoice Total</th>
               <th>Stripe Invoice Url</th>
-              <!-- <th>Payment Status</th> -->
-              <!-- <th>Actions</th> -->
+              <th>Payment Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -378,6 +378,19 @@
                     href={lineItem.stripe_invoice_url}
                     target="_blank">Invoice</a
                   ></td
+                >
+                <td
+                  ><button
+                    class="btn btn-sm"
+                    class:btn-accent={lineItem.is_paid}
+                    class:btn-error={!lineItem.is_paid}
+                    >{lineItem.is_paid ? 'Paid' : 'Unpaid'}</button
+                  ></td
+                >
+                <td>
+                  <div class="flex space-x-1">
+                    <button class="btn btn-warning btn-sm">Send Collection Email</button>
+                  </div></td
                 >
               </tr>
             {/each}

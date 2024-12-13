@@ -17,38 +17,20 @@ export const generateInvoicesForSelectedMonth = (invoiceLineItemsForSelectedMont
         0,
       )
 
+      const is_paid = lineItemsForCompany.every((item) => item.payment_status === 'Paid')
+
       // Push the invoice object for this company
       invoices.push({
         billing_month: lineItem.billing_month,
         company_name: lineItem.company_name,
         invoice_total: invoiceTotal,
         stripe_invoice_url: lineItem.stripe_invoice_url,
-        payment_status: false,
+        is_paid,
       })
     }
     return invoices
   }, [])
 }
-
-// export const generateInvoicesForSelectedMonth = (invoiceLineItemsForSelectedMonth) => {
-//   return invoiceLineItemsForSelectedMonth.map((lineItem) => {
-//     const lineItemsForCompanyThatMonth = invoiceLineItemsForSelectedMonth.filter(
-//       (item) => item.company_name === lineItem.company_name,
-//     )
-//     const invoiceTotal = lineItemsForCompanyThatMonth.reduce(
-//       (total, item) => total + (item.line_item_cost || 0),
-//       0,
-//     )
-//     console.log('invoiceTotal', invoiceTotal)
-//     return {
-//       billing_month: lineItem.billing_month,
-//       company_name: lineItem.company_name,
-//       invoice_total: invoiceTotal,
-//       stripe_invoice_url: lineItem.stripe_invoice_url,
-//       payment_status: false,
-//     }
-//   })
-// }
 
 export const generateClientIds = (clients) => {
   const activeClients = clients.filter(
