@@ -19,6 +19,7 @@
     calculateRevenueCollectedForSelectedMonth,
     generateCompanyNames,
     generateClientIds,
+    generateInvoicesForSelectedMonth,
   } from '$lib/utils.js'
 
   // Stores
@@ -46,6 +47,10 @@
 
   $: invoiceLineItemsForSelectedMonthAlphabetized = alphabetizeByCompanyName(
     invoiceLineItemsForSelectedMonth,
+  )
+
+  $: invoicesForSelectedMonth = generateInvoicesForSelectedMonth(
+    invoiceLineItemsForSelectedMonthAlphabetized,
   )
 
   $: revenueBilledForSelectedMonth = calculateRevenueBilledForSelectedMonth(
@@ -210,13 +215,15 @@
     stripeInvoiceUrl = lineItem.stripe_invoice_url
     paymentStatus = lineItem.payment_status
   }
+
+  let displaySetting = 'invoices'
 </script>
 
 <Loading {loading} />
 <div class="mt-10 flex justify-center">
   <div class="ml-10 mr-10 w-full bg-base-100 p-4 shadow-xl">
     <h1 class="text-center text-3xl font-bold">
-      {selectedBillingMonthAndYear} - Invoice Line Items
+      {selectedBillingMonthAndYear} - Invoices
     </h1>
     <div class="mt-2 flex justify-center">
       <button
@@ -267,70 +274,117 @@
       </table>
     </div>
 
-    <div class="mt-5 overflow-x-auto">
-      <table class="table table-zebra">
-        <thead>
-          <tr>
-            <th>Billing Month</th>
-            <th>Company Name</th>
-            <th>Services Provided</th>
-            <th>Billing Terms</th>
-            <th>Cost</th>
-            <th>Stripe Invoice Url</th>
-            <th>Payment Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each invoiceLineItemsForSelectedMonthAlphabetized as lineItem}
-            <tr>
-              <td>{lineItem.billing_month}</td>
-              <td>{lineItem.company_name}</td>
-              <td>{lineItem.line_item_name}</td>
-              <td>{lineItem.line_item_billing_terms}</td>
-              <td>{formatDollarValue(lineItem.line_item_cost)}</td>
-              <td
-                ><a
-                  class="link-primary font-semibold underline"
-                  href={lineItem.stripe_invoice_url}
-                  target="_blank">Invoice</a
-                ></td
-              >
-              <td
-                ><button
-                  on:click={() => updatePaymentStatus(lineItem.payment_status, lineItem.id)}
-                  class="btn btn-sm"
-                  class:btn-accent={lineItem.payment_status === 'Paid'}
-                  class:btn-error={lineItem.payment_status === 'Unpaid'}
-                  >{lineItem.payment_status}</button
-                ></td
-              >
-              <td>
-                <div class="flex space-x-1">
-                  <button
-                    on:click={() => {
-                      clearLineItemFields()
-                      setLineItemFields(lineItem)
-                      lineItemToEdit = lineItem
-                      showEditLineItemModal = true
-                    }}
-                    class="btn btn-info btn-sm">Edit</button
-                  >
-                  <button
-                    on:click={() => {
-                      showDeleteLineItemModal = true
-                      lineItemToDelete = lineItem
-                    }}
-                    class="btn btn-error btn-sm">Delete</button
-                  >
-                  <!-- <button class="btn btn-warning btn-sm">Send Collection Email</button> -->
-                </div></td
-              >
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+    <div class="mt-4 flex justify-center">
+      <button
+        on:click={() => (displaySetting = 'invoices')}
+        class:btn-active={displaySetting === 'invoices'}
+        class="btn">Invoices</button
+      >
+      <button
+        on:click={() => (displaySetting = 'line items')}
+        class:btn-active={displaySetting === 'line items'}
+        class="btn">Line Items</button
+      >
     </div>
+
+    {#if displaySetting === 'line items'}
+      <div class="mt-5 overflow-x-auto">
+        <table class="table table-zebra">
+          <thead>
+            <tr>
+              <th>Billing Month</th>
+              <th>Company Name</th>
+              <th>Services Provided</th>
+              <th>Billing Terms</th>
+              <th>Cost</th>
+              <th>Stripe Invoice Url</th>
+              <th>Payment Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each invoiceLineItemsForSelectedMonthAlphabetized as lineItem}
+              <tr>
+                <td>{lineItem.billing_month}</td>
+                <td>{lineItem.company_name}</td>
+                <td>{lineItem.line_item_name}</td>
+                <td>{lineItem.line_item_billing_terms}</td>
+                <td>{formatDollarValue(lineItem.line_item_cost)}</td>
+                <td
+                  ><a
+                    class="link-primary font-semibold underline"
+                    href={lineItem.stripe_invoice_url}
+                    target="_blank">Invoice</a
+                  ></td
+                >
+                <td
+                  ><button
+                    on:click={() => updatePaymentStatus(lineItem.payment_status, lineItem.id)}
+                    class="btn btn-sm"
+                    class:btn-accent={lineItem.payment_status === 'Paid'}
+                    class:btn-error={lineItem.payment_status === 'Unpaid'}
+                    >{lineItem.payment_status}</button
+                  ></td
+                >
+                <td>
+                  <div class="flex space-x-1">
+                    <button
+                      on:click={() => {
+                        clearLineItemFields()
+                        setLineItemFields(lineItem)
+                        lineItemToEdit = lineItem
+                        showEditLineItemModal = true
+                      }}
+                      class="btn btn-info btn-sm">Edit</button
+                    >
+                    <button
+                      on:click={() => {
+                        showDeleteLineItemModal = true
+                        lineItemToDelete = lineItem
+                      }}
+                      class="btn btn-error btn-sm">Delete</button
+                    >
+                    <!-- <button class="btn btn-warning btn-sm">Send Collection Email</button> -->
+                  </div></td
+                >
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    {/if}
+    {#if displaySetting === 'invoices'}
+      <div class="mt-5 overflow-x-auto">
+        <table class="table table-zebra">
+          <thead>
+            <tr>
+              <th>Billing Month</th>
+              <th>Company Name</th>
+              <th>Invoice Total</th>
+              <th>Stripe Invoice Url</th>
+              <!-- <th>Payment Status</th> -->
+              <!-- <th>Actions</th> -->
+            </tr>
+          </thead>
+          <tbody>
+            {#each invoicesForSelectedMonth as lineItem}
+              <tr>
+                <td>{lineItem.billing_month}</td>
+                <td>{lineItem.company_name}</td>
+                <td>{formatDollarValue(lineItem.invoice_total)}</td>
+                <td
+                  ><a
+                    class="link-primary font-semibold underline"
+                    href={lineItem.stripe_invoice_url}
+                    target="_blank">Invoice</a
+                  ></td
+                >
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    {/if}
   </div>
 </div>
 

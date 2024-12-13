@@ -1,3 +1,55 @@
+export const generateInvoicesForSelectedMonth = (invoiceLineItemsForSelectedMonth) => {
+  const companySet = new Set() // To track companies already processed
+
+  return invoiceLineItemsForSelectedMonth.reduce((invoices, lineItem) => {
+    if (!companySet.has(lineItem.company_name)) {
+      // Add the company to the Set to avoid duplicates
+      companySet.add(lineItem.company_name)
+
+      // Filter line items for the current company
+      const lineItemsForCompany = invoiceLineItemsForSelectedMonth.filter(
+        (item) => item.company_name === lineItem.company_name,
+      )
+
+      // Calculate total invoice for the company
+      const invoiceTotal = lineItemsForCompany.reduce(
+        (total, item) => total + (item.line_item_cost || 0),
+        0,
+      )
+
+      // Push the invoice object for this company
+      invoices.push({
+        billing_month: lineItem.billing_month,
+        company_name: lineItem.company_name,
+        invoice_total: invoiceTotal,
+        stripe_invoice_url: lineItem.stripe_invoice_url,
+        payment_status: false,
+      })
+    }
+    return invoices
+  }, [])
+}
+
+// export const generateInvoicesForSelectedMonth = (invoiceLineItemsForSelectedMonth) => {
+//   return invoiceLineItemsForSelectedMonth.map((lineItem) => {
+//     const lineItemsForCompanyThatMonth = invoiceLineItemsForSelectedMonth.filter(
+//       (item) => item.company_name === lineItem.company_name,
+//     )
+//     const invoiceTotal = lineItemsForCompanyThatMonth.reduce(
+//       (total, item) => total + (item.line_item_cost || 0),
+//       0,
+//     )
+//     console.log('invoiceTotal', invoiceTotal)
+//     return {
+//       billing_month: lineItem.billing_month,
+//       company_name: lineItem.company_name,
+//       invoice_total: invoiceTotal,
+//       stripe_invoice_url: lineItem.stripe_invoice_url,
+//       payment_status: false,
+//     }
+//   })
+// }
+
 export const generateClientIds = (clients) => {
   const activeClients = clients.filter(
     (client) =>
