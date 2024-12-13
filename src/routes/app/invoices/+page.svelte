@@ -17,10 +17,12 @@
     alphabetizeByCompanyName,
     calculateRevenueBilledForSelectedMonth,
     calculateRevenueCollectedForSelectedMonth,
+    generateCompanyNames,
   } from '$lib/utils.js'
 
   // Stores
   import { invoiceLineItems, loadInvoiceLineItems } from '$lib/stores/invoiceLineItems'
+  import { clients, loadClients } from '$lib/stores/clients.js'
 
   $: billingMonthsAndYears = generateBillingMonthsAndYears($invoiceLineItems)
 
@@ -29,7 +31,10 @@
   // Execute onMount
   onMount(async () => {
     await loadInvoiceLineItems(data.supabase)
+    await loadClients(data.supabase)
   })
+
+  $: companyNames = generateCompanyNames($clients)
 
   $: invoiceLineItemsForSelectedMonth = findInvoiceLineItemsForSelectedMonth(
     $invoiceLineItems,
@@ -51,7 +56,10 @@
   $: accountsReceivableForSelectedMonth =
     revenueBilledForSelectedMonth - collectedRevenueForSelectedMonth
 
-  $: percentCollectedForSelectedMonth = 0
+  $: percentCollectedForSelectedMonth = (
+    (collectedRevenueForSelectedMonth / revenueBilledForSelectedMonth) *
+    100
+  ).toFixed(2)
 
   let loading = false
 
@@ -206,7 +214,7 @@
             <td>{formatDollarValue(revenueBilledForSelectedMonth)}</td>
             <td>{formatDollarValue(collectedRevenueForSelectedMonth)}</td>
             <td>{formatDollarValue(accountsReceivableForSelectedMonth)}</td>
-            <td>{formatDollarValue(percentCollectedForSelectedMonth)}</td>
+            <td>{percentCollectedForSelectedMonth}%</td>
           </tr>
         </tbody>
       </table>
@@ -326,16 +334,20 @@
         </select>
       </div>
 
-      <!-- Company Name -->
+      <!-- Company Names -->
       <div class="form-control mb-4">
-        <label class="label" for="companyName">Company Name</label>
-        <input
-          class="input input-bordered bg-base-200"
-          type="text"
-          id="companyName"
+        <label class="label" for="billingMonth">Company Names</label>
+        <select
+          required
+          class="select select-bordered bg-base-200"
+          id="billingMonth"
           bind:value={companyName}
-          placeholder="Company Name"
-        />
+        >
+          <option value="" disabled>Select Company Name</option>
+          {#each companyNames as companyName}
+            <option value={companyName}>{companyName}</option>
+          {/each}
+        </select>
       </div>
 
       <!-- Line Item Name -->

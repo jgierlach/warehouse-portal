@@ -73,6 +73,10 @@ export const generateBillingMonthsAndYears = (rows) => {
   return sortBillingMonthsAndYears([...new Set(rows.map((row) => row.billing_month))])
 }
 
+export const generateCompanyNames = (clients) => {
+  return [...new Set(clients.map((client) => client.company_name))]
+}
+
 export const sortBillingMonthsAndYears = (dates) => {
   return dates.sort((a, b) => {
     const [monthA, yearA] = a.split(', ').map((str) => str.trim())
