@@ -23,8 +23,6 @@ export async function PUT({ request, locals }) {
     payment_status: paymentStatus,
   }
 
-  console.log('ROW ON SERVER', row)
-
   const { data, error } = await locals.supabase
     .from('invoice_line_items')
     .update(row)
