@@ -221,11 +221,6 @@
   let showInvoiceLineItemsModal = false
   let invoiceToDisplayLineItems = {}
   $: selectedLineItems = invoiceToDisplayLineItems?.line_items_for_company
-
-  $: {
-    console.log('invoiceToDisplayLineItems', invoiceToDisplayLineItems)
-    console.log('selectedLineItems', selectedLineItems)
-  }
 </script>
 
 <Loading {loading} />
