@@ -1,6 +1,7 @@
 <script>
   // Import svelte specific functions
   import { onMount } from 'svelte'
+  import { goto } from '$app/navigation'
 
   // Props
   export let data
@@ -229,6 +230,10 @@
   let showInvoiceLineItemsModal = false
   let invoiceToDisplayLineItems = {}
   $: selectedLineItems = invoiceToDisplayLineItems?.line_items_for_company
+
+  function sendToCollections(userId, clientId) {
+    goto(`/app/collections?userId=${userId}&clientId=${clientId}`)
+  }
 </script>
 
 <Loading {loading} />
@@ -412,7 +417,10 @@
                       }}
                       class="btn btn-sm">View Line Items</button
                     >
-                    <button class="btn btn-warning btn-sm">Send Collection Email</button>
+                    <button
+                      on:click={() => sendToCollections(invoice.user_id, invoice.client_id)}
+                      class="btn btn-warning btn-sm">Send Collection Email</button
+                    >
                   </div></td
                 >
               </tr>

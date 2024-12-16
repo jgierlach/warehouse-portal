@@ -21,6 +21,8 @@ export const generateInvoicesForSelectedMonth = (invoiceLineItemsForSelectedMont
 
       // Push the invoice object for this company
       invoices.push({
+        user_id: lineItem.user_id,
+        client_id: lineItem.client_id,
         billing_month: lineItem.billing_month,
         company_name: lineItem.company_name,
         invoice_total: invoiceTotal,
@@ -29,7 +31,6 @@ export const generateInvoicesForSelectedMonth = (invoiceLineItemsForSelectedMont
         line_items_for_company: lineItemsForCompany,
       })
     }
-    console.log('MODIFIED INVOICES', invoices)
     return invoices
   }, [])
 }
