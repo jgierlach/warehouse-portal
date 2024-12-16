@@ -208,5 +208,8 @@
 {/if}
 
 {#if unpaidInvoiceLineItems?.length === 0}
-  <h1 class="mt-10 text-center text-3xl font-semibold">This client has no unpaid invoices!</h1>
+  <h1 class="mt-10 text-center text-3xl font-semibold">{companyName} has no unpaid invoices!</h1>
+  <div class="mt-4 flex justify-center">
+    <a class="btn btn-primary" href="/app/invoices">Return to Invoices</a>
+  </div>
 {/if}
