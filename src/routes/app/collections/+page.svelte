@@ -36,6 +36,12 @@
     // Send collection email
   }
 
+  let collectionEmail = ''
+
+  function changeCollectionEmail() {
+    // Change collection email
+  }
+
   // Execute onMount
   onMount(() => {
     billingContactEmail = invoiceLineItems[0]?.client_id
@@ -46,6 +52,44 @@
 <div class="mt-10 flex justify-center">
   <div class="w-full max-w-2xl rounded-md bg-base-100 p-7 shadow-lg">
     <h1 class="text-center text-xl font-semibold">{companyName} - Collections Email</h1>
+
+    <div class="mb-4 mt-4 flex justify-center space-x-2">
+      <button
+        on:click={() => changeCollectionEmail('first')}
+        class="btn btn-outline btn-primary btn-sm rounded-full"
+        class:bg-primary={collectionEmail === 'first'}
+      >
+        1
+      </button>
+      <button
+        on:click={() => changeCollectionEmail('second')}
+        class="btn btn-outline btn-primary btn-sm rounded-full"
+        class:bg-primary={collectionEmail === 'second'}
+      >
+        2
+      </button>
+      <button
+        on:click={() => changeCollectionEmail('third')}
+        class="btn btn-outline btn-primary btn-sm rounded-full"
+        class:bg-primary={collectionEmail === 'third'}
+      >
+        3
+      </button>
+      <button
+        on:click={() => changeCollectionEmail('fourth')}
+        class="btn btn-outline btn-primary btn-sm rounded-full"
+        class:bg-primary={collectionEmail === 'fourth'}
+      >
+        4
+      </button>
+      <button
+        on:click={() => changeCollectionEmail('fifth')}
+        class="btn btn-outline btn-primary btn-sm rounded-full"
+        class:bg-primary={collectionEmail === 'fifth'}
+      >
+        5
+      </button>
+    </div>
 
     <form on:submit|preventDefault={sendCollectionEmail}>
       <div class="mb-4 mt-4 flex items-center">
