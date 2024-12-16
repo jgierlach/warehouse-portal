@@ -11,7 +11,7 @@ export async function load({ url, locals: { supabase } }) {
     .from('invoice_line_items')
     .select('*') // Select all columns
     .eq('user_id', userId) // Filter by user_id
-    .eq('payment_status', 'Unpaid') // Filter where payment_status is Unpaid
+  // .eq('payment_status', 'Unpaid') // Filter where payment_status is Unpaid
 
   if (error) {
     console.error('Error fetching invoice line items:', error.message)
