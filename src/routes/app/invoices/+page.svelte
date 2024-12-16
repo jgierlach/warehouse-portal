@@ -96,6 +96,14 @@
     }
   }
 
+  async function updateInvoicePaymentStatus(paymentStatus, invoice) {
+    const lineItems = invoice.line_items_for_company
+    for (let i = 0; i <= lineItems.length; i++) {
+      let lineItem = lineItems[i]
+      await updatePaymentStatus(paymentStatus, lineItem.id)
+    }
+  }
+
   let showDeleteLineItemModal = false
   let lineItemToDelete = {}
 
@@ -385,6 +393,11 @@
                 >
                 <td
                   ><button
+                    on:click={async () =>
+                      await updateInvoicePaymentStatus(
+                        invoice.is_paid ? 'Paid' : 'Unpaid',
+                        invoice,
+                      )}
                     class="btn btn-sm"
                     class:btn-accent={invoice.is_paid}
                     class:btn-error={!invoice.is_paid}>{invoice.is_paid ? 'Paid' : 'Unpaid'}</button
@@ -587,22 +600,6 @@
           {/each}
         </select>
       </div>
-
-      <!-- Client ID Dropdown -->
-      <!-- <div class="form-control mb-4">
-        <label class="label" for="clientId">Client Id</label>
-        <select
-          required
-          class="select select-bordered bg-base-200"
-          id="clientId"
-          bind:value={clientId}
-        >
-          <option value="" disabled>Select Client Id</option>
-          {#each clientIds as clientIdOption}
-            <option value={clientIdOption}>{clientIdOption}</option>
-          {/each}
-        </select>
-      </div> -->
 
       <!-- Client Id -->
       <div class="form-control mb-4">
