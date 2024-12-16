@@ -29,6 +29,7 @@ export const generateInvoicesForSelectedMonth = (invoiceLineItemsForSelectedMont
         line_items_for_company: lineItemsForCompany,
       })
     }
+    console.log('MODIFIED INVOICES', invoices)
     return invoices
   }, [])
 }

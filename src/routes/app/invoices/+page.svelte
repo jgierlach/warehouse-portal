@@ -217,6 +217,15 @@
   }
 
   let displaySetting = 'invoices'
+
+  let showInvoiceLineItemsModal = false
+  let invoiceToDisplayLineItems = {}
+  $: selectedLineItems = invoiceToDisplayLineItems?.line_items_for_company
+
+  $: {
+    console.log('invoiceToDisplayLineItems', invoiceToDisplayLineItems)
+    console.log('selectedLineItems', selectedLineItems)
+  }
 </script>
 
 <Loading {loading} />
@@ -367,29 +376,34 @@
             </tr>
           </thead>
           <tbody>
-            {#each invoicesForSelectedMonth as lineItem}
+            {#each invoicesForSelectedMonth as invoice}
               <tr>
-                <td>{lineItem.billing_month}</td>
-                <td>{lineItem.company_name}</td>
-                <td>{formatDollarValue(lineItem.invoice_total)}</td>
+                <td>{invoice.billing_month}</td>
+                <td>{invoice.company_name}</td>
+                <td>{formatDollarValue(invoice.invoice_total)}</td>
                 <td
                   ><a
                     class="link-primary font-semibold underline"
-                    href={lineItem.stripe_invoice_url}
+                    href={invoice.stripe_invoice_url}
                     target="_blank">Invoice</a
                   ></td
                 >
                 <td
                   ><button
                     class="btn btn-sm"
-                    class:btn-accent={lineItem.is_paid}
-                    class:btn-error={!lineItem.is_paid}
-                    >{lineItem.is_paid ? 'Paid' : 'Unpaid'}</button
+                    class:btn-accent={invoice.is_paid}
+                    class:btn-error={!invoice.is_paid}>{invoice.is_paid ? 'Paid' : 'Unpaid'}</button
                   ></td
                 >
                 <td>
                   <div class="flex space-x-1">
-                    <button class="btn btn-sm">View Line Items</button>
+                    <button
+                      on:click={() => {
+                        invoiceToDisplayLineItems = invoice
+                        showInvoiceLineItemsModal = true
+                      }}
+                      class="btn btn-sm">View Line Items</button
+                    >
                     <button class="btn btn-warning btn-sm">Send Collection Email</button>
                   </div></td
                 >
@@ -679,3 +693,39 @@
   </div>
 </div>
 <!-- ADD LINE ITEM MODAL ENDS -->
+
+<!-- INVOICE LINE ITEMS MODAL BEGINS -->
+<div class={`modal ${showInvoiceLineItemsModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative bg-base-100">
+    <button
+      on:click={() => (showInvoiceLineItemsModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mt-2 text-center text-lg font-bold">
+      {invoiceToDisplayLineItems?.company_name} - Line Items
+    </h1>
+    <div class="mt-5 flex justify-center">
+      <table class="table bg-base-100 shadow-lg">
+        <thead>
+          <tr>
+            <th>Billing Month</th>
+            <th>Service Name</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#if selectedLineItems !== undefined}
+            {#each selectedLineItems as lineItem}
+              <tr>
+                <td>{lineItem?.billing_month}</td>
+                <td>{lineItem?.line_item_name}</td>
+                <td>{formatDollarValue(lineItem?.line_item_cost)}</td>
+              </tr>
+            {/each}
+          {/if}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- INVOICE LINE ITEMS MODAL ENDS -->
