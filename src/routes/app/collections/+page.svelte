@@ -2,6 +2,7 @@
   // Import svelte specific functions
   import { onMount } from 'svelte'
   import { goto } from '$app/navigation'
+  import { fade } from 'svelte/transition'
 
   // Import utils
   import { formatDollarValue, abbreviateString, setCollectionEmailText } from '$lib/utils.js'
@@ -40,7 +41,23 @@
         })
 
   async function sendCollectionEmail() {
-    // Send collection email
+    const response = await fetch('/app/api/notifications/sendCollectionEmail', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        billingContactEmail,
+        subjectLine,
+        emailText,
+        ccArray,
+      }),
+    })
+    if (response.ok) {
+      toggleEmailTemplate()
+      goto('/app/invoices')
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to send collection email: ${errorData.message}`)
+    }
   }
 
   let collectionEmail = 'first'
@@ -81,7 +98,7 @@
     showEmailTemplate = !showEmailTemplate
     setTimeout(() => {
       showEmailTemplate = !showEmailTemplate
-    }, 2000)
+    }, 3000)
   }
 
   // Execute onMount
@@ -92,100 +109,109 @@
 </script>
 
 {#if unpaidInvoiceLineItems?.length > 0}
-  <div class="mt-10 flex justify-center">
-    <div class="w-full max-w-2xl rounded-md bg-base-100 p-7 shadow-lg">
-      <h1 class="text-center text-xl font-semibold">{companyName} - Collections Email</h1>
+  {#if showEmailTemplate}
+    <div class="mt-10 flex justify-center">
+      <div class="w-full max-w-2xl rounded-md bg-base-100 p-7 shadow-lg">
+        <h1 class="text-center text-xl font-semibold">{companyName} - Collections Email</h1>
 
-      <div class="mb-4 mt-4 flex justify-center space-x-2">
-        <button
-          on:click={() => changeCollectionEmail('first')}
-          class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:btn-active={collectionEmail === 'first'}
-        >
-          1
-        </button>
-        <button
-          on:click={() => changeCollectionEmail('second')}
-          class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:btn-active={collectionEmail === 'second'}
-        >
-          2
-        </button>
-        <button
-          on:click={() => changeCollectionEmail('third')}
-          class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:btn-active={collectionEmail === 'third'}
-        >
-          3
-        </button>
-        <button
-          on:click={() => changeCollectionEmail('fourth')}
-          class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:btn-active={collectionEmail === 'fourth'}
-        >
-          4
-        </button>
-        <button
-          on:click={() => changeCollectionEmail('fifth')}
-          class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:btn-active={collectionEmail === 'fifth'}
-        >
-          5
-        </button>
-      </div>
-
-      <form on:submit|preventDefault={sendCollectionEmail}>
-        <div class="mb-4 mt-4 flex items-center">
-          <strong class="mr-2">To:</strong>
-          <input
-            class="input input-bordered mr-2 w-full bg-base-200"
-            bind:value={billingContactEmail}
-            required
-          />
-          <button on:click={() => (showCc = !showCc)} class="btn btn-outline btn-info">
-            <i class="fas fa-plus"></i>
+        <div class="mb-4 mt-4 flex justify-center space-x-2">
+          <button
+            on:click={() => changeCollectionEmail('first')}
+            class="btn btn-outline btn-primary btn-sm rounded-full"
+            class:btn-active={collectionEmail === 'first'}
+          >
+            1
+          </button>
+          <button
+            on:click={() => changeCollectionEmail('second')}
+            class="btn btn-outline btn-primary btn-sm rounded-full"
+            class:btn-active={collectionEmail === 'second'}
+          >
+            2
+          </button>
+          <button
+            on:click={() => changeCollectionEmail('third')}
+            class="btn btn-outline btn-primary btn-sm rounded-full"
+            class:btn-active={collectionEmail === 'third'}
+          >
+            3
+          </button>
+          <button
+            on:click={() => changeCollectionEmail('fourth')}
+            class="btn btn-outline btn-primary btn-sm rounded-full"
+            class:btn-active={collectionEmail === 'fourth'}
+          >
+            4
+          </button>
+          <button
+            on:click={() => changeCollectionEmail('fifth')}
+            class="btn btn-outline btn-primary btn-sm rounded-full"
+            class:btn-active={collectionEmail === 'fifth'}
+          >
+            5
           </button>
         </div>
 
-        {#if showCc}
-          <div class="mb-4 flex items-center">
-            <strong class="mr-2">Cc:</strong>
-            <input class="input input-bordered w-full bg-base-200" bind:value={cc} />
+        <form on:submit|preventDefault={sendCollectionEmail}>
+          <div class="mb-4 mt-4 flex items-center">
+            <strong class="mr-2">To:</strong>
+            <input
+              class="input input-bordered mr-2 w-full bg-base-200"
+              bind:value={billingContactEmail}
+              required
+            />
+            <button on:click={() => (showCc = !showCc)} class="btn btn-outline btn-info">
+              <i class="fas fa-plus"></i>
+            </button>
           </div>
-          <div class="mt-2 flex flex-wrap space-x-2">
-            {#each ccArray as email}
-              <button class="btn btn-outline btn-info btn-sm rounded-full">
-                {email.email}
-              </button>
-            {/each}
+
+          {#if showCc}
+            <div class="mb-4 flex items-center">
+              <strong class="mr-2">Cc:</strong>
+              <input class="input input-bordered w-full bg-base-200" bind:value={cc} />
+            </div>
+            <div class="mt-2 flex flex-wrap space-x-2">
+              {#each ccArray as email}
+                <button class="btn btn-outline btn-info btn-sm rounded-full">
+                  {email.email}
+                </button>
+              {/each}
+            </div>
+          {/if}
+
+          <div class="mt-4 flex items-center">
+            <strong class="mr-2">Subject:</strong>
+            <input
+              class="input input-bordered w-full bg-base-200"
+              bind:value={subjectLine}
+              required
+            />
           </div>
-        {/if}
 
-        <div class="mt-4 flex items-center">
-          <strong class="mr-2">Subject:</strong>
-          <input
-            class="input input-bordered w-full bg-base-200"
-            bind:value={subjectLine}
-            required
-          />
-        </div>
+          <div class="mt-4 flex justify-center">
+            <textarea
+              class="textarea textarea-bordered min-h-48 w-full bg-base-200"
+              id="collectionMessage"
+              bind:value={emailText}
+              placeholder="Collection Text"
+              required
+            ></textarea>
+          </div>
 
-        <div class="mt-4 flex justify-center">
-          <textarea
-            class="textarea textarea-bordered min-h-48 w-full bg-base-200"
-            id="collectionMessage"
-            bind:value={emailText}
-            placeholder="Collection Text"
-            required
-          ></textarea>
-        </div>
-
-        <div class="mt-8 flex justify-end">
-          <button class="btn btn-primary" type="submit">Send Collection Email</button>
-        </div>
-      </form>
+          <div class="mt-8 flex justify-end">
+            <button class="btn btn-primary" type="submit">Send Collection Email</button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
+  {:else}
+    <!-- SHOW GREEN CHECK MARK WHEN EMAIL IS SENT -->
+    <div class="mt-4 flex justify-center">
+      <div transition:fade={{ duration: 500 }}>
+        <img src="/green-check-mark.png" class="h-32 w-32 rounded-lg" alt="green check mark" />
+      </div>
+    </div>
+  {/if}
 
   <div class="mt-10 flex justify-center">
     <div class="w-full max-w-3xl rounded-md bg-base-100 p-7 shadow-lg">

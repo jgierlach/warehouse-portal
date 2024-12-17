@@ -705,7 +705,7 @@
       {invoiceToDisplayLineItems?.company_name} - Line Items
     </h1>
     <div class="mt-5 flex justify-center">
-      <table class="table bg-base-100 shadow-lg">
+      <table class="table table-zebra bg-base-100 shadow-lg">
         <thead>
           <tr>
             <th>Billing Month</th>
