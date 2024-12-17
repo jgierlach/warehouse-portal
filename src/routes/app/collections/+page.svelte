@@ -161,7 +161,11 @@
               bind:value={billingContactEmail}
               required
             />
-            <button on:click={() => (showCc = !showCc)} class="btn btn-outline btn-info">
+            <button
+              type="button"
+              on:click={() => (showCc = !showCc)}
+              class="btn btn-outline btn-info"
+            >
               <i class="fas fa-plus"></i>
             </button>
           </div>
