@@ -1,26 +1,24 @@
 export const setCollectionEmailText = (
   collectionEmail,
-  hasMultipleInvoicesOutstanding,
-  multipleInvoicesOutstandingText,
+  lineItemsOutstandingText,
   companyName,
-  billingMonthAndYear,
-  servicesProvided,
-  actualContractValue,
-  stripeInvoiceLink,
+  totalOutstandingBalance,
+  stripeInvoiceUrls,
 ) => {
   if (collectionEmail === 'first') {
-    return hasMultipleInvoicesOutstanding && multipleInvoicesOutstandingText !== ''
-      ? `Hello,
+    return `Hello,
 
 This is accounting at Hometown Industries/Online Seller Consulting.
 
 We are reaching out because ${companyName} has invoices outstanding with Hometown Industries/Online Seller Consulting. Your outstanding invoices are as follows:
 
-${multipleInvoicesOutstandingText}
+${lineItemsOutstandingText}
 
-If paying by credit card
+The total outstanding balance is ${formatDollarValue(totalOutstandingBalance)}.
 
-${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+If paying by credit card below are links to 
+
+${stripeInvoiceUrls === '' ? '{INSERT LINK}' : stripeInvoiceUrls}
 
 If paying by ACH or Wire
 
@@ -41,69 +39,21 @@ Sincerely,
 
 Hometown Industries & Online Seller Consulting Accounting
 `
-      : `Hello,
-
-This is accounting at Hometown Industries/Online Seller Consulting.
-
-We are reaching out because according to our records ${companyName} has an invoice outstanding with Hometown Industries/Online Seller Consulting.
-
-The invoice is for work done in the month and year of ${billingMonthAndYear}, the services provided were ${servicesProvided}, and the total amount due is ${formatDollarValue(
-          parseFloat(actualContractValue.toString().replace(/,/g, '')),
-        )}.
-
-If paying by credit card
-
-${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
-      
-If paying by ACH
-      
-Beneficiary Details:
-Name: Numble LLC
-Type of Account: Checking
-Address: 5505 O Street, Ste #4, Lincoln, NE 68510, USA
-      
-Receiving Bank Details
-Bank Name: Choice Financial Group
-Bank Address: 4501 23rd Avenue S, Fargo, ND 58104
-Routing Number: 091311229
-Account Number: 202456848094
-    
-Please promptly pay these invoices to avoid any interruptions in work.
-
-Sincerely, 
-
-- Hometown Industries & Online Seller Consulting Accounting
-`
   }
   if (collectionEmail === 'second') {
-    return hasMultipleInvoicesOutstanding && multipleInvoicesOutstandingText !== ''
-      ? `Hello,
+    return `Hello,
 
 Following up again on the invoices that are outstanding:
 
-${multipleInvoicesOutstandingText}
+${lineItemsOutstandingText}
 
-${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+The total balance owed is ${formatDollarValue(totalOutstandingBalance)}.
+
+${stripeInvoiceUrls === '' ? '{INSERT LINK}' : stripeInvoiceUrls}
 
 Please get back to us on this as soon as possible!
 
-Thank you!
-
-  `
-      : `Hello,
-
-Following up again on the invoice that is outstanding.
-
-For work done in the month and year of ${billingMonthAndYear}, the services provided were ${servicesProvided}, and the total amount due is ${formatDollarValue(
-          parseFloat(actualContractValue.toString().replace(/,/g, '')),
-        )}.
-
-${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
-
-Please get back to me on this as soon as possible!
-
-Thank you!
-  `
+Thank you!`
   }
   if (collectionEmail === 'third') {
     return `Hello,
@@ -112,7 +62,7 @@ If I do not get confirmation of when this will be paid I will have to tell the t
 
 Please pay your outstanding balance here:
 
-${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+${stripeInvoiceUrls === '' ? '{INSERT LINK}' : stripeInvoiceUrls}
 
 Please provide proof of payment or a timeline of when the outstanding balance will be paid to prevent this from happening.
 
@@ -128,7 +78,7 @@ Effective immediately, we have instructed our team to temporarily pause all work
     
 We sincerely value the relationship we have built and are eager to move forward. Should there be any concerns regarding this matter, we encourage you to contact us directly. Otherwise, your invoice can be paid at this link:
 
-${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+${stripeInvoiceUrls === '' ? '{INSERT LINK}' : stripeInvoiceUrls}
 
 Regards,`
   }

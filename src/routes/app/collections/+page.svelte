@@ -26,11 +26,9 @@
   )
 
   $: companyName = invoiceLineItems[0]?.company_name
-  $: billingMonthAndYear = invoiceLineItems[0]?.billing_month
 
   let billingContactEmail = ''
   let subjectLine = ''
-  let collectionMessage = ''
 
   let showCc = false
   let cc = ''
@@ -51,25 +49,26 @@
     collectionEmail = email
   }
 
-  $: hasMultipleInvoicesOutstanding = numberOfUnpaidLineItems > 1
+  $: lineItemsOutstandingText = unpaidInvoiceLineItems
+    .map((lineItem) => {
+      return `- For work done in ${lineItem?.billing_month}, the services provided were ${lineItem?.line_item_name} and the amount due is ${formatDollarValue(lineItem?.line_item_cost)}.`
+    })
+    .join('\n\n')
 
-  $: multipleInvoicesOutstandingText = hasMultipleInvoicesOutstanding
-    ? unpaidInvoiceLineItems
-        .map((lineItem) => {
-          return `- For work done in ${lineItem.billing_month}, the services provided were ${lineItem.line_item_name} and the amount due is $${formatDollarValue(lineItem.line_item_cost)}.`
-        })
-        .join('\n\n')
-    : ''
+  $: stripeInvoiceUrls = [
+    ...new Set(unpaidInvoiceLineItems.map((lineItem) => lineItem?.stripe_invoice_url)),
+  ].join('\n\n')
+
+  $: {
+    console.log('stripeInvoiceUrls', stripeInvoiceUrls)
+  }
 
   $: emailText = setCollectionEmailText(
     collectionEmail,
-    hasMultipleInvoicesOutstanding,
-    multipleInvoicesOutstandingText,
+    lineItemsOutstandingText,
     companyName,
-    billingMonthAndYear,
-    '3PL Services',
     totalOutstandingBalance,
-    'Stripe Invoice Url',
+    stripeInvoiceUrls,
   )
 
   let showEmailTemplate = true
