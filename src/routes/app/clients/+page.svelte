@@ -54,6 +54,22 @@
   let per_pallet_monthly_storage_fee = 20.0
   let stripe_customer_id = ''
 
+  function resetUserFields() {
+    company_name = ''
+    username = ''
+    password = ''
+    hasLotNumbers = false
+    isadmin = false
+    isclient = true
+    per_order_fee = 1.3
+    per_order_unit_fee = 0.3
+    per_unit_fba_pack_prep = 0.25
+    per_unit_wfs_pack_prep = 0.25
+    b2b_freight_percentage_markup = 10.0
+    per_pallet_monthly_storage_fee = 20.0
+    stripe_customer_id = ''
+  }
+
   async function createUser() {
     const response = await fetch('/app/api/users/createUser', {
       method: 'POST',
@@ -172,7 +188,10 @@
       </div>
       <div class="mb-4 flex justify-center">
         <button
-          on:click={() => (showAddUserModal = true)}
+          on:click={() => {
+            resetUserFields()
+            showAddUserModal = true
+          }}
           class="btn btn-outline btn-primary btn-sm"
           >Add Client <i class="fas fa-plus"></i>
         </button>
@@ -183,7 +202,6 @@
             <th>Company Name</th>
             <th>Username</th>
             <th>Password</th>
-            <!-- <th>Has Lot #s</th> -->
             <th>Actions</th>
           </tr>
         </thead>
@@ -193,7 +211,6 @@
               <td>{client.company_name}</td>
               <td>{client.username}</td>
               <td>{client.password}</td>
-              <!-- <td>{client.has_lot_numbers}</td> -->
               <td
                 ><div class="flex space-x-1">
                   <button
