@@ -369,6 +369,9 @@
     }
   }
 
+  // Stripe specific fields
+  let stripe_invoice_id = ''
+  let stripe_dashboard_url = ''
   let stripeInvoiceLink = ''
 
   async function createStripeInvoice() {
@@ -393,11 +396,11 @@
     }
 
     const result = await response.json()
-    const stripeInvoiceUrl = result.body.stripeInvoiceUrl
-    const stripeInvoiceId = result.body.invoiceId
 
     // Set the stripe invoice link displayed to the newly created stripe invoice url
-    stripeInvoiceLink = stripeInvoiceUrl
+    stripe_invoice_id = result.body.invoiceId
+    stripe_dashboard_url = result.body.stripeDashboardUrl
+    stripeInvoiceLink = result.body.stripeInvoiceUrl
 
     loading = false
   }
@@ -474,6 +477,8 @@
         line_item_cost: lineItem.cost,
         line_item_billing_terms: lineItem.billingTerms,
         billing_month: formatMonthForLineItem(startDate),
+        stripe_invoice_id,
+        stripe_dashboard_url,
         stripe_invoice_url: stripeInvoiceLink,
         payment_status: 'Unpaid',
       }

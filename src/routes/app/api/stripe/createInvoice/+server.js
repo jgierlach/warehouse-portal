@@ -1,13 +1,13 @@
-import Stripe from 'stripe';
-import { json } from '@sveltejs/kit';
+import Stripe from 'stripe'
+import { json } from '@sveltejs/kit'
 
-const stripePrivateKey = import.meta.env.VITE_STRIPE_PRIVATE_KEY;
-const stripe = new Stripe(stripePrivateKey);
+const stripePrivateKey = import.meta.env.VITE_STRIPE_PRIVATE_KEY
+const stripe = new Stripe(stripePrivateKey)
 
 export async function POST({ request, locals }) {
   // Parse the request body from JSON
-  const requestBody = await request.json();
-  const { stripeCustomerId, lineItems, passCardFeesOn, billingPeriod, daysUntilDue } = requestBody;
+  const requestBody = await request.json()
+  const { stripeCustomerId, lineItems, passCardFeesOn, billingPeriod, daysUntilDue } = requestBody
 
   if (stripeCustomerId === null || stripeCustomerId === undefined) {
     return json({
@@ -15,15 +15,15 @@ export async function POST({ request, locals }) {
       body: {
         message: 'No Stripe Customer Id was provided.',
       },
-    });
+    })
   }
 
   const convertStrToCents = (str, passCardFeesOn) => {
     const num = parseFloat(str.toString().replace(/,/g, ''))
     const invoiceAmount = passCardFeesOn ? num * 1.034 : num
     const invoiceAmountInCents = invoiceAmount * 100
-    return Math.round(invoiceAmountInCents); // Ensure rounding to deal with floating point imprecision
-  };
+    return Math.round(invoiceAmountInCents) // Ensure rounding to deal with floating point imprecision
+  }
 
   const generateDescription = (item, passCardFeesOn) => {
     if (passCardFeesOn) {
@@ -39,12 +39,12 @@ export async function POST({ request, locals }) {
       collection_method: 'send_invoice',
       days_until_due: daysUntilDue,
       payment_settings: {
-        payment_method_types: ['card', 'us_bank_account']
+        payment_method_types: ['card', 'us_bank_account'],
       },
-    });
+    })
 
     // Create an invoice item for each line item provided
-    const invoiceItemPromises = lineItems.map(item => {
+    const invoiceItemPromises = lineItems.map((item) => {
       let amount = convertStrToCents(item.cost, passCardFeesOn)
       let description = generateDescription(item, passCardFeesOn)
       return stripe.invoiceItems.create({
@@ -52,15 +52,14 @@ export async function POST({ request, locals }) {
         amount,
         currency: 'usd',
         description,
-        invoice: invoice.id
+        invoice: invoice.id,
       })
-    }
-    );
+    })
 
     // Wait for all invoice items to be created
-    await Promise.all(invoiceItemPromises);
+    await Promise.all(invoiceItemPromises)
 
-    await stripe.invoices.finalizeInvoice(invoice.id);
+    await stripe.invoices.finalizeInvoice(invoice.id)
 
     // Comment the line below in if you want Stripe Invoices to be sent to customers
     // await stripe.invoices.sendInvoice(invoice.id);
@@ -76,16 +75,17 @@ export async function POST({ request, locals }) {
         message: 'Invoice created successfully.',
         invoiceId: invoice.id,
         stripeInvoiceUrl,
+        stripeDashboardUrl: `https://dashboard.stripe.com/invoices/${invoice.id}`,
       },
-    });
+    })
   } catch (error) {
-    console.error('Failed to create invoice:', error);
+    console.error('Failed to create invoice:', error)
     // Return error response
     return json({
       status: 500,
       body: {
         error: 'Failed to create invoice',
       },
-    });
+    })
   }
 }
