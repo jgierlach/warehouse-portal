@@ -83,6 +83,7 @@
       unpaidInvoiceLineItems.find((lineItem) => lineItem.stripe_invoice_url === stripeInvoiceUrl),
     )
     .map((lineItem) => `${lineItem.billing_month} - ${lineItem.stripe_invoice_url}`)
+    .join('\n\n')
 
   $: emailText = setCollectionEmailText(
     collectionEmail,
