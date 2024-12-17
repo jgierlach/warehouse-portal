@@ -1,3 +1,147 @@
+export const setCollectionEmailText = (
+  collectionEmail,
+  hasMultipleInvoicesOutstanding,
+  multipleInvoicesOutstandingText,
+  companyName,
+  billingMonthAndYear,
+  servicesProvided,
+  actualContractValue,
+  stripeInvoiceLink,
+) => {
+  if (collectionEmail === 'first') {
+    return hasMultipleInvoicesOutstanding && multipleInvoicesOutstandingText !== ''
+      ? `Hello,
+
+This is accounting at Hometown Industries/Online Seller Consulting.
+
+We are reaching out because ${companyName} has invoices outstanding with Hometown Industries/Online Seller Consulting. Your outstanding invoices are as follows:
+
+${multipleInvoicesOutstandingText}
+
+If paying by credit card
+
+${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+
+If paying by ACH or Wire
+
+Beneficiary Details:
+Name: Numble LLC
+Type of Account: Checking
+Address: 5505 O Street, Ste #4, Lincoln, NE 68510, USA
+
+Receiving Bank Details
+Bank Name: Choice Financial Group
+Bank Address: 4501 23rd Avenue S, Fargo, ND 58104
+Routing Number: 091311229
+Account Number: 202456848094
+
+Please promptly pay these invoices to avoid any interruptions in work.
+
+Sincerely, 
+
+Hometown Industries & Online Seller Consulting Accounting
+`
+      : `Hello,
+
+This is accounting at Hometown Industries/Online Seller Consulting.
+
+We are reaching out because according to our records ${companyName} has an invoice outstanding with Hometown Industries/Online Seller Consulting.
+
+The invoice is for work done in the month and year of ${billingMonthAndYear}, the services provided were ${servicesProvided}, and the total amount due is ${formatDollarValue(
+          parseFloat(actualContractValue.toString().replace(/,/g, '')),
+        )}.
+
+If paying by credit card
+
+${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+      
+If paying by ACH
+      
+Beneficiary Details:
+Name: Numble LLC
+Type of Account: Checking
+Address: 5505 O Street, Ste #4, Lincoln, NE 68510, USA
+      
+Receiving Bank Details
+Bank Name: Choice Financial Group
+Bank Address: 4501 23rd Avenue S, Fargo, ND 58104
+Routing Number: 091311229
+Account Number: 202456848094
+    
+Please promptly pay these invoices to avoid any interruptions in work.
+
+Sincerely, 
+
+- Hometown Industries & Online Seller Consulting Accounting
+`
+  }
+  if (collectionEmail === 'second') {
+    return hasMultipleInvoicesOutstanding && multipleInvoicesOutstandingText !== ''
+      ? `Hello,
+
+Following up again on the invoices that are outstanding:
+
+${multipleInvoicesOutstandingText}
+
+${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+
+Please get back to us on this as soon as possible!
+
+Thank you!
+
+  `
+      : `Hello,
+
+Following up again on the invoice that is outstanding.
+
+For work done in the month and year of ${billingMonthAndYear}, the services provided were ${servicesProvided}, and the total amount due is ${formatDollarValue(
+          parseFloat(actualContractValue.toString().replace(/,/g, '')),
+        )}.
+
+${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+
+Please get back to me on this as soon as possible!
+
+Thank you!
+  `
+  }
+  if (collectionEmail === 'third') {
+    return `Hello,
+  
+If I do not get confirmation of when this will be paid I will have to tell the team to pause all work and activity.
+
+Please pay your outstanding balance here:
+
+${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+
+Please provide proof of payment or a timeline of when the outstanding balance will be paid to prevent this from happening.
+
+Best,
+    `
+  }
+  if (collectionEmail === 'fourth') {
+    return `Hello,
+
+We have reached out numerous times regarding your outstanding invoices and recently informed you if we did not receive payment, we would pause work. At this time, we still have not received payment from you.
+    
+Effective immediately, we have instructed our team to temporarily pause all work on your account. Once payment is received, they will be informed to continue work.
+    
+We sincerely value the relationship we have built and are eager to move forward. Should there be any concerns regarding this matter, we encourage you to contact us directly. Otherwise, your invoice can be paid at this link:
+
+${stripeInvoiceLink === '' ? '{INSERT LINK}' : stripeInvoiceLink}
+
+Regards,`
+  }
+  if (collectionEmail === 'fifth') {
+    return `Hello,
+  
+If confirmation or proof of payment is not sent within 48 hours of this email then the entirety of outstanding balance owed by ${companyName} to Hometown Industries/Online Seller Consulting will be sent to a collections agency.
+
+Regards,
+    `
+  }
+}
+
 export const generateInvoicesForSelectedMonth = (invoiceLineItemsForSelectedMonth) => {
   const companySet = new Set() // To track companies already processed
 

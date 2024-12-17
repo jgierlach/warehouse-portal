@@ -4,7 +4,7 @@
   import { goto } from '$app/navigation'
 
   // Import utils
-  import { formatDollarValue, abbreviateString } from '$lib/utils.js'
+  import { formatDollarValue, abbreviateString, setCollectionEmailText } from '$lib/utils.js'
 
   export let data
 
@@ -26,6 +26,7 @@
   )
 
   $: companyName = invoiceLineItems[0]?.company_name
+  $: billingMonthAndYear = invoiceLineItems[0]?.billing_month
 
   let billingContactEmail = ''
   let subjectLine = ''
@@ -44,10 +45,39 @@
     // Send collection email
   }
 
-  let collectionEmail = ''
+  let collectionEmail = 'first'
 
-  function changeCollectionEmail() {
-    // Change collection email
+  function changeCollectionEmail(email) {
+    collectionEmail = email
+  }
+
+  $: hasMultipleInvoicesOutstanding = numberOfUnpaidLineItems > 1
+
+  $: multipleInvoicesOutstandingText = hasMultipleInvoicesOutstanding
+    ? unpaidInvoiceLineItems
+        .map((lineItem) => {
+          return `- For work done in ${lineItem.billing_month}, the services provided were ${lineItem.line_item_name} and the amount due is $${formatDollarValue(lineItem.line_item_cost)}.`
+        })
+        .join('\n\n')
+    : ''
+
+  $: emailText = setCollectionEmailText(
+    collectionEmail,
+    hasMultipleInvoicesOutstanding,
+    multipleInvoicesOutstandingText,
+    companyName,
+    billingMonthAndYear,
+    '3PL Services',
+    'Stripe Invoice Url',
+  )
+
+  let showEmailTemplate = true
+
+  function toggleEmailTemplate() {
+    showEmailTemplate = !showEmailTemplate
+    setTimeout(() => {
+      showEmailTemplate = !showEmailTemplate
+    }, 2000)
   }
 
   // Execute onMount
@@ -66,35 +96,35 @@
         <button
           on:click={() => changeCollectionEmail('first')}
           class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:bg-primary={collectionEmail === 'first'}
+          class:btn-active={collectionEmail === 'first'}
         >
           1
         </button>
         <button
           on:click={() => changeCollectionEmail('second')}
           class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:bg-primary={collectionEmail === 'second'}
+          class:btn-active={collectionEmail === 'second'}
         >
           2
         </button>
         <button
           on:click={() => changeCollectionEmail('third')}
           class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:bg-primary={collectionEmail === 'third'}
+          class:btn-active={collectionEmail === 'third'}
         >
           3
         </button>
         <button
           on:click={() => changeCollectionEmail('fourth')}
           class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:bg-primary={collectionEmail === 'fourth'}
+          class:btn-active={collectionEmail === 'fourth'}
         >
           4
         </button>
         <button
           on:click={() => changeCollectionEmail('fifth')}
           class="btn btn-outline btn-primary btn-sm rounded-full"
-          class:bg-primary={collectionEmail === 'fifth'}
+          class:btn-active={collectionEmail === 'fifth'}
         >
           5
         </button>
@@ -140,7 +170,7 @@
           <textarea
             class="textarea textarea-bordered min-h-48 w-full bg-base-200"
             id="collectionMessage"
-            bind:value={collectionMessage}
+            bind:value={emailText}
             placeholder="Collection Text"
             required
           ></textarea>
