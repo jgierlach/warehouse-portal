@@ -16,7 +16,7 @@ ${lineItemsOutstandingText}
 
 The total outstanding balance is ${formatDollarValue(totalOutstandingBalance)}.
 
-If paying by credit card below are links to 
+If paying by credit card below are links to pay outstanding balances by month.
 
 ${stripeInvoiceUrls === '' ? '{INSERT LINK}' : stripeInvoiceUrls}
 

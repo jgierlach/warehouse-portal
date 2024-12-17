@@ -55,13 +55,17 @@
     })
     .join('\n\n')
 
-  $: stripeInvoiceUrls = [
-    ...new Set(unpaidInvoiceLineItems.map((lineItem) => lineItem?.stripe_invoice_url)),
-  ].join('\n\n')
+  // $: stripeInvoiceUrls = [
+  //   ...new Set(unpaidInvoiceLineItems.map((lineItem) => lineItem?.stripe_invoice_url)),
+  // ].join('\n\n')
 
-  $: {
-    console.log('stripeInvoiceUrls', stripeInvoiceUrls)
-  }
+  $: stripeInvoiceUrls = Array.from(
+    new Set(unpaidInvoiceLineItems.map((lineItem) => lineItem.stripe_invoice_url)),
+  )
+    .map((stripeInvoiceUrl) =>
+      unpaidInvoiceLineItems.find((lineItem) => lineItem.stripe_invoice_url === stripeInvoiceUrl),
+    )
+    .map((lineItem) => `${lineItem.billing_month} - ${lineItem.stripe_invoice_url}`)
 
   $: emailText = setCollectionEmailText(
     collectionEmail,
