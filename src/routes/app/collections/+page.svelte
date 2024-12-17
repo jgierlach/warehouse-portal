@@ -68,6 +68,7 @@
     companyName,
     billingMonthAndYear,
     '3PL Services',
+    totalOutstandingBalance,
     'Stripe Invoice Url',
   )
 
@@ -186,7 +187,7 @@
   <div class="mt-10 flex justify-center">
     <div class="w-full max-w-3xl rounded-md bg-base-100 p-7 shadow-lg">
       <h1 class="text-center text-xl font-semibold">
-        All Outstanding Line Items From - {companyName}
+        {companyName} - All Outstanding Line Items
       </h1>
       <div class="mt-4 flex justify-center">
         <table class="table max-w-10 shadow-lg">
