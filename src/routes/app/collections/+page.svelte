@@ -247,7 +247,8 @@
               <th>Billing Month</th>
               <th>Services Provided</th>
               <th>Cost</th>
-              <th>Invoice Url</th>
+              <th>Stripe Dashboard Url</th>
+              <th>Stripe Invoice Url</th>
             </tr>
           </thead>
           <tbody>
@@ -256,6 +257,13 @@
                 <td>{lineItem?.billing_month}</td>
                 <td>{lineItem?.line_item_name}</td>
                 <td>{formatDollarValue(lineItem?.line_item_cost)}</td>
+                <td
+                  ><a
+                    class="link-primary font-semibold underline"
+                    href={lineItem.stripe_dashboard_url}
+                    target="_blank">Dashboard Url</a
+                  ></td
+                >
                 <td
                   ><a
                     class="link-primary font-semibold underline"
