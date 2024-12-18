@@ -7,7 +7,7 @@
   import Loading from '$lib/components/Loading.svelte'
 
   // Import utility functions
-  import { abbreviateString, formatDate } from '$lib/utils'
+  import { abbreviateString, formatDate, generateUniqueShippingNumber } from '$lib/utils'
 
   // Import props
   export let data
@@ -290,7 +290,10 @@
 
     <div class="mb-5 flex justify-center">
       <button
-        on:click={() => (showCreateInboundShipment = !showCreateInboundShipment)}
+        on:click={() => {
+          showCreateInboundShipment = !showCreateInboundShipment
+          shipmentNumber = generateUniqueShippingNumber()
+        }}
         class="btn btn-primary">Create Inbound Shipment</button
       >
     </div>
