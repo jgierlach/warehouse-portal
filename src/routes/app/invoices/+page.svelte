@@ -136,6 +136,8 @@
   let lineItemName = ''
   let billingTerms = ''
   let cost = 0
+  let stripeInvoiceId = ''
+  $: stripeDashboardUrl = `https://dashboard.stripe.com/invoices/${stripeInvoiceId}`
   let stripeInvoiceUrl = ''
   let paymentStatus = ''
 
@@ -154,6 +156,8 @@
         lineItemName,
         billingTerms,
         cost,
+        stripeInvoiceId,
+        stripeDashboardUrl,
         stripeInvoiceUrl,
         paymentStatus,
       }),
@@ -211,6 +215,8 @@
     lineItemName = ''
     billingTerms = ''
     cost = 0
+    stripeInvoiceId = ''
+    stripeDashboardUrl = ''
     stripeInvoiceUrl = ''
     paymentStatus = ''
   }
@@ -221,6 +227,8 @@
     lineItemName = lineItem.line_item_name
     billingTerms = lineItem.line_item_billing_terms
     cost = lineItem.line_item_cost
+    stripeInvoiceId = lineItem.stripe_invoice_id
+    stripeDashboardUrl = lineItem.stripe_dashboard_url
     stripeInvoiceUrl = lineItem.stripe_invoice_url
     paymentStatus = lineItem.payment_status
   }
@@ -548,6 +556,30 @@
         />
       </div>
 
+      <!-- Stripe Invoice Id -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeInvoiceId">Stripe Invoice Id</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="stripeInvoiceId"
+          bind:value={stripeInvoiceId}
+          placeholder="Stripe Invoice Id"
+        />
+      </div>
+
+      <!-- Stripe Dashboard Url -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeDashboardUrl">Stripe Dashboard Url</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="stripeDashboardUrl"
+          bind:value={stripeDashboardUrl}
+          placeholder="Stripe Dashboard Url"
+        />
+      </div>
+
       <!-- Stripe Invoice Url -->
       <div class="form-control mb-4">
         <label class="label" for="stripeInvoiceUrl">Stripe Invoice Url</label>
@@ -671,6 +703,30 @@
           step="0.01"
           placeholder="0.00"
           inputmode="decimal"
+        />
+      </div>
+
+      <!-- Stripe Invoice Id -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeInvoiceId">Stripe Invoice Id</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="stripeInvoiceId"
+          bind:value={stripeInvoiceId}
+          placeholder="Stripe Invoice Id"
+        />
+      </div>
+
+      <!-- Stripe Dashboard Url -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeDashboardUrl">Stripe Dashboard Url</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="stripeDashboardUrl"
+          bind:value={stripeDashboardUrl}
+          placeholder="Stripe Dashboard Url"
         />
       </div>
 
