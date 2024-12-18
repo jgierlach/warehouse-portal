@@ -121,6 +121,7 @@ export const generateInvoicesForSelectedMonth = (invoiceLineItemsForSelectedMont
         company_name: lineItem.company_name,
         invoice_total: invoiceTotal,
         stripe_invoice_url: lineItem.stripe_invoice_url,
+        stripe_dashboard_url: lineItem.stripe_dashboard_url,
         is_paid,
         line_items_for_company: lineItemsForCompany,
       })

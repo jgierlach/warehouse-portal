@@ -330,6 +330,13 @@
                 <td
                   ><a
                     class="link-primary font-semibold underline"
+                    href={lineItem.stripe_dashboard_url}
+                    target="_blank">Dashboard Url</a
+                  ></td
+                >
+                <td
+                  ><a
+                    class="link-primary font-semibold underline"
                     href={lineItem.stripe_invoice_url}
                     target="_blank">Invoice</a
                   ></td
@@ -378,6 +385,7 @@
               <th>Billing Month</th>
               <th>Company Name</th>
               <th>Invoice Total</th>
+              <th>Stripe Dashboard Url</th>
               <th>Stripe Invoice Url</th>
               <th>Payment Status</th>
               <th>Actions</th>
@@ -389,6 +397,13 @@
                 <td>{invoice.billing_month}</td>
                 <td>{invoice.company_name}</td>
                 <td>{formatDollarValue(invoice.invoice_total)}</td>
+                <td
+                  ><a
+                    class="link-primary font-semibold underline"
+                    href={invoice.stripe_dashboard_url}
+                    target="_blank">Dashboard Url</a
+                  ></td
+                >
                 <td
                   ><a
                     class="link-primary font-semibold underline"
