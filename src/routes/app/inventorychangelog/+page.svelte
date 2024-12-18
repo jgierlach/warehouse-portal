@@ -6,17 +6,31 @@
   export let data
 
   // Import utils
-  import { formatTimeStampForChangelog } from '$lib/utils.js'
+  import { formatTimeStampForChangelog, abbreviateString } from '$lib/utils.js'
 
   // Import stores
   import { inventoryChangelog, loadInventoryChangelog } from '$lib/stores/inventoryChangelog.js'
-
-  // Component specific variables and business logic
 
   // Execute onMount
   onMount(() => {
     loadInventoryChangelog(data.supabase)
   })
+
+  // Component specific variables and business logic
+
+  let hoveredTitleId = null
+  let timer
+
+  function handleMouseEnter(id) {
+    timer = setTimeout(() => {
+      hoveredTitleId = id
+    }, 1000)
+  }
+
+  function handleMouseLeave() {
+    clearTimeout(timer)
+    hoveredTitleId = null
+  }
 </script>
 
 <div class="mt-10 flex justify-center">
@@ -40,15 +54,33 @@
         <tbody>
           {#each $inventoryChangelog as log}
             <tr>
-              <td>{formatTimeStampForChangelog(log.created_at)}</td>
-              <td>{log.client_id}</td>
-              <td>{log.name}</td>
-              <td>{log.asin}</td>
-              <td>{log.sku}</td>
-              <td>{log.previous_quantity}</td>
-              <td>{log.new_quantity}</td>
-              <td>{log.previous_pending}</td>
-              <td>{log.new_pending}</td>
+              <td>{formatTimeStampForChangelog(log?.created_at)}</td>
+              <td>{log?.client_id}</td>
+              <!-- <td>{abbreviateString(log?.name, 30)}</td> -->
+              <td
+                ><div
+                  class="tooltip"
+                  role="tooltip"
+                  on:mouseenter={() => handleMouseEnter(log?.name)}
+                  on:mouseleave={handleMouseLeave}
+                >
+                  {abbreviateString(log?.name, 25)}
+                  {#if hoveredTitleId === log?.name}
+                    <div
+                      class="absolute left-0 top-full z-50 mt-2 rounded-lg bg-gray-200 p-2 text-gray-800 opacity-100 shadow-lg"
+                      style="opacity: 1; background-color: rgba(229, 231, 235, 1);"
+                    >
+                      {log?.name}
+                    </div>
+                  {/if}
+                </div>
+              </td>
+              <td>{log?.asin}</td>
+              <td>{log?.sku}</td>
+              <td>{log?.previous_quantity}</td>
+              <td>{log?.new_quantity}</td>
+              <td>{log?.previous_pending}</td>
+              <td>{log?.new_pending}</td>
             </tr>
           {/each}
         </tbody>
