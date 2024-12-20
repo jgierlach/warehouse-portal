@@ -532,6 +532,10 @@ export const findStoreNameBasedOnId = (storeId, stores) => {
 }
 
 export const assignClientIdBasedOnStoreName = (storeName) => {
+  // Going Commando categorization
+  if (storeName === 'Going Commando Shopify') {
+    return 'contact@goingcommando.io'
+  }
   // Dog Rocks categorization
   if (storeName === 'Dog Rocks Walmart') {
     return 'operations@podiumpetproducts.com'
