@@ -532,6 +532,10 @@ export const findStoreNameBasedOnId = (storeId, stores) => {
 }
 
 export const assignClientIdBasedOnStoreName = (storeName) => {
+  // LadyWell categorization
+  if (storeName === 'Ladywell Amazon') {
+    return 'ashley@getladywell.com'
+  }
   // Going Commando categorization
   if (storeName === 'Going Commando Shopify') {
     return 'contact@goingcommando.io'
