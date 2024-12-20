@@ -17,12 +17,6 @@
   <div class="flex flex-1 items-center">
     {#if isUserLoggedIn}
       <a href="/app" class="btn btn-ghost text-xl normal-case">Warehouse Portal</a>
-      <!-- <div class="flex-1">
-        <a href="/app" class="flex items-center space-x-2">
-          <img src="logo.png" alt="Logo" class="h-12 w-12" />
-          <span class="text-xl font-bold">Warehouse Portal</span>
-        </a>
-      </div> -->
       <div class="ml-4 hidden space-x-4 md:flex">
         <a href="/app" class={`btn btn-ghost`} class:btn-active={$page.url.pathname === '/app'}
           >Inventory</a
@@ -52,11 +46,6 @@
           class={`btn btn-ghost`}
           class:btn-active={$page.url.pathname === '/app/inventorychangelog'}>Changelog</a
         >
-        <!-- <a
-          href="/app/invoices"
-          class={`btn btn-ghost`}
-          class:btn-active={$page.url.pathname === '/app/invoices'}>Invoices</a
-        > -->
       </div>
     {:else}
       <a href="/" class="btn btn-ghost text-xl normal-case">Home</a>
@@ -122,15 +111,15 @@
       class:btn-active={$page.url.pathname === '/app/clients'}>Clients</a
     >
     <a
+      href="/app/invoices"
+      class={`btn btn-ghost`}
+      class:btn-active={$page.url.pathname === '/app/invoices'}>Invoices</a
+    >
+    <a
       href="/app/inventorychangelog"
       class={`btn btn-ghost`}
       class:btn-active={$page.url.pathname === '/app/inventorychangelog'}>Changelog</a
     >
-    <!-- <a
-      href="/app/invoices"
-      class={`btn btn-ghost`}
-      class:btn-active={$page.url.pathname === '/app/invoices'}>Invoices</a
-    > -->
     {#if isUserLoggedIn}
       <form method="post" action="/logout">
         <button type="submit" class="btn btn-primary mb-2">Logout</button>
