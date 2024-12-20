@@ -20,8 +20,6 @@ export async function load({ url, locals: { supabase } }) {
     }
   }
 
-  console.log('LINE ITEMS ON SERVER', data)
-
   return {
     invoiceLineItems: data,
   }
