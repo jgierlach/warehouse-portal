@@ -1167,7 +1167,6 @@
               <th>Order Date</th>
               <th>Shipment Number</th>
               <th>Recipient Name</th>
-              <th>PO Number</th>
               <th>Order Source</th>
               <th>Units Shipped</th>
               <th>Shipment Cost</th>
@@ -1182,7 +1181,6 @@
                 <td>{formatDate(item.orderDate)}</td>
                 <td>{item.shipmentNumber}</td>
                 <td>{item.recipientName}</td>
-                <td>{item.poNumber}</td>
                 <td>{item.orderSource}</td>
                 <td>{item.unitsShipped}</td>
                 <td>{formatDollarValue(item.shipmentCost)}</td>
