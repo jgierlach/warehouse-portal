@@ -4,7 +4,7 @@
 
   let menuOpen = false
 
-  let theme = 'light' // Default to light mode
+  let theme = 'dark' // Default to light mode
 
   // Toggle between light and dark themes
   function toggleTheme() {
