@@ -140,6 +140,7 @@
   $: stripeDashboardUrl = `https://dashboard.stripe.com/invoices/${stripeInvoiceId}`
   let stripeInvoiceUrl = ''
   let paymentStatus = ''
+  let dateDue = ''
 
   let showEditLineItemModal = false
   let lineItemToEdit = {}
@@ -189,6 +190,7 @@
         line_item_billing_terms: billingTerms,
         stripe_invoice_url: stripeInvoiceUrl,
         payment_status: paymentStatus,
+        date_due: dateDue,
       },
     ]
     const response = await fetch('/app/api/invoices/createLineItems', {
@@ -219,6 +221,7 @@
     stripeDashboardUrl = ''
     stripeInvoiceUrl = ''
     paymentStatus = ''
+    dateDue = ''
   }
 
   function setLineItemFields(lineItem) {
@@ -231,6 +234,7 @@
     stripeDashboardUrl = lineItem.stripe_dashboard_url
     stripeInvoiceUrl = lineItem.stripe_invoice_url
     paymentStatus = lineItem.payment_status
+    dateDue = lineItem.date_due
   }
 
   let displaySetting = 'invoices'
@@ -241,6 +245,14 @@
 
   function sendToCollections(userId, clientId) {
     goto(`/app/collections?userId=${userId}&clientId=${clientId}`)
+  }
+
+  let showEditInvoiceModal = false
+  let invoiceToEdit = {}
+  function setInvoiceFields(invoice) {
+    stripeInvoiceId = invoice.stripe_invoice_id
+    stripeDashboardUrl = invoice.stripe_dashboard_url
+    stripeInvoiceUrl = invoice.stripe_invoice_url
   }
 </script>
 
@@ -435,6 +447,12 @@
                   <div class="flex space-x-1">
                     <button
                       on:click={() => {
+                        showEditInvoiceModal = !showEditInvoiceModal
+                      }}
+                      class="btn btn-info btn-sm">Edit</button
+                    >
+                    <button
+                      on:click={() => {
                         invoiceToDisplayLineItems = invoice
                         showInvoiceLineItemsModal = true
                       }}
@@ -606,6 +624,18 @@
         </select>
       </div>
 
+      <!-- Date Due -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeInvoiceUrl">Date Due</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="date"
+          id="dateDue"
+          bind:value={dateDue}
+          placeholder="Date Payment Is Due"
+        />
+      </div>
+
       <!-- Submit Button -->
       <div class="mt-4 flex justify-center">
         <button class="btn btn-info" type="submit">Save</button>
@@ -756,6 +786,18 @@
         </select>
       </div>
 
+      <!-- Date Due -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeInvoiceUrl">Date Due</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="date"
+          id="dateDue"
+          bind:value={dateDue}
+          placeholder="Date Payment Is Due"
+        />
+      </div>
+
       <!-- Submit Button -->
       <div class="mt-4 flex justify-center">
         <button class="btn btn-info" type="submit">Submit</button>
@@ -800,3 +842,69 @@
   </div>
 </div>
 <!-- INVOICE LINE ITEMS MODAL ENDS -->
+
+<!-- EDIT INVOICE MODAL BEGINS -->
+<div class={`modal ${showEditInvoiceModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showEditInvoiceModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mb-5 text-center text-xl font-semibold">Edit Invoice</h1>
+    <form on:submit|preventDefault={editLineItem}>
+      <!-- Stripe Invoice Id -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeInvoiceId">Stripe Invoice Id</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="stripeInvoiceId"
+          bind:value={stripeInvoiceId}
+          placeholder="Stripe Invoice Id"
+        />
+      </div>
+
+      <!-- Stripe Dashboard Url -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeDashboardUrl">Stripe Dashboard Url</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="stripeDashboardUrl"
+          bind:value={stripeDashboardUrl}
+          placeholder="Stripe Dashboard Url"
+        />
+      </div>
+
+      <!-- Stripe Invoice Url -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeInvoiceUrl">Stripe Invoice Url</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="text"
+          id="stripeInvoiceUrl"
+          bind:value={stripeInvoiceUrl}
+          placeholder="Stripe Invoice Url"
+        />
+      </div>
+
+      <!-- Date Due -->
+      <div class="form-control mb-4">
+        <label class="label" for="stripeInvoiceUrl">Date Due</label>
+        <input
+          class="input input-bordered bg-base-200"
+          type="date"
+          id="dateDue"
+          bind:value={dateDue}
+          placeholder="Date Payment Is Due"
+        />
+      </div>
+
+      <!-- Submit Button -->
+      <div class="mt-4 flex justify-center">
+        <button class="btn btn-info" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- EDIT INVOICE MODAL ENDS -->
