@@ -177,7 +177,7 @@
 
 {#if $selectedSection === 'Clients'}
   <div class="mt-10 flex justify-center">
-    <div class="ml-10 mr-10 bg-base-100 p-4 shadow-xl">
+    <div class="ml-10 mr-10 rounded-lg bg-base-100 p-4 shadow-xl">
       <h1 class="mb-2 text-center text-3xl font-bold">3PL Clients</h1>
       <div class="mb-2 flex justify-center">
         <a

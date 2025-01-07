@@ -246,7 +246,7 @@
 
 <Loading {loading} />
 <div class="mt-10 flex justify-center">
-  <div class="ml-10 mr-10 w-full bg-base-100 p-4 shadow-xl">
+  <div class="ml-10 mr-10 w-full rounded-lg bg-base-100 p-4 shadow-xl">
     <h1 class="text-center text-3xl font-bold">
       {selectedBillingMonthAndYear} - Invoices
     </h1>

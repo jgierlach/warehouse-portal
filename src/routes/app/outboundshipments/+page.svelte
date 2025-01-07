@@ -312,7 +312,7 @@
 
 <Loading {loading} />
 <div class="mt-10 flex justify-center">
-  <div class="ml-20 mr-20 w-full bg-base-100 p-4 shadow-xl">
+  <div class="ml-20 mr-20 w-full rounded-lg bg-base-100 p-4 shadow-xl">
     <h1 class="mb-5 text-center text-3xl font-bold">Outbound Shipments</h1>
 
     <div class="mb-5 flex justify-center">
@@ -875,15 +875,11 @@
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Create Outbound Shipment</h1>
     <form on:submit={createOutboundShipment}>
-       <!-- Create in Shipstation Toggle -->
-       <div class="form-control mb-4">
+      <!-- Create in Shipstation Toggle -->
+      <div class="form-control mb-4">
         <label class="label cursor-pointer">
           <span class="label-text">Create in Shipstation</span>
-          <input 
-            type="checkbox" 
-            class="toggle toggle-primary"
-            bind:checked={createInShipstation} 
-          />
+          <input type="checkbox" class="toggle toggle-primary" bind:checked={createInShipstation} />
         </label>
       </div>
       <!-- Client ID Dropdown -->
