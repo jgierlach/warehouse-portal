@@ -249,7 +249,6 @@
   }
 
   let showEditInvoiceModal = false
-  // let invoiceToEdit = {}
   function setInvoiceFields(invoice) {
     billingMonth = invoice.billing_month
     companyName = invoice.company_name
@@ -275,7 +274,6 @@
     })
     if (response.ok) {
       await loadInvoiceLineItems(data.supabase)
-      // invoiceToEdit = {}
       clearLineItemFields()
     } else {
       const errorData = await response.json()
