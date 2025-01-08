@@ -1,3 +1,8 @@
+export const isInvoicePastDue = (invoice) => {
+  const today = new Date()
+  return !invoice?.is_paid && today > new Date(invoice?.date_due)
+}
+
 export const setCollectionEmailText = (
   collectionEmail,
   lineItemsOutstandingText,

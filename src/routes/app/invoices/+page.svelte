@@ -21,6 +21,7 @@
     generateCompanyNames,
     generateClientIds,
     generateInvoicesForSelectedMonth,
+    isInvoicePastDue,
   } from '$lib/utils.js'
 
   // Stores
@@ -427,7 +428,7 @@
     {/if}
     {#if displaySetting === 'invoices'}
       <div class="mt-5 overflow-x-auto">
-        <table class="table table-zebra">
+        <table class="table">
           <thead>
             <tr>
               <th>Billing Month</th>
@@ -441,7 +442,7 @@
           </thead>
           <tbody>
             {#each invoicesForSelectedMonth as invoice}
-              <tr>
+              <tr class:!bg-red-100={isInvoicePastDue(invoice)}>
                 <td>{invoice.billing_month}</td>
                 <td>{invoice.company_name}</td>
                 <td>{formatDollarValue(invoice.invoice_total)}</td>
@@ -459,18 +460,29 @@
                     target="_blank">Invoice</a
                   ></td
                 >
-                <td
-                  ><button
-                    on:click={async () =>
-                      await updateInvoicePaymentStatus(
-                        invoice.is_paid ? 'Paid' : 'Unpaid',
-                        invoice,
-                      )}
-                    class="btn btn-sm"
-                    class:btn-accent={invoice.is_paid}
-                    class:btn-error={!invoice.is_paid}>{invoice.is_paid ? 'Paid' : 'Unpaid'}</button
-                  ></td
-                >
+                <td>
+                  <div class="flex items-center justify-center space-x-2">
+                    <button
+                      on:click={async () =>
+                        await updateInvoicePaymentStatus(
+                          invoice.is_paid ? 'Paid' : 'Unpaid',
+                          invoice,
+                        )}
+                      class="btn btn-sm"
+                      class:btn-accent={invoice.is_paid}
+                      class:btn-error={!invoice.is_paid}
+                    >
+                      {invoice.is_paid ? 'Paid' : 'Unpaid'}
+                    </button>
+                    {#if isInvoicePastDue(invoice)}
+                      <span
+                        class="badge badge-error whitespace-nowrap px-2 py-1 text-center leading-none"
+                      >
+                        Past Due
+                      </span>
+                    {/if}
+                  </div>
+                </td>
                 <td>
                   <div class="flex space-x-1">
                     <button
