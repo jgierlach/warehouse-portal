@@ -50,6 +50,7 @@
   let b2bFreightPercentageMarkup = $selectedClientToInvoice.b2b_freight_percentage_markup
   let perPalletMonthlyStorageFee = $selectedClientToInvoice.per_pallet_monthly_storage_fee
   let stripeCustomerId = $selectedClientToInvoice.stripe_customer_id
+  let passCardFeesOn = $selectedClientToInvoice.pass_on_card_fees
 
   // Toggling date range specific variables and functions
   const now = new Date()
@@ -271,7 +272,7 @@
   }
 
   let autoPay = false
-  let passCardFeesOn = false
+  // let passCardFeesOn = false
 
   let dateIssued = getCurrentDateFormatted()
   let daysUntilDue = 7

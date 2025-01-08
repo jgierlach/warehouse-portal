@@ -53,6 +53,7 @@
   let b2b_freight_percentage_markup = 10.0
   let per_pallet_monthly_storage_fee = 20.0
   let stripe_customer_id = ''
+  let pass_on_card_fees = true
 
   function resetUserFields() {
     company_name = ''
@@ -68,6 +69,7 @@
     b2b_freight_percentage_markup = 10.0
     per_pallet_monthly_storage_fee = 20.0
     stripe_customer_id = ''
+    pass_on_card_fees = true
   }
 
   async function createUser() {
@@ -88,24 +90,13 @@
         b2b_freight_percentage_markup,
         per_pallet_monthly_storage_fee,
         stripe_customer_id,
+        pass_on_card_fees,
       }),
     })
     if (response.ok) {
       loadClients(data.supabase)
       showAddUserModal = false
-      company_name = ''
-      username = ''
-      password = ''
-      hasLotNumbers = false
-      isadmin = false
-      isclient = true
-      per_order_fee = 1.3
-      per_order_unit_fee = 0.3
-      per_unit_fba_pack_prep = 0.25
-      per_unit_wfs_pack_prep = 0.25
-      b2b_freight_percentage_markup = 10.0
-      per_pallet_monthly_storage_fee = 20.0
-      stripe_customer_id = ''
+      resetUserFields()
     } else {
       const errorData = await response.json()
       alert(`Failed to Create inventory: ${errorData.message}`)
@@ -155,22 +146,16 @@
         b2b_freight_percentage_markup,
         per_pallet_monthly_storage_fee,
         stripe_customer_id,
+        pass_on_card_fees,
       }),
     })
     if (response.ok) {
       loadClients(data.supabase)
       showEditUserModal = false
-      hasLotNumbers = false
-      per_order_fee = 1.3
-      per_order_unit_fee = 0.3
-      per_unit_fba_pack_prep = 0.25
-      per_unit_wfs_pack_prep = 0.25
-      b2b_freight_percentage_markup = 10.0
-      per_pallet_monthly_storage_fee = 20.0
-      stripe_customer_id = ''
+      resetUserFields()
     } else {
       const errorData = await response.json()
-      alert(`Failed to Create inventory: ${errorData.message}`)
+      alert(`Failed to edit client billing details: ${errorData.message}`)
     }
   }
 </script>
@@ -225,6 +210,7 @@
                       b2b_freight_percentage_markup = client.b2b_freight_percentage_markup
                       per_pallet_monthly_storage_fee = client.per_pallet_monthly_storage_fee
                       stripe_customer_id = client.stripe_customer_id
+                      pass_on_card_fees = client.pass_on_card_fees
                     }}
                     class="btn btn-info btn-sm">Edit</button
                   >
@@ -379,6 +365,11 @@
             bind:value={per_pallet_monthly_storage_fee}
             class="input input-bordered mb-2 bg-base-200"
           />
+          <label class="label" for="pass_on_card_fees">Pass On Card Fees</label>
+          <select class="select select-bordered bg-base-200" bind:value={pass_on_card_fees}>
+            <option value={true}>TRUE</option>
+            <option value={false}>FALSE</option>
+          </select>
           <label class="label" for="stripeCustomerId">Stripe Customer Id</label>
           <input
             type="text"
@@ -484,6 +475,11 @@
             bind:value={per_pallet_monthly_storage_fee}
             class="input input-bordered mb-2 bg-base-200"
           />
+          <label class="label" for="pass_on_card_fees">Pass On Card Fees</label>
+          <select class="select select-bordered bg-base-200" bind:value={pass_on_card_fees}>
+            <option value={true}>TRUE</option>
+            <option value={false}>FALSE</option>
+          </select>
           <label class="label" for="stripeCustomerId">Stripe Customer Id</label>
           <input
             type="text"

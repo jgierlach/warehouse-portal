@@ -1,14 +1,25 @@
-import { json } from '@sveltejs/kit';
-import { createClient } from '@supabase/supabase-js';
+import { json } from '@sveltejs/kit'
+import { createClient } from '@supabase/supabase-js'
 
 export async function PUT({ request }) {
-  const { id, hasLotNumbers, per_order_fee, per_order_unit_fee, per_unit_fba_pack_prep, per_unit_wfs_pack_prep, b2b_freight_percentage_markup, per_pallet_monthly_storage_fee, stripe_customer_id } = await request.json();
+  const {
+    id,
+    hasLotNumbers,
+    per_order_fee,
+    per_order_unit_fee,
+    per_unit_fba_pack_prep,
+    per_unit_wfs_pack_prep,
+    b2b_freight_percentage_markup,
+    per_pallet_monthly_storage_fee,
+    stripe_customer_id,
+    pass_on_card_fees,
+  } = await request.json()
 
   // Initialize Supabase client with service role key
   const supabaseAdmin = createClient(
     import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-  );
+    import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY,
+  )
 
   try {
     // Update the user in your custom `users` table
@@ -23,23 +34,24 @@ export async function PUT({ request }) {
         b2b_freight_percentage_markup,
         per_pallet_monthly_storage_fee,
         stripe_customer_id,
+        pass_on_card_fees,
       })
-      .eq('id', id);
+      .eq('id', id)
 
     if (userError) {
-      console.error('Error updating user in users table:', userError);
-      throw new Error('Failed to update user in users table.');
+      console.error('Error updating user in users table:', userError)
+      throw new Error('Failed to update user in users table.')
     }
 
     return json({
       status: 200,
-      body: { message: 'User updated successfully!' }
-    });
+      body: { message: 'User updated successfully!' },
+    })
   } catch (error) {
-    console.error('Error during user update:', error);
+    console.error('Error during user update:', error)
     return json({
       status: 500,
-      body: { message: error.message }
-    });
+      body: { message: error.message },
+    })
   }
 }
