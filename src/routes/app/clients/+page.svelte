@@ -304,7 +304,7 @@
         class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
       >
       <form on:submit={editUser}>
-        <h3 class="text-center text-xl font-bold">Edit Client Details</h3>
+        <h3 class="text-center text-xl font-bold">{userToEdit?.company_name} - Edit Details</h3>
         <div class="form-control mt-4">
           <label class="label" for="hasLotNumbers">Has Lot Numbers</label>
           <select class="select select-bordered bg-base-200" bind:value={hasLotNumbers}>
