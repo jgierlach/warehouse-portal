@@ -10,6 +10,7 @@ export async function PUT({ request, locals }) {
     cost,
     stripeInvoiceUrl,
     paymentStatus,
+    dateDue,
   } = await request.json()
 
   const row = {
@@ -21,6 +22,7 @@ export async function PUT({ request, locals }) {
     line_item_billing_terms: billingTerms,
     stripe_invoice_url: stripeInvoiceUrl,
     payment_status: paymentStatus,
+    date_due: dateDue,
   }
 
   const { data, error } = await locals.supabase

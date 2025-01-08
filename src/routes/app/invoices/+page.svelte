@@ -161,6 +161,7 @@
         stripeDashboardUrl,
         stripeInvoiceUrl,
         paymentStatus,
+        dateDue,
       }),
     })
     if (response.ok) {
