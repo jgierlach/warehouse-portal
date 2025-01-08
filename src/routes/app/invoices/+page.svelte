@@ -249,11 +249,40 @@
   }
 
   let showEditInvoiceModal = false
-  let invoiceToEdit = {}
+  // let invoiceToEdit = {}
   function setInvoiceFields(invoice) {
+    billingMonth = invoice.billing_month
+    companyName = invoice.company_name
     stripeInvoiceId = invoice.stripe_invoice_id
     stripeDashboardUrl = invoice.stripe_dashboard_url
     stripeInvoiceUrl = invoice.stripe_invoice_url
+    dateDue = invoice.date_due
+  }
+
+  async function editInvoice() {
+    loading = true
+    const response = await fetch('/app/api/invoices/editInvoice', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        billingMonth,
+        companyName,
+        stripeInvoiceId,
+        stripeDashboardUrl,
+        stripeInvoiceUrl,
+        dateDue,
+      }),
+    })
+    if (response.ok) {
+      await loadInvoiceLineItems(data.supabase)
+      // invoiceToEdit = {}
+      clearLineItemFields()
+    } else {
+      const errorData = await response.json()
+      alert(`Failed to edit invoice: ${errorData.message}`)
+    }
+    loading = false
+    showEditInvoiceModal = false
   }
 </script>
 
@@ -449,6 +478,7 @@
                     <button
                       on:click={() => {
                         showEditInvoiceModal = !showEditInvoiceModal
+                        setInvoiceFields(invoice)
                       }}
                       class="btn btn-info btn-sm">Edit</button
                     >
@@ -851,8 +881,8 @@
       on:click={() => (showEditInvoiceModal = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
-    <h1 class="mb-5 text-center text-xl font-semibold">Edit Invoice</h1>
-    <form on:submit|preventDefault={editLineItem}>
+    <h1 class="mb-5 text-center text-xl font-semibold">{companyName} - Edit Invoice</h1>
+    <form on:submit|preventDefault={editInvoice}>
       <!-- Stripe Invoice Id -->
       <div class="form-control mb-4">
         <label class="label" for="stripeInvoiceId">Stripe Invoice Id</label>
@@ -893,6 +923,7 @@
       <div class="form-control mb-4">
         <label class="label" for="stripeInvoiceUrl">Date Due</label>
         <input
+          required
           class="input input-bordered bg-base-200"
           type="date"
           id="dateDue"
