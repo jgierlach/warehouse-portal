@@ -285,90 +285,6 @@
 
   let invoicePDFLink = ''
 
-  async function generateAndUploadPDF() {
-    const element = document.getElementById('pdfContent')
-
-    // Inject a temporary global style to override Tailwind/DaisyUI colors within #pdfContent
-    const styleOverride = document.createElement('style')
-    styleOverride.innerHTML = `
-    #pdfContent * {
-      --tw-text-opacity: 1 !important;
-      color: rgb(0, 0, 0) !important; /* Text color fallback */
-      background-color: rgb(255, 255, 255) !important; /* Background color fallback */
-      border-color: rgb(0, 0, 0) !important; /* Border color fallback */
-    }
-
-    /* Override specific DaisyUI variables if themes are involved */
-    [data-theme] #pdfContent * {
-      color: rgb(0, 0, 0) !important;
-      background-color: rgb(255, 255, 255) !important;
-      border-color: rgb(0, 0, 0) !important;
-    }
-  `
-    document.head.appendChild(styleOverride)
-
-    try {
-      // Short delay to ensure styles apply
-      await new Promise((resolve) => setTimeout(resolve, 100))
-
-      loading = true
-      isPDFGeneratingAndUploading = true
-
-      const canvas = await html2canvas(element)
-      const imgData = canvas.toDataURL('image/png')
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: [canvas.width, canvas.height],
-        compress: true,
-      })
-
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height, 'MEDIUM')
-      const pdfBlob = pdf.output('blob')
-      console.log('PDF BLOB', pdfBlob)
-      await uploadPDF(pdfBlob)
-      loading = false
-    } catch (error) {
-      console.error('Error in PDF generation or upload:', error)
-      loading = false
-    } finally {
-      // Remove the temporary style override
-      document.head.removeChild(styleOverride)
-      isPDFGeneratingAndUploading = false
-      loading = false
-    }
-  }
-
-  async function uploadPDF(pdfBlob) {
-    const fileName = `invoice-${companyName}-${generateInvoiceNumber()}.pdf`
-      .toLowerCase()
-      .replace(/[^a-zA-Z0-9- .]/g, '')
-      .replace(/ /g, '-') // Unique file name
-
-    console.log('FILENAME', fileName)
-    console.log('PDF BLOB', pdfBlob)
-    try {
-      const { error } = await supabase.storage.from('invoice-pdfs').upload(`${fileName}`, pdfBlob, {
-        contentType: 'application/pdf',
-        cacheControl: '3600',
-        upsert: true,
-      })
-
-      if (error) {
-        console.log('Error', error)
-        throw error
-      }
-
-      const { data } = await supabase.storage.from('invoice-pdfs').getPublicUrl(fileName)
-
-      // Set invoice link to the newly created Invoice PDF
-      invoicePDFLink = data.publicUrl
-      console.log('PDF uploaded successfully:', data, res)
-    } catch (error) {
-      console.error('Error uploading PDF:', error.message)
-    }
-  }
-
   // Stripe specific fields
   let stripe_invoice_id = ''
   let stripe_dashboard_url = ''
@@ -481,6 +397,7 @@
         stripe_dashboard_url,
         stripe_invoice_url: stripeInvoiceLink,
         payment_status: 'Unpaid',
+        date_due: dateDue,
       }
     })
     // Make server api call to create line items
