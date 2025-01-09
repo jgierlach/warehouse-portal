@@ -783,7 +783,8 @@
                                 <td align="right" colspan="2">
                                   <p>
                                     <strong>Invoice #:</strong>
-                                    {`3PL${generateInvoiceNumber()}`}
+                                    <!-- {`3PL${generateInvoiceNumber()}`} -->
+                                    {stripe_invoice_id}
                                   </p>
                                   <p>
                                     <strong>Billing Period:</strong>
