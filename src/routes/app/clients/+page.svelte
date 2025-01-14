@@ -26,11 +26,13 @@
   })
 
   // Component specific variables and business logic
-  $: activeClients = $clients.filter(
-    (client) =>
-      client.username !== 'wesley@hometown-industries.com' &&
-      client.username !== 'susan@hometown-industries.com',
-  )
+  $: activeClients = $clients
+    .filter(
+      (client) =>
+        client.username !== 'wesley@hometown-industries.com' &&
+        client.username !== 'susan@hometown-industries.com',
+    )
+    .sort((a, b) => a.company_name.localeCompare(b.company_name))
 
   // Variables for displaying clients billing terms
   let showClientBillingTermsModal = false
