@@ -194,7 +194,7 @@
         </thead>
         <tbody>
           {#each activeClients as client}
-            <tr>
+            <tr class:!bg-red-100={client.per_order_fee === 0}>
               <td>{client.company_name}</td>
               <td>{client.username}</td>
               <td>{client.password}</td>
