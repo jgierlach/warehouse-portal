@@ -490,7 +490,7 @@
       on:click={() => (showEditInboundShipment = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
-    <h1 class="mb-5 text-center text-xl font-semibold">Edit Outbound Shipment</h1>
+    <h1 class="mb-5 text-center text-xl font-semibold">Edit Inbound Shipment</h1>
     <form on:submit={editInboundShipment}>
       <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
