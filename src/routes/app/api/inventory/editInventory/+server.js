@@ -1,5 +1,4 @@
-import fetch from 'node-fetch';
-import { json } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit'
 
 export async function PUT({ request, locals }) {
   const {
@@ -15,29 +14,30 @@ export async function PUT({ request, locals }) {
     pending,
     quantity,
     expirationDate,
-    lotNumber
-  } = await request.json();
+    lotNumber,
+  } = await request.json()
 
   // Execute inventory changelog
   const log = {
     client_id: clientId,
+    change_source: 'Warehouse Portal',
     name,
     asin,
     sku,
     previous_quantity: inventoryToEdit.Quantity,
     new_quantity: quantity,
     previous_pending: inventoryToEdit.Pending,
-    new_pending: pending
-  };
+    new_pending: pending,
+  }
 
   const { logData, logError } = await locals.supabase
     .from('inventory_changelog')
     .insert([log])
-    .select();
+    .select()
 
   if (logError) {
-    console.error(logError);
-    return;
+    console.error(logError)
+    return
   }
 
   const row = {
@@ -52,21 +52,17 @@ export async function PUT({ request, locals }) {
     Pending: pending,
     Quantity: quantity,
     Product_Expiration: expirationDate,
-    Lot_Number: lotNumber
-  };
+    Lot_Number: lotNumber,
+  }
 
-  const { data, error } = await locals.supabase
-    .from('Inventory')
-    .update(row)
-    .eq('id', id)
-    .select();
+  const { data, error } = await locals.supabase.from('Inventory').update(row).eq('id', id).select()
 
   if (error) {
-    console.error(error);
+    console.error(error)
   }
 
   return json({
     status: 200,
     body: { message: 'Inventory was edited' },
-  });
+  })
 }
