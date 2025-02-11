@@ -47,8 +47,8 @@
             <th>Sku</th>
             <th>Previous Quantity</th>
             <th>New Quantity</th>
-            <th>Previous Pending</th>
-            <th>New Pending</th>
+            <!-- <th>Previous Pending</th> -->
+            <!-- <th>New Pending</th> -->
           </tr>
         </thead>
         <tbody>
@@ -79,8 +79,8 @@
               <td>{log?.sku}</td>
               <td>{log?.previous_quantity}</td>
               <td>{log?.new_quantity}</td>
-              <td>{log?.previous_pending}</td>
-              <td>{log?.new_pending}</td>
+              <!-- <td>{log?.previous_pending}</td> -->
+              <!-- <td>{log?.new_pending}</td> -->
             </tr>
           {/each}
         </tbody>
