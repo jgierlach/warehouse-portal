@@ -42,6 +42,7 @@
           <tr>
             <th>Timestamp</th>
             <th>Client Id</th>
+            <th>Change Source</th>
             <th>Name</th>
             <th>Asin</th>
             <th>Sku</th>
@@ -56,6 +57,7 @@
             <tr>
               <td>{formatTimeStampForChangelog(log?.created_at)}</td>
               <td>{log?.client_id}</td>
+              <td>{log?.change_source}</td>
               <!-- <td>{abbreviateString(log?.name, 30)}</td> -->
               <td
                 ><div
