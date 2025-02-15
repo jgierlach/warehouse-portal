@@ -1,0 +1,254 @@
+<script>
+  import { onMount } from 'svelte'
+
+  // Stores
+  import { skuMapping, loadSkuMapping } from '$lib/stores/skuMapping'
+  import { inventory, loadInventory } from '$lib/stores/inventory'
+
+  // Props
+  let { data } = $props()
+
+  // Execute onMount
+  onMount(async () => {
+    await loadSkuMapping(data.supabase)
+    await loadInventory(data.supabase)
+  })
+
+  // Business Logic
+  let showCreateSkuMapping = $state(true)
+
+  let selectedProduct = $state(null)
+
+  let productImageUrl = $derived(selectedProduct?.Product_Image_Url)
+  let sku = $state('')
+  let name = $derived(selectedProduct?.Name)
+  let productId = $derived(selectedProduct?.id)
+  let clientId = $derived(selectedProduct?.Client_Id)
+
+  function resetFields() {
+    selectedProduct = null
+    sku = ''
+  }
+
+  async function createSkuMapping(event) {
+    event.preventDefault()
+    const response = await fetch('/app/api/sku-mapping/create-sku-mapping', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        product_id: productId,
+        client_id: clientId,
+        sku,
+        name,
+        product_image_url: productImageUrl,
+      }),
+    })
+    if (response.ok) {
+      await loadSkuMapping(data.supabase)
+      showCreateSkuMapping = false
+      resetFields()
+    } else {
+      const error = response.json()
+      console.error('Failed to create sku mapping', error)
+    }
+  }
+</script>
+
+{#if showCreateSkuMapping}
+  <div class="mt-10 flex justify-center">
+    <div class="ml-10 mr-10 max-w-4xl rounded-lg bg-base-100 p-4 shadow-xl">
+      <h1 class="text-center text-3xl font-bold">Create Sku Mapping</h1>
+      <form onsubmit={createSkuMapping} class="mt-4 p-4 shadow-md">
+        <div class="mt-4">
+          <label for="productImageUrl" class="block">Product Image Url</label>
+          <input
+            type="text"
+            id="productImageUrl"
+            class="input input-bordered w-full bg-base-200"
+            value={productImageUrl}
+            required
+          />
+        </div>
+        <div class="mt-4">
+          <label for="sku" class="block">Additional Sku</label>
+          <input
+            type="text"
+            id="sku"
+            class="input input-bordered w-full bg-base-200"
+            bind:value={sku}
+            required
+          />
+        </div>
+        <div class="mt-4">
+          <label for="name" class="block">Name</label>
+          <input
+            type="text"
+            id="name"
+            class="input input-bordered w-full bg-base-200"
+            value={name}
+            required
+          />
+        </div>
+        <div class="mt-4">
+          <label for="name" class="block">Client Id</label>
+          <input
+            type="text"
+            id="clientId"
+            class="input input-bordered w-full bg-base-200"
+            value={clientId}
+            required
+          />
+        </div>
+        <div class="mt-4">
+          <label for="productId" class="block">Product Id</label>
+          <input
+            type="number"
+            id="productId"
+            class="input input-bordered w-full bg-base-200"
+            value={productId}
+            required
+          />
+        </div>
+        <div class="mt-4 flex justify-center">
+          <button class="btn btn-error" onclick={() => (showCreateSkuMapping = false)}
+            >Cancel</button
+          >
+          <button type="submit" class="btn btn-primary ml-4">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SELECTED PRODUCT BEGINS -->
+  {#if selectedProduct !== null}
+    <div class="mt-10 flex justify-center">
+      <div class="ml-10 mr-10 max-w-5xl rounded-lg bg-base-100 p-4 shadow-xl">
+        <h1 class="text-center text-3xl font-bold">Selected Product</h1>
+        <div class="flex justify-center">
+          <button onclick={() => (selectedProduct = null)} class="btn btn-outline btn-sm mt-4"
+            >Reset</button
+          >
+        </div>
+        <div class="mt-4 flex justify-center">
+          <table class="table shadow-lg">
+            <thead>
+              <tr>
+                <th>Product Image</th>
+                <th>Sku</th>
+                <th>Name</th>
+                <th>Product Id</th>
+                <th>Client Id</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <img
+                    src={selectedProduct?.Product_Image_Url}
+                    alt="selectedProduct thumbnail"
+                    class="h-20 w-20"
+                  />
+                </td>
+                <td>{selectedProduct?.Sku}</td>
+                <td>{selectedProduct?.Name}</td>
+                <td>{selectedProduct?.id}</td>
+                <td>{selectedProduct?.Client_Id}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {/if}
+  <!-- SELECTED PRODUCT ENDS -->
+
+  <!-- Select from existing products to map too begins -->
+  <div class="mt-10 flex justify-center">
+    <div class="ml-10 mr-10 max-w-5xl rounded-lg bg-base-100 p-4 shadow-xl">
+      <h1 class="text-center text-3xl font-bold">Products To Map Too</h1>
+      <div class="mt-4 flex justify-center">
+        <table class="table shadow-lg">
+          <thead>
+            <tr>
+              <th>Product Image</th>
+              <th>Sku</th>
+              <th>Name</th>
+              <th>Product Id</th>
+              <th>Client Id</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each $inventory as product}
+              <tr>
+                <td>
+                  <img src={product?.Product_Image_Url} alt="product thumbnail" class="h-20 w-20" />
+                </td>
+                <td>{product?.Sku}</td>
+                <td>{product?.Name}</td>
+                <td>{product?.id}</td>
+                <td>{product?.Client_Id}</td>
+                <td
+                  ><button onclick={() => (selectedProduct = product)} class="btn btn-outline"
+                    >Select</button
+                  ></td
+                >
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- Select from existing products to map too ends -->
+{/if}
+
+{#if !showCreateSkuMapping}
+  <div class="mt-10 flex justify-center">
+    <div class="ml-10 mr-10 max-w-4xl rounded-lg bg-base-100 p-4 shadow-xl">
+      <h1 class="text-center text-3xl font-bold">Sku Mapping</h1>
+      <div class="flex justify-center">
+        <button
+          class="btn btn-outline btn-primary btn-sm mt-4"
+          onclick={() => (showCreateSkuMapping = true)}
+          >Create Sku Mapping <i class="fas fa-plus"></i></button
+        >
+      </div>
+      <div class="mt-4 flex justify-center">
+        <table class="table max-w-10 shadow-lg">
+          <thead>
+            <tr>
+              <th>Product Image</th>
+              <th>Sku</th>
+              <th>Name</th>
+              <th>Product Id</th>
+              <th>Client Id</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each $skuMapping as sku}
+              <tr>
+                <td>
+                  <img src={sku?.product_image_url} alt="product thumbnail" class="h-20 w-20" />
+                </td>
+                <td>{sku?.sku}</td>
+                <td>{sku?.name}</td>
+                <td>{sku?.product_id}</td>
+                <td>{sku?.client_id}</td>
+                <td
+                  ><div class="flex space-x-2">
+                    <button class="btn btn-info btn-sm">Edit</button>
+                    <button class="btn btn-error btn-sm">Delete</button>
+                  </div></td
+                >
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{/if}

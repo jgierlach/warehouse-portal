@@ -42,6 +42,11 @@
           class:btn-active={$page.url.pathname === '/app/invoices'}>Invoices</a
         >
         <a
+        href="/app/sku-mapping"
+        class={`btn btn-ghost`}
+        class:btn-active={$page.url.pathname === '/app/sku-mapping"'}>Mapping</a
+      >
+        <a
           href="/app/inventorychangelog"
           class={`btn btn-ghost`}
           class:btn-active={$page.url.pathname === '/app/inventorychangelog'}>Changelog</a
@@ -115,6 +120,11 @@
       class={`btn btn-ghost`}
       class:btn-active={$page.url.pathname === '/app/invoices'}>Invoices</a
     >
+    <a
+    href="/app/sku-mapping"
+    class={`btn btn-ghost`}
+    class:btn-active={$page.url.pathname === '/app/sku-mapping"'}>Mapping</a
+  >
     <a
       href="/app/inventorychangelog"
       class={`btn btn-ghost`}
