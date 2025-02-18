@@ -20,11 +20,13 @@
 
   let selectedProduct = null
 
+  let id = 0
   $: productImageUrl = selectedProduct?.Product_Image_Url
   let sku = ''
   $: name = selectedProduct?.Name
   $: productId = selectedProduct?.id
   $: clientId = selectedProduct?.Client_Id
+  let quantityToDeduct = 0
 
   function resetFields() {
     selectedProduct = null
@@ -44,6 +46,7 @@
         sku,
         name,
         product_image_url: productImageUrl,
+        quantity_to_deduct: quantityToDeduct,
       }),
     })
     if (response.ok) {
@@ -53,6 +56,27 @@
     } else {
       const error = response.json()
       console.error('Failed to create sku mapping', error)
+    }
+  }
+
+  let showDeleteSkuMappingModal = false
+  async function deleteSkuMapping() {
+    const response = await fetch('/app/api/sku-mapping/delete-sku-mapping', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id,
+      }),
+    })
+    if (response.ok) {
+      await loadSkuMapping(data.supabase)
+      showCreateSkuMapping = false
+      resetFields()
+    } else {
+      const error = response.json()
+      console.error('Failed to delete sku mapping', error)
     }
   }
 </script>
@@ -73,12 +97,22 @@
           />
         </div>
         <div class="mt-4">
-          <label for="sku" class="block">Additional Sku</label>
+          <label for="sku" class="block">Sku Map</label>
           <input
             type="text"
             id="sku"
             class="input input-bordered w-full bg-base-200"
             bind:value={sku}
+            required
+          />
+        </div>
+        <div class="mt-4">
+          <label for="quantityToDeduct" class="block">Quatity To Deduct</label>
+          <input
+            type="number"
+            id="quantityToDeduct"
+            class="input input-bordered w-full bg-base-200"
+            bind:value={quantityToDeduct}
             required
           />
         </div>
@@ -242,7 +276,13 @@
                 <td
                   ><div class="flex space-x-2">
                     <button class="btn btn-info btn-sm">Edit</button>
-                    <button class="btn btn-error btn-sm">Delete</button>
+                    <button
+                      on:click={() => {
+                        id = sku.id
+                        showDeleteSkuMappingModal = true
+                      }}
+                      class="btn btn-error btn-sm">Delete</button
+                    >
                   </div></td
                 >
               </tr>
