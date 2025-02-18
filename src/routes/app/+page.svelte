@@ -176,6 +176,7 @@
         sku,
         name,
         product_image_url: productImageUrl,
+        quantity_to_deduct: 1,
       }),
     })
     if (response.ok) {

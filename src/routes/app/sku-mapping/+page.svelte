@@ -59,7 +59,8 @@
     }
   }
 
-  let showDeleteSkuMappingModal = false
+  let showDeleteSkuMapping = false
+  let skuMapToDelete = {}
   async function deleteSkuMapping() {
     const response = await fetch('/app/api/sku-mapping/delete-sku-mapping', {
       method: 'DELETE',
@@ -67,17 +68,17 @@
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id,
+        id: skuMapToDelete?.id,
       }),
     })
     if (response.ok) {
       await loadSkuMapping(data.supabase)
-      showCreateSkuMapping = false
-      resetFields()
     } else {
+      console.log('THERE IS AN ERROR')
       const error = response.json()
       console.error('Failed to delete sku mapping', error)
     }
+    showDeleteSkuMapping = false
   }
 </script>
 
@@ -257,6 +258,7 @@
             <tr>
               <th>Product Image</th>
               <th>Sku</th>
+              <th>Quantity To Deduct</th>
               <th>Name</th>
               <th>Product Id</th>
               <th>Client Id</th>
@@ -270,16 +272,17 @@
                   <img src={sku?.product_image_url} alt="product thumbnail" class="h-20 w-20" />
                 </td>
                 <td>{sku?.sku}</td>
+                <td>{sku?.quantity_to_deduct}</td>
                 <td>{sku?.name}</td>
                 <td>{sku?.product_id}</td>
                 <td>{sku?.client_id}</td>
                 <td
                   ><div class="flex space-x-2">
-                    <button class="btn btn-info btn-sm">Edit</button>
+                    <!-- <button class="btn btn-info btn-sm">Edit</button> -->
                     <button
                       on:click={() => {
-                        id = sku.id
-                        showDeleteSkuMappingModal = true
+                        skuMapToDelete = sku
+                        showDeleteSkuMapping = true
                       }}
                       class="btn btn-error btn-sm">Delete</button
                     >
@@ -293,3 +296,26 @@
     </div>
   </div>
 {/if}
+
+<!-- DELETE SKU MAPPING MODAL BEGINS -->
+<div class={`modal ${showDeleteSkuMapping ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showDeleteSkuMapping = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <h1 class="mt-2 text-center text-lg font-bold">
+      Are you sure you want to delete this sku map?
+    </h1>
+    <p class="entry-content py-4 text-center" style="white-space: pre-line;">
+      {skuMapToDelete?.name}
+    </p>
+    <div class="flex justify-center">
+      <img src={skuMapToDelete?.product_image_url} alt="product thumbnail" class="h-20 w-20" />
+    </div>
+    <div class="mt-4 flex justify-center">
+      <button on:click={deleteSkuMapping} class="btn btn-error"> Yes, Delete </button>
+    </div>
+  </div>
+</div>
+<!-- DELETE SKU MAPPING MODAL ENDS -->
