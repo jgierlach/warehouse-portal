@@ -15,6 +15,7 @@
   // Import stores
   import { inventory, loadInventory } from '$lib/stores/inventory.js'
   import { clients, loadClients } from '$lib/stores/clients.js'
+  import { loadSkuMapping } from '$lib/stores/skuMapping.js'
 
   // Execute onMount
   onMount(async () => {
@@ -101,21 +102,35 @@
       showEditInventory = false
       goto(`/app/#${inventoryToEdit.id}`)
       inventoryToEdit = {}
-      clientId = ''
-      name = ''
-      asin = ''
-      productTitle = ''
-      sku = ''
-      productImageUrl = ''
-      pending = 0
-      quantity = 0
-      expirationDate = ''
-      lotNumber = ''
+      resetFields()
+      // clientId = ''
+      // name = ''
+      // asin = ''
+      // productTitle = ''
+      // sku = ''
+      // productImageUrl = ''
+      // pending = 0
+      // quantity = 0
+      // expirationDate = ''
+      // lotNumber = ''
     } else {
       const errorData = await response.json()
       alert(`Failed to edit inventory: ${errorData.message}`)
     }
     loading = false
+  }
+
+  function resetFields() {
+    clientId = ''
+    name = ''
+    asin = ''
+    productTitle = ''
+    sku = ''
+    productImageUrl = ''
+    pending = 0
+    quantity = 0
+    expirationDate = ''
+    lotNumber = ''
   }
 
   let showCreateInventory = false
@@ -141,19 +156,45 @@
     if (response.ok) {
       loadInventory(data.supabase)
       showCreateInventory = false
-      clientId = ''
-      name = ''
-      asin = ''
-      productTitle = ''
-      sku = ''
-      productImageUrl = ''
-      pending = 0
-      quantity = 0
-      expirationDate = ''
-      lotNumber = ''
+      return response.json()
     } else {
       const errorData = await response.json()
       alert(`Failed to Create inventory: ${errorData.message}`)
+    }
+    loading = false
+  }
+
+  async function createSkuMapping(productId, clientId, sku, name, productImageUrl) {
+    const response = await fetch('/app/api/sku-mapping/create-sku-mapping', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        product_id: productId,
+        client_id: clientId,
+        sku,
+        name,
+        product_image_url: productImageUrl,
+      }),
+    })
+    if (response.ok) {
+      await loadSkuMapping(data.supabase)
+    } else {
+      const error = response.json()
+      console.error('Failed to create sku mapping', error)
+    }
+  }
+
+  async function createProduct(event) {
+    event.preventDefault()
+    try {
+      const product = await createInventory()
+      const productId = product?.body?.id
+      await createSkuMapping(productId, clientId, sku, name, productImageUrl)
+      resetFields()
+    } catch (err) {
+      console.error('Failed to create product', err)
     }
     loading = false
   }
@@ -469,7 +510,7 @@
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Create Inventory</h1>
-    <form on:submit={createInventory}>
+    <form on:submit={createProduct}>
       <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="clientId">Client Id</label>

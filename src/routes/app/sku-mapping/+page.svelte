@@ -6,7 +6,8 @@
   import { inventory, loadInventory } from '$lib/stores/inventory'
 
   // Props
-  let { data } = $props()
+  // let { data } = $props()
+  export let data
 
   // Execute onMount
   onMount(async () => {
@@ -15,15 +16,15 @@
   })
 
   // Business Logic
-  let showCreateSkuMapping = $state(true)
+  let showCreateSkuMapping = false
 
-  let selectedProduct = $state(null)
+  let selectedProduct = null
 
-  let productImageUrl = $derived(selectedProduct?.Product_Image_Url)
-  let sku = $state('')
-  let name = $derived(selectedProduct?.Name)
-  let productId = $derived(selectedProduct?.id)
-  let clientId = $derived(selectedProduct?.Client_Id)
+  $: productImageUrl = selectedProduct?.Product_Image_Url
+  let sku = ''
+  $: name = selectedProduct?.Name
+  $: productId = selectedProduct?.id
+  $: clientId = selectedProduct?.Client_Id
 
   function resetFields() {
     selectedProduct = null
@@ -60,7 +61,7 @@
   <div class="mt-10 flex justify-center">
     <div class="ml-10 mr-10 max-w-4xl rounded-lg bg-base-100 p-4 shadow-xl">
       <h1 class="text-center text-3xl font-bold">Create Sku Mapping</h1>
-      <form onsubmit={createSkuMapping} class="mt-4 p-4 shadow-md">
+      <form on:submit={createSkuMapping} class="mt-4 p-4 shadow-md">
         <div class="mt-4">
           <label for="productImageUrl" class="block">Product Image Url</label>
           <input
@@ -112,7 +113,7 @@
           />
         </div>
         <div class="mt-4 flex justify-center">
-          <button class="btn btn-error" onclick={() => (showCreateSkuMapping = false)}
+          <button class="btn btn-error" on:click={() => (showCreateSkuMapping = false)}
             >Cancel</button
           >
           <button type="submit" class="btn btn-primary ml-4">Create</button>
@@ -127,7 +128,7 @@
       <div class="ml-10 mr-10 max-w-5xl rounded-lg bg-base-100 p-4 shadow-xl">
         <h1 class="text-center text-3xl font-bold">Selected Product</h1>
         <div class="flex justify-center">
-          <button onclick={() => (selectedProduct = null)} class="btn btn-outline btn-sm mt-4"
+          <button on:click={() => (selectedProduct = null)} class="btn btn-outline btn-sm mt-4"
             >Reset</button
           >
         </div>
@@ -191,7 +192,7 @@
                 <td>{product?.id}</td>
                 <td>{product?.Client_Id}</td>
                 <td
-                  ><button onclick={() => (selectedProduct = product)} class="btn btn-outline"
+                  ><button on:click={() => (selectedProduct = product)} class="btn btn-outline"
                     >Select</button
                   ></td
                 >
@@ -212,7 +213,7 @@
       <div class="flex justify-center">
         <button
           class="btn btn-outline btn-primary btn-sm mt-4"
-          onclick={() => (showCreateSkuMapping = true)}
+          on:click={() => (showCreateSkuMapping = true)}
           >Create Sku Mapping <i class="fas fa-plus"></i></button
         >
       </div>
