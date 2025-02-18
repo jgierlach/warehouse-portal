@@ -48,8 +48,7 @@
             <th>Sku</th>
             <th>Previous Quantity</th>
             <th>New Quantity</th>
-            <!-- <th>Previous Pending</th> -->
-            <!-- <th>New Pending</th> -->
+            <th>Net Change</th>
           </tr>
         </thead>
         <tbody>
@@ -58,7 +57,6 @@
               <td>{formatTimeStampForChangelog(log?.created_at)}</td>
               <td>{log?.client_id}</td>
               <td>{log?.change_source}</td>
-              <!-- <td>{abbreviateString(log?.name, 30)}</td> -->
               <td
                 ><div
                   class="tooltip"
@@ -81,8 +79,11 @@
               <td>{log?.sku}</td>
               <td>{log?.previous_quantity}</td>
               <td>{log?.new_quantity}</td>
-              <!-- <td>{log?.previous_pending}</td> -->
-              <!-- <td>{log?.new_pending}</td> -->
+              <td
+                class:text-green-600={log?.previous_quantity - log?.new_quantity > 0}
+                class:text-error={log?.previous_quantity - log?.new_quantity < 0}
+                >{log?.previous_quantity - log?.new_quantity}</td
+              >
             </tr>
           {/each}
         </tbody>
