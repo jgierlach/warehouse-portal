@@ -168,7 +168,7 @@ export async function POST({ request, locals }) {
             // You'll need to do a loop and deduct for every time a sku map is found
             for (const skuMap of data) {
               const { product_id, sku, quantity_to_deduct } = skuMap
-              const valueToSubtractFromInventory = quantity_to_deduct * quantity
+              const valueToSubtractFromInventoryQuantity = quantity_to_deduct * quantity
 
               // Fetch the current inventory quantity
               const { data: inventoryData, error: fetchError } = await locals.supabase
@@ -186,7 +186,10 @@ export async function POST({ request, locals }) {
               }
 
               const currentQuantity = inventoryData?.quantity
-              const newQuantity = Math.max(0, currentQuantity - valueToSubtractFromInventory) // Prevent negative values
+              const newQuantity = Math.max(
+                0,
+                currentQuantity - valueToSubtractFromInventoryQuantity,
+              ) // Prevent negative values
 
               // Update the inventory changelog table
               const log = {
