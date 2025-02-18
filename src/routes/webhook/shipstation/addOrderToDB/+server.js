@@ -163,10 +163,66 @@ export async function POST({ request, locals }) {
             })
           }
 
-          // Execute lookup and deduct inventory quanity from correct product
+          // If sku mappings are found execute lookup and deduct inventory quantity from correct product
           if (data?.length > 0) {
-            // You'll need to do a loop and deduct every time for every sku map found
-            // To calculate the correct quantity to deduct multiply quantityToDeduct * quantity
+            // You'll need to do a loop and deduct for every time a sku map is found
+            for (const skuMap of data) {
+              const { product_id, sku, quantity_to_deduct } = skuMap
+              const valueToSubtractFromInventory = quantity_to_deduct * quantity
+
+              // Fetch the current inventory quantity
+              const { data: inventoryData, error: fetchError } = await locals.supabase
+                .from('inventory')
+                .select('quantity')
+                .eq('id', product_id)
+                .single()
+
+              if (fetchError) {
+                console.error(`Error fetching inventory for product_id ${product_id}:`, fetchError)
+              }
+
+              if (!inventoryData) {
+                console.warn(`No inventory found for product_id ${product_id}`)
+              }
+
+              const currentQuantity = inventoryData?.quantity
+              const newQuantity = Math.max(0, currentQuantity - valueToSubtractFromInventory) // Prevent negative values
+
+              // Update the inventory changelog table
+              const log = {
+                client_id: clientId,
+                change_source: storeName,
+                name: item?.name,
+                asin: item?.upc,
+                sku,
+                previous_quantity: currentQuantity,
+                new_quantity: newQuantity,
+                previous_pending: 0,
+                new_pending: 0,
+              }
+
+              const { error: logError } = await locals.supabase
+                .from('inventory_changelog')
+                .insert([log])
+
+              if (logError) {
+                console.error('Supabase error: inserting into inventory_changelog table', logError)
+              }
+
+              // Deduct the appropriate quantities from the inventory table
+              const { error: updateError } = await locals.supabase
+                .from('inventory')
+                .update({ quantity: newQuantity })
+                .eq('id', product_id)
+
+              if (updateError) {
+                console.error(`Error updating inventory for product_id ${product_id}:`, updateError)
+              } else {
+                console.log(
+                  `Successfully updated inventory for product_id ${product_id}. New quantity: ${newQuantity}`,
+                )
+              }
+            }
           }
 
           // Check if error is returned from Supabase
