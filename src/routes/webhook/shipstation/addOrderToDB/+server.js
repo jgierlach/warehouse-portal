@@ -1,59 +1,66 @@
-import { json } from '@sveltejs/kit';
-import { findStoreNameBasedOnId, assignClientIdBasedOnStoreName } from '$lib/utils';
+import { json } from '@sveltejs/kit'
+import { findStoreNameBasedOnId, assignClientIdBasedOnStoreName } from '$lib/utils'
+import { SEND_GRID_API_KEY } from '$env/static/private'
 
 // Disable CSRF protection for this webhook route
 export const config = {
-  csrf: false
-};
+  csrf: false,
+}
 
 export async function POST({ request, locals }) {
   // Set CORS headers
   const headers = {
-    'Access-Control-Allow-Origin': '*',  // Allow requests from any origin
+    'Access-Control-Allow-Origin': '*', // Allow requests from any origin
     'Access-Control-Allow-Methods': 'POST',
-    'Access-Control-Allow-Headers': 'Content-Type'
-  };
+    'Access-Control-Allow-Headers': 'Content-Type',
+  }
 
   try {
-    const event = await request.json();
+    const event = await request.json()
 
-    console.log('Webhook received:', event);
+    console.log('Webhook received:', event)
 
     // Check if the event contains a resource_url
     if (!event.resource_url) {
-      return json({ error: 'Invalid webhook payload: no resource_url provided' }, { status: 400, headers });
+      return json(
+        { error: 'Invalid webhook payload: no resource_url provided' },
+        { status: 400, headers },
+      )
     }
 
     // Fetch order data from ShipStation using the resource_url
     const response = await fetch(event.resource_url, {
       headers: {
-        'Authorization': `Basic ${Buffer.from(import.meta.env.VITE_SHIPSTATION_API_KEY + ':' + import.meta.env.VITE_SHIPSTATION_SECRET).toString('base64')}`,
-        'Content-Type': 'application/json'
-      }
-    });
+        Authorization: `Basic ${Buffer.from(import.meta.env.VITE_SHIPSTATION_API_KEY + ':' + import.meta.env.VITE_SHIPSTATION_SECRET).toString('base64')}`,
+        'Content-Type': 'application/json',
+      },
+    })
 
     if (!response.ok) {
-      console.error('Failed to fetch order data:', response.status, response.statusText);
-      return json({ error: 'Failed to fetch order data' }, { status: 500, headers });
+      console.error('Failed to fetch order data:', response.status, response.statusText)
+      return json({ error: 'Failed to fetch order data' }, { status: 500, headers })
     }
 
-    const { orders } = await response.json();
-    console.log('Fetched orders', JSON.stringify(orders, null, 2));
+    const { orders } = await response.json()
+    console.log('Fetched orders', JSON.stringify(orders, null, 2))
 
-    const allShipmentData = [];
+    const allShipmentData = []
 
     // Load all of the stores in ShipStation
     const shipstationStores = await fetch('https://ssapi.shipstation.com/stores', {
       method: 'GET',
       headers: {
-        'Authorization': `Basic ${Buffer.from(import.meta.env.VITE_SHIPSTATION_API_KEY + ':' + import.meta.env.VITE_SHIPSTATION_SECRET).toString('base64')}`,
-        'Content-Type': 'application/json'
-      }
-    });
+        Authorization: `Basic ${Buffer.from(import.meta.env.VITE_SHIPSTATION_API_KEY + ':' + import.meta.env.VITE_SHIPSTATION_SECRET).toString('base64')}`,
+        'Content-Type': 'application/json',
+      },
+    })
 
     // Check if the shipstation stores came back as expected
     if (!shipstationStores.ok) {
-      return json({ error: 'Failed to fetch ShipStation stores' }, { status: shipstationStores.status });
+      return json(
+        { error: 'Failed to fetch ShipStation stores' },
+        { status: shipstationStores.status },
+      )
     }
 
     // Process the successful return of ShipStation stores
@@ -74,8 +81,8 @@ export async function POST({ request, locals }) {
         orderDate,
         shippingAmount,
         customerNotes,
-        externallyFulfilled
-      } = order;
+        externallyFulfilled,
+      } = order
 
       // Check if order is fulfilled by FBA
       // if (externallyFulfilled) {
@@ -88,111 +95,135 @@ export async function POST({ request, locals }) {
       const storeName = findStoreNameBasedOnId(storeId, stores)
 
       // Check if the webhook is detecting a manual order
-      if (storeName === "Manual Orders") {
-        console.log("Exit due to Manual Order source")
+      if (storeName === 'Manual Orders') {
+        console.log('Exit due to Manual Order source')
         continue
       }
 
       // Check if the webhook is detecting a Hometown Amazon order
-      if (storeName === "Hometown Amazon") {
-        console.log("Do not process order if from Hometown Amazon")
+      if (storeName === 'Hometown Amazon') {
+        console.log('Do not process order if from Hometown Amazon')
         continue
       }
 
-      const clientId = assignClientIdBasedOnStoreName(storeName);
+      const clientId = assignClientIdBasedOnStoreName(storeName)
 
-      console.log("CLIENT ID", clientId);
+      console.log('CLIENT ID', clientId)
 
       // Loop through each item in the order
-      const shipmentData = await Promise.all(items.map(async (item) => {
-        let sku = item?.sku
-        let quantity = item?.quantity
+      const shipmentData = await Promise.all(
+        items.map(async (item) => {
+          let sku = item?.sku
+          let quantity = item?.quantity
+          let shipmentNumber = orderNumber
 
-        // const { data, error } = await locals.supabase
-        //   .from('Inventory')
-        //   .select('Quantity')
-        //   .eq('Sku', sku)
-        //   .eq('Client_Id', clientId)
-        //   .single();  // Ensures only one row is returned
+          // Check sku against the sku mapping table
+          const { data, error } = await locals.supabase
+            .from('sku_mapping')
+            .select('*')
+            .eq('sku', sku)
 
-        // if (error) {
-        //   console.error('Error fetching row by sku and clientId:', error);
-        // }
+          // No sku is found in the sku mapping table that matches
+          if (data?.length === 0) {
+            console.log('No SKU mapping found for', sku)
+            // Send an alert with send grid
+            const endpoint = 'https://api.sendgrid.com/v3/mail/send'
+            const emailData = {
+              personalizations: [
+                {
+                  to: [
+                    { email: 'jan@hometown-industries.com' },
+                    { email: 'storageandfulfillment@hometown-industries.com' },
+                    { email: 'wesley@hometown-industries.com' },
+                  ],
+                  subject: `Sku Value: ${sku} not found in Sku Mapping Table`,
+                },
+              ],
+              from: {
+                email: 'storageandfulfillment@hometown-industries.com',
+                name: 'Sku Mapping',
+              },
+              content: [
+                {
+                  type: 'text/html',
+                  value: `
+                <p>Sku Value: <strong>${sku}</strong> not found in Sku Mapping table.</p>
+                <p>Please navigate to <a href="https://warehouse-portal.vercel.app/app/sku-mapping" target="_blank">Sku Mapping</a> in the warehouse portal and add it as a value.</p>
+                <p>The shipment number associated with this sku is <strong>${shipmentNumber}</strong></p>`,
+                },
+              ],
+            }
+            await fetch(endpoint, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${SEND_GRID_API_KEY}`,
+              },
+              body: JSON.stringify(emailData),
+            })
+          }
 
-        // const currentQuantity = data?.Quantity;
-        // let newQuantity = 0
-        // // Defensive check if current quantity comes back as not a valid integer
-        // if (currentQuantity === null || currentQuantity === undefined) {
-        //   newQuantity = 0
-        // } else {
-        //   newQuantity = currentQuantity - quantity;
-        // }
+          // Execute lookup and deduct inventory quanity from correct product
+          if (data?.length > 0) {
+            // You'll need to do a loop and deduct every time for every sku map found
+            // To calculate the correct quantity to deduct multiply quantityToDeduct * quantity
+          }
 
-        // Update the Quantity column
-        // const { data: updateData, error: updateError } = await locals.supabase
-        //   .from('Inventory')
-        //   .update({ Quantity: newQuantity })
-        //   .eq('Sku', sku)
-        //   .eq('Client_Id', clientId);
+          // Check if error is returned from Supabase
+          if (error) {
+            console.error('Supabase Error: fetching sku mapping:', error)
+          }
 
-        // if (updateError) {
-        //   console.error('Error updating inventory quantity:', updateError);
-        // } else {
-        //   console.log('Inventory quantity updated successfully:', updateData);
-        // }
+          return {
+            Client_Id: clientId || null,
+            Shipment_Number: orderNumber || null,
+            Carrier: carrierCode || null,
+            Tracking_Number: trackingNumber || null,
+            PO_Number: orderNumber || null,
+            Destination: storeName || null,
+            Requires_Amazon_Labeling: 'No',
+            Shipment_Type: 'Outbound', // Default or map from payload if available
+            Status: 'Pending', // Set a default status
+            Date_Of_Last_Change: orderDate || null,
+            Asin: item.upc || null, // Using UPC as a proxy for ASIN in the payload
+            Product_Title: item.name || null, // Title of the product (SKU)
+            Sku: item.sku || null, // SKU for the product
+            Product_Image_Url: item.imageUrl || null, // Image URL if available
+            Quantity: item.quantity || 1, // Quantity of the current item
+            Buyer_Name: shipTo?.name || null,
+            Buyer_Email: customerEmail || null,
+            Recipient_Name: shipTo?.name || null,
+            Recipient_Company: shipTo?.company || null,
+            Recipient_Address_Line_1: shipTo?.street1 || null,
+            Recipient_City: shipTo?.city || null,
+            Recipient_State: shipTo?.state || null,
+            Recipient_Postal_Code: shipTo?.postalCode || null,
+            Recipient_Country: shipTo?.country || null,
+            Notes: customerNotes || null, // Any internal notes provided
+            Cost_Of_Shipment: null,
+          }
+        }),
+      )
 
-        return {
-          Client_Id: clientId || null,
-          Shipment_Number: orderNumber || null,
-          Carrier: carrierCode || null,
-          Tracking_Number: trackingNumber || null,
-          PO_Number: orderNumber || null,
-          Destination: storeName || null,
-          Requires_Amazon_Labeling: "No",
-          Shipment_Type: 'Outbound',  // Default or map from payload if available
-          Status: 'Pending',  // Set a default status
-          Date_Of_Last_Change: orderDate || null,
-          Asin: item.upc || null,  // Using UPC as a proxy for ASIN in the payload
-          Product_Title: item.name || null,  // Title of the product (SKU)
-          Sku: item.sku || null,  // SKU for the product
-          Product_Image_Url: item.imageUrl || null,  // Image URL if available
-          Quantity: item.quantity || 1,  // Quantity of the current item
-          Buyer_Name: shipTo?.name || null,
-          Buyer_Email: customerEmail || null,
-          Recipient_Name: shipTo?.name || null,
-          Recipient_Company: shipTo?.company || null,
-          Recipient_Address_Line_1: shipTo?.street1 || null,
-          Recipient_City: shipTo?.city || null,
-          Recipient_State: shipTo?.state || null,
-          Recipient_Postal_Code: shipTo?.postalCode || null,
-          Recipient_Country: shipTo?.country || null,
-          Notes: customerNotes || null,  // Any internal notes provided
-          Cost_Of_Shipment: null,
-        }
-      }));
-
-      allShipmentData.push(...shipmentData);
+      allShipmentData.push(...shipmentData)
     }
 
-    console.log('All Shipment Data:', JSON.stringify(allShipmentData, null, 2));
+    console.log('All Shipment Data:', JSON.stringify(allShipmentData, null, 2))
 
     // Insert all shipment data into the database
-    const { data, error } = await locals.supabase
-      .from('Outbound_Shipments')
-      .insert(allShipmentData);
+    const { data, error } = await locals.supabase.from('Outbound_Shipments').insert(allShipmentData)
 
-    console.log('Insert result:', allShipmentData, data, error);
+    console.log('Insert result:', allShipmentData, data, error)
 
     if (error) {
-      console.error('Error inserting shipment data:', error);
-      return json({ error: 'Failed to process shipment' }, { status: 500, headers });
+      console.error('Error inserting shipment data:', error)
+      return json({ error: 'Failed to process shipment' }, { status: 500, headers })
     }
 
-    return json({ success: true }, { headers });
-
+    return json({ success: true }, { headers })
   } catch (err) {
-    console.error('Error processing webhook:', err);
-    return json({ error: 'Invalid request' }, { status: 400, headers });
+    console.error('Error processing webhook:', err)
+    return json({ error: 'Invalid request' }, { status: 400, headers })
   }
 }
 
@@ -203,9 +234,9 @@ export function OPTIONS() {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    }
-  });
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  })
 }
 
 // const FetchedOrders = [
