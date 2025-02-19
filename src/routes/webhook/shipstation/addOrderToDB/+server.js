@@ -115,6 +115,7 @@ export async function POST({ request, locals }) {
         items.map(async (item) => {
           let sku = item?.sku
           let quantity = item?.quantity
+          let imageUrl = item?.imageUrl
           let shipmentNumber = orderNumber
 
           // Check sku against the sku mapping table
@@ -126,6 +127,25 @@ export async function POST({ request, locals }) {
           // No sku is found in the sku mapping table that matches
           if (data?.length === 0) {
             console.log('No SKU mapping found for', sku)
+
+            // Insert row into unmapped_skus table
+            const unmappedSku = {
+              sku,
+              client_id: clientId,
+              quantity,
+              shipment_number: shipmentNumber,
+              order_source: storeName,
+              product_image_url: imageUrl,
+            }
+
+            const { error: insertError } = await locals.supabase
+              .from('unmapped_skus')
+              .insert([unmappedSku])
+
+            if (insertError) {
+              console.error('Supabase error: inserting into unmapped_skus table', insertError)
+            }
+
             // Send an alert with send grid
             const endpoint = 'https://api.sendgrid.com/v3/mail/send'
             const emailData = {
