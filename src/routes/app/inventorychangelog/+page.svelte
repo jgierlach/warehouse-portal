@@ -80,9 +80,9 @@
               <td>{log?.previous_quantity}</td>
               <td>{log?.new_quantity}</td>
               <td
-                class:text-green-600={log?.previous_quantity - log?.new_quantity > 0}
-                class:text-error={log?.previous_quantity - log?.new_quantity < 0}
-                >{log?.previous_quantity - log?.new_quantity}</td
+                class:text-green-600={log?.new_quantity - log?.previous_quantity > 0}
+                class:text-error={log?.new_quantity - log?.previous_quantity < 0}
+                >{log?.new_quantity - log?.previous_quantity}</td
               >
             </tr>
           {/each}
