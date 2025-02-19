@@ -30,15 +30,29 @@
   $: name = selectedProduct?.Name
   $: productId = selectedProduct?.id
   $: clientId = selectedProduct?.Client_Id
-  let quantityToDeduct = 0
+  let quantityToDeduct = 1
 
   function resetFields() {
     selectedProduct = null
     sku = ''
+    quantityToDeduct = 1
   }
 
   async function createSkuMapping(event) {
     event.preventDefault()
+
+    // See if any skus in the unmapped skus array match the skus that's passed in. If it does delete that sku automatically
+    const skuToDelete = $unmappedSkus.find((unmappedSku) => unmappedSku?.sku === sku)
+    if (skuToDelete) {
+      try {
+        await deleteUnmappedSku(skuToDelete)
+      } catch (error) {
+        console.error('Error deleting SKU:', error)
+      }
+    } else {
+      console.warn(`SKU ${sku} not found in unmappedSkus.`)
+    }
+
     const response = await fetch('/app/api/sku-mapping/create-sku-mapping', {
       method: 'POST',
       headers: {
@@ -200,7 +214,7 @@
           />
         </div>
         <div class="mt-4">
-          <label for="quantityToDeduct" class="block">Quatity To Deduct</label>
+          <label for="quantityToDeduct" class="block">Quantity To Deduct</label>
           <input
             type="number"
             id="quantityToDeduct"
