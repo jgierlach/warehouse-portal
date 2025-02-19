@@ -106,6 +106,12 @@ export async function POST({ request, locals }) {
         continue
       }
 
+      // Check if the webhook is detecting a Hometown Amazon order
+      if (storeName === 'Hometown Walmart') {
+        console.log('Do not process order if from Hometown Walmart')
+        continue
+      }
+
       const clientId = assignClientIdBasedOnStoreName(storeName)
 
       console.log('CLIENT ID', clientId)
