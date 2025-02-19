@@ -85,6 +85,25 @@
     showDeleteSkuMapping = false
   }
 
+  async function deleteUnmappedSku(sku) {
+    const response = await fetch('/app/api/sku-mapping/delete-unmapped-sku', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: sku?.id,
+      }),
+    })
+    if (response.ok) {
+      await loadUnmappedSkus(data.supabase)
+    } else {
+      console.log('THERE IS AN ERROR')
+      const error = response.json()
+      console.error('Failed to delete sku mapping', error)
+    }
+  }
+
   let hoveredTitleId = null
   let timer
 
@@ -101,8 +120,58 @@
 </script>
 
 {#if $unmappedSkus?.length > 0}
-  <!-- INSERT HTML THAT WARNS USER THAT THEY HAVE UNMAPPED SKUS -->
-  <!-- ADD PRODUCT NAME TO UNMAPPED SKUS TABLE -->
+  <div class="mt-10 flex justify-center">
+    <div class="ml-10 mr-10 max-w-4xl rounded-lg bg-base-100 p-4 shadow-xl">
+      <div class="flex items-center justify-center text-2xl font-semibold">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 flex-shrink-0 stroke-current text-yellow-400"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10.29 3.86l-6.4 11A1 1 0 004 16h16a1 1 0 00.86-1.49l-6.4-11a1 1 0 00-1.72 0zM12 9v4m0 4h.01"
+          ></path>
+        </svg>
+        <span class="ml-2">Warning! You have unmapped skus.</span>
+      </div>
+      <div class="mt-4 flex justify-center">
+        <table class="table shadow-lg">
+          <thead>
+            <tr>
+              <th>Product Image</th>
+              <th>Client Id</th>
+              <th>Sku</th>
+              <th>Name</th>
+              <th>Order Source</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each $unmappedSkus as sku}
+              <tr>
+                <td>
+                  <img src={sku?.product_image_url} alt="product thumbnail" class="h-20 w-20" />
+                </td>
+                <td>{sku?.client_id}</td>
+                <td>{sku?.sku}</td>
+                <td>{sku?.name}</td>
+                <td>{sku?.order_source}</td>
+                <td
+                  ><button on:click={() => deleteUnmappedSku(sku)} class="btn btn-error btn-sm"
+                    >Delete</button
+                  ></td
+                >
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 {/if}
 
 {#if showCreateSkuMapping}
