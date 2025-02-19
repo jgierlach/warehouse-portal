@@ -4,6 +4,7 @@
   // Stores
   import { skuMapping, loadSkuMapping } from '$lib/stores/skuMapping'
   import { inventory, loadInventory } from '$lib/stores/inventory'
+  import { unmappedSkus, loadUnmappedSkus } from '$lib/stores/unmappedSkus'
 
   // Props
   // let { data } = $props()
@@ -13,6 +14,7 @@
   onMount(async () => {
     await loadSkuMapping(data.supabase)
     await loadInventory(data.supabase)
+    await loadUnmappedSkus(data.supabase)
   })
 
   // Business Logic
@@ -81,6 +83,10 @@
     showDeleteSkuMapping = false
   }
 </script>
+
+{#if $unmappedSkus?.length > 0}
+  <!-- INSERT HTML THAT WARNS USER THAT THEY HAVE UNMAPPED SKUS -->
+{/if}
 
 {#if showCreateSkuMapping}
   <div class="mt-10 flex justify-center">
