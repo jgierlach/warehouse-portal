@@ -194,7 +194,7 @@ export async function POST({ request, locals }) {
 
               // Fetch the current inventory quantity
               const { data: inventoryData, error: fetchError } = await locals.supabase
-                .from('inventory')
+                .from('Inventory')
                 .select('quantity')
                 .eq('id', product_id)
                 .single()
@@ -236,7 +236,7 @@ export async function POST({ request, locals }) {
 
               // Deduct the appropriate quantities from the inventory table
               const { error: updateError } = await locals.supabase
-                .from('inventory')
+                .from('Inventory')
                 .update({ quantity: newQuantity })
                 .eq('id', product_id)
 
