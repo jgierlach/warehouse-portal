@@ -168,7 +168,13 @@
             {#each $unmappedSkus as sku}
               <tr>
                 <td>
-                  <img src={sku?.product_image_url} alt="product thumbnail" class="h-20 w-20" />
+                  <img
+                    src={sku?.product_image_url === null
+                      ? '/placeholder-image.jpg'
+                      : sku?.product_image_url}
+                    alt="product thumbnail"
+                    class="h-20 w-20"
+                  />
                 </td>
                 <td>{sku?.client_id}</td>
                 <td>{sku?.sku}</td>
