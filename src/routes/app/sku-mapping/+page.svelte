@@ -7,8 +7,10 @@
   import { unmappedSkus, loadUnmappedSkus } from '$lib/stores/unmappedSkus'
 
   // Props
-  // let { data } = $props()
   export let data
+
+  // Utils
+  import { abbreviateString } from '$lib/utils'
 
   // Execute onMount
   onMount(async () => {
@@ -82,10 +84,25 @@
     }
     showDeleteSkuMapping = false
   }
+
+  let hoveredTitleId = null
+  let timer
+
+  function handleMouseEnter(id) {
+    timer = setTimeout(() => {
+      hoveredTitleId = id
+    }, 1000)
+  }
+
+  function handleMouseLeave() {
+    clearTimeout(timer)
+    hoveredTitleId = null
+  }
 </script>
 
 {#if $unmappedSkus?.length > 0}
   <!-- INSERT HTML THAT WARNS USER THAT THEY HAVE UNMAPPED SKUS -->
+  <!-- ADD PRODUCT NAME TO UNMAPPED SKUS TABLE -->
 {/if}
 
 {#if showCreateSkuMapping}
@@ -249,7 +266,7 @@
 
 {#if !showCreateSkuMapping}
   <div class="mt-10 flex justify-center">
-    <div class="ml-10 mr-10 max-w-4xl rounded-lg bg-base-100 p-4 shadow-xl">
+    <div class="ml-10 mr-10 max-w-7xl rounded-lg bg-base-100 p-4 shadow-xl">
       <h1 class="text-center text-3xl font-bold">Sku Mapping</h1>
       <div class="flex justify-center">
         <button
@@ -279,7 +296,24 @@
                 </td>
                 <td>{sku?.sku}</td>
                 <td>{sku?.quantity_to_deduct}</td>
-                <td>{sku?.name}</td>
+                <td
+                  ><div
+                    class="tooltip"
+                    role="tooltip"
+                    on:mouseenter={() => handleMouseEnter(sku?.name)}
+                    on:mouseleave={handleMouseLeave}
+                  >
+                    {abbreviateString(sku?.name, 25)}
+                    {#if hoveredTitleId === sku?.name}
+                      <div
+                        class="absolute left-0 top-full z-50 mt-2 rounded-lg bg-gray-200 p-2 text-gray-800 opacity-100 shadow-lg"
+                        style="opacity: 1; background-color: rgba(229, 231, 235, 1);"
+                      >
+                        {sku?.name}
+                      </div>
+                    {/if}
+                  </div></td
+                >
                 <td>{sku?.product_id}</td>
                 <td>{sku?.client_id}</td>
                 <td
