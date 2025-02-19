@@ -116,6 +116,7 @@ export async function POST({ request, locals }) {
           let sku = item?.sku
           let quantity = item?.quantity
           let imageUrl = item?.imageUrl
+          let name = item?.name
           let shipmentNumber = orderNumber
 
           // Check sku against the sku mapping table
@@ -135,6 +136,7 @@ export async function POST({ request, locals }) {
               quantity,
               shipment_number: shipmentNumber,
               order_source: storeName,
+              name,
               product_image_url: imageUrl,
             }
 
