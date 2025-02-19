@@ -210,6 +210,7 @@
             id="sku"
             class="input input-bordered w-full bg-base-200"
             bind:value={sku}
+            on:input={() => (sku = sku.trim())}
             required
           />
         </div>
