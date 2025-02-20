@@ -175,8 +175,8 @@ export async function POST({ request, locals }) {
                 {
                   type: 'text/html',
                   value: `
-                <p>Sku Value: <strong>${sku}</strong> not found in Sku Mapping table.</p>
-                <p>Please navigate to <strong><a href="https://warehouse-portal.vercel.app/app/sku-mapping" target="_blank">Sku Mapping</a></strong> in the warehouse portal and add it as a value.</p>
+                <p>Sku Value: <strong>${sku}</strong> not found in Sku Mapping table. The product name associated with this sku is <strong>${name}</strong></p>
+                <p>Please navigate to <strong><a href="https://warehouse-portal.vercel.app/app/sku-mapping" target="_blank">Sku Mapping</a></strong> in the warehouse portal and add this sku as a value.</p>
                 <p>The shipment number associated with this sku is <strong>${shipmentNumber}</strong></p>`,
                 },
               ],
