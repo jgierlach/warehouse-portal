@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+  import { goto } from '$app/navigation'
 
   // Stores
   import { skuMapping, loadSkuMapping } from '$lib/stores/skuMapping'
@@ -24,7 +25,6 @@
 
   let selectedProduct = null
 
-  let id = 0
   $: productImageUrl = selectedProduct?.Product_Image_Url
   let sku = ''
   $: name = selectedProduct?.Name
@@ -196,7 +196,7 @@
 
 {#if showCreateSkuMapping}
   <div class="mt-10 flex justify-center">
-    <div class="ml-10 mr-10 max-w-4xl rounded-lg bg-base-100 p-4 shadow-xl">
+    <div id="create-sku-mapping" class="ml-10 mr-10 max-w-4xl rounded-lg bg-base-100 p-4 shadow-xl">
       <h1 class="text-center text-3xl font-bold">Create Sku Mapping</h1>
       <form on:submit={createSkuMapping} class="mt-4 p-4 shadow-md">
         <div class="mt-4">
@@ -340,8 +340,12 @@
                 <td>{product?.id}</td>
                 <td>{product?.Client_Id}</td>
                 <td
-                  ><button on:click={() => (selectedProduct = product)} class="btn btn-outline"
-                    >Select</button
+                  ><button
+                    on:click={() => {
+                      selectedProduct = product
+                      goto('/app/sku-mapping/#create-sku-mapping')
+                    }}
+                    class="btn btn-outline">Select</button
                   ></td
                 >
               </tr>
