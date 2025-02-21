@@ -103,16 +103,6 @@
       goto(`/app/#${inventoryToEdit.id}`)
       inventoryToEdit = {}
       resetFields()
-      // clientId = ''
-      // name = ''
-      // asin = ''
-      // productTitle = ''
-      // sku = ''
-      // productImageUrl = ''
-      // pending = 0
-      // quantity = 0
-      // expirationDate = ''
-      // lotNumber = ''
     } else {
       const errorData = await response.json()
       alert(`Failed to edit inventory: ${errorData.message}`)
@@ -345,6 +335,9 @@
       {inventoryToDelete.Product_Title}
     </p>
     <div class="flex justify-center">
+      <img src={inventoryToDelete?.Product_Image_Url} alt="product thumbnail" class="h-20 w-20" />
+    </div>
+    <div class="mt-4 flex justify-center">
       <button
         on:click={() => deleteInventory(inventoryToDelete.id, inventoryToDelete.created_at)}
         class="btn btn-error"
