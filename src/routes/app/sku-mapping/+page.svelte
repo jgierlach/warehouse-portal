@@ -157,7 +157,8 @@
           <thead>
             <tr>
               <th>Product Image</th>
-              <th>Client Id</th>
+              <!-- <th>Client Id</th> -->
+              <th>Shipment Number</th>
               <th>Sku</th>
               <th>Name</th>
               <th>Order Source</th>
@@ -176,7 +177,8 @@
                     class="h-20 w-20"
                   />
                 </td>
-                <td>{sku?.client_id}</td>
+                <!-- <td>{sku?.client_id}</td> -->
+                <td>{sku?.shipment_number}</td>
                 <td>{sku?.sku}</td>
                 <td>{sku?.name}</td>
                 <td>{sku?.order_source}</td>
