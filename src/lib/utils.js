@@ -588,6 +588,9 @@ export const assignClientIdBasedOnStoreName = (storeName) => {
   if (storeName === 'Drink Ballast Wix') {
     return 'roy@drinkballast.com'
   }
+  if (storeName === 'Drink Ballast Shopify') {
+    return 'roy@drinkballast.com'
+  }
   // Jewell Nursing categorization
   if (storeName === 'Jewell Nursing Website') {
     return 'support@jewellnursingsolutions.com'
