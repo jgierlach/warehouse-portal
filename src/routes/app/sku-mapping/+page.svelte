@@ -106,7 +106,7 @@
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: sku?.id,
+        sku: sku?.sku,
       }),
     })
     if (response.ok) {
@@ -135,7 +135,7 @@
 
 {#if $unmappedSkus?.length > 0}
   <div class="mt-10 flex justify-center">
-    <div class="ml-10 mr-10 max-w-4xl rounded-lg bg-base-100 p-4 shadow-xl">
+    <div class="ml-10 mr-10 max-w-5xl rounded-lg bg-base-100 p-4 shadow-xl">
       <div class="flex items-center justify-center text-2xl font-semibold">
         <svg
           xmlns="http://www.w3.org/2000/svg"

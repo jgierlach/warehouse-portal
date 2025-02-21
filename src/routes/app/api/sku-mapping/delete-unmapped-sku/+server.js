@@ -2,13 +2,16 @@ import { json } from '@sveltejs/kit'
 
 export async function DELETE({ request, locals }) {
   try {
-    const { id } = await request.json()
+    const { sku } = await request.json()
 
-    if (!id) {
-      return json({ message: 'Missing id in request body.' }, { status: 400 })
+    if (!sku) {
+      return json({ message: 'Missing sku in request body.' }, { status: 400 })
     }
 
-    const { error: deleteError } = await locals.supabase.from('unmapped_skus').delete().eq('id', id)
+    const { error: deleteError } = await locals.supabase
+      .from('unmapped_skus')
+      .delete()
+      .eq('sku', sku)
 
     if (deleteError) {
       console.error('Supabase delete error:', deleteError)
