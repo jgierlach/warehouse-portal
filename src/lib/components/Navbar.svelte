@@ -74,7 +74,7 @@
     </button>
   </div>
   <div class="hidden items-center space-x-4 md:flex">
-    <div>
+    <!-- <div>
       <button class="btn" on:click={toggleTheme}>
         {#if theme === 'light'}
           🌙
@@ -82,7 +82,7 @@
           ☀️
         {/if}
       </button>
-    </div>
+    </div> -->
     {#if isUserLoggedIn}
       <form method="post" action="/logout">
         <button type="submit" class="btn btn-primary">Logout</button>
