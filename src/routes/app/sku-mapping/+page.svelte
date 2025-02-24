@@ -100,21 +100,39 @@
   }
 
   async function deleteUnmappedSku(sku) {
-    const response = await fetch('/app/api/sku-mapping/delete-unmapped-sku', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sku: sku?.sku,
-      }),
-    })
-    if (response.ok) {
-      await loadUnmappedSkus(data.supabase)
+    // If no sku value is available then delete by id otherwise delete by sku
+    if (sku?.sku === '') {
+      const response = await fetch('/app/api/sku-mapping/delete-unmapped-sku-by-id', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: sku?.id,
+        }),
+      })
+      if (response.ok) {
+        await loadUnmappedSkus(data.supabase)
+      } else {
+        const error = response.json()
+        console.error('Failed to delete sku mapping', error)
+      }
     } else {
-      console.log('THERE IS AN ERROR')
-      const error = response.json()
-      console.error('Failed to delete sku mapping', error)
+      const response = await fetch('/app/api/sku-mapping/delete-unmapped-sku', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sku: sku?.sku,
+        }),
+      })
+      if (response.ok) {
+        await loadUnmappedSkus(data.supabase)
+      } else {
+        const error = response.json()
+        console.error('Failed to delete sku mapping', error)
+      }
     }
   }
 
