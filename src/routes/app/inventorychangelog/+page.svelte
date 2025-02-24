@@ -44,7 +44,7 @@
             <th>Client Id</th>
             <th>Change Source</th>
             <th>Name</th>
-            <th>Asin</th>
+            <!-- <th>Asin</th> -->
             <th>Sku</th>
             <th>Previous Quantity</th>
             <th>New Quantity</th>
@@ -75,7 +75,7 @@
                   {/if}
                 </div>
               </td>
-              <td>{log?.asin}</td>
+              <!-- <td>{log?.asin}</td> -->
               <td>{log?.sku}</td>
               <td>{log?.previous_quantity}</td>
               <td>{log?.new_quantity}</td>
