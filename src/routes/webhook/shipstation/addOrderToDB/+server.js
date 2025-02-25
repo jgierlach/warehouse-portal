@@ -219,6 +219,63 @@ export async function POST({ request, locals }) {
                 console.warn(`No inventory found for product_id ${product_id}`)
               }
 
+              //  DETERMINE IF MULTIPLES OF THE SAME PRDODUCT HAVE BEEN RETURNED WITH DIFFERENT EXPIRATION DATES BEGINS
+              if (
+                data?.length > 1 &&
+                data[0]?.name === data[1]?.name &&
+                inventoryData?.Product_Expiration !== null
+              ) {
+                const currentQuantity = inventoryData?.Quantity
+                const newQuantity = Math.max(
+                  0,
+                  currentQuantity - valueToSubtractFromInventoryQuantity,
+                ) // Prevent negative values
+
+                // Update the inventory changelog table
+                const log = {
+                  client_id: clientId,
+                  change_source: storeName,
+                  name: item?.name,
+                  asin: item?.upc,
+                  sku,
+                  previous_quantity: currentQuantity,
+                  new_quantity: newQuantity,
+                  previous_pending: 0,
+                  new_pending: 0,
+                }
+
+                const { error: logError } = await locals.supabase
+                  .from('inventory_changelog')
+                  .insert([log])
+
+                if (logError) {
+                  console.error(
+                    'Supabase error: inserting into inventory_changelog table',
+                    logError,
+                  )
+                }
+
+                // Deduct the appropriate quantities from the inventory table
+                const { error: updateError } = await locals.supabase
+                  .from('Inventory')
+                  .update({ Quantity: newQuantity })
+                  .eq('id', product_id)
+
+                if (updateError) {
+                  console.error(
+                    `Error updating inventory for product_id ${product_id}:`,
+                    updateError,
+                  )
+                } else {
+                  console.log(
+                    `Successfully updated inventory for product_id ${product_id}. New quantity: ${newQuantity}`,
+                  )
+                }
+                // break out of the loop after just updating one of the products
+                break
+              }
+              //  DETERMINE IF MULTIPLES OF THE SAME PRDODUCT HAVE BEEN RETURNED WITH DIFFERENT EXPIRATION DATES ENDS
+
               const currentQuantity = inventoryData?.Quantity
               const newQuantity = Math.max(
                 0,
