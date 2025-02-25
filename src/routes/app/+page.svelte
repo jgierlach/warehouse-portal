@@ -428,7 +428,6 @@
       <div class="form-control mb-4">
         <label class="label" for="sku">Expiration Date</label>
         <input
-          required
           class="input input-bordered bg-base-200"
           type="text"
           id="sku"
@@ -575,7 +574,6 @@
       <div class="form-control mb-4">
         <label class="label" for="sku">Expiration Date</label>
         <input
-          required
           class="input input-bordered bg-base-200"
           type="text"
           id="sku"
