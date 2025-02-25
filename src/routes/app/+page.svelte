@@ -285,7 +285,11 @@
             <td>{product.Sku}</td>
             <td>{product.Quantity}</td>
             <td>{product.Pending}</td>
-            <td>{product.Product_Expiration}</td>
+            <td
+              >{product?.Product_Expiration === null
+                ? 'No Expiration Date'
+                : product?.Product_Expiration}</td
+            >
             <td>
               <div class="flex items-center justify-center">
                 <button
