@@ -101,7 +101,7 @@
 
   async function deleteUnmappedSku(sku) {
     // If no sku value is available then delete by id otherwise delete by sku
-    if (sku?.sku === '') {
+    if (sku?.sku === '' || sku?.sku === null) {
       const response = await fetch('/app/api/sku-mapping/delete-unmapped-sku-by-id', {
         method: 'DELETE',
         headers: {
