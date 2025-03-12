@@ -539,6 +539,10 @@ export const findStoreNameBasedOnId = (storeId, stores) => {
 }
 
 export const assignClientIdBasedOnStoreName = (storeName) => {
+  // Get Your Thing categorization
+  if (storeName === 'Get Your Thing Amazon') {
+    return 'orders@getyourthing.com'
+  }
   // Veto Athletics categorization
   if (storeName === 'Veto Athletics Shopify') {
     return 'staff@vetoathletic.com'
