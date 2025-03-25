@@ -206,9 +206,9 @@
 </script>
 
 <Loading {loading} />
-<div class="mt-10 flex justify-center">
-  <div class="ml-10 mr-10 rounded-lg bg-base-100 p-4 shadow-xl">
-    <h1 class="mb-2 text-center text-3xl font-bold">Client Inventory</h1>
+<div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+  <div class="w-full max-w-7xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+    <h1 class="mb-2 text-center text-2xl font-bold sm:text-3xl">Client Inventory</h1>
     <div class="mb-4 flex justify-center">
       <button
         on:click={() => {
@@ -225,73 +225,167 @@
           lotNumber = ''
         }}
         class="btn btn-outline btn-primary btn-sm"
-        >Add Product <i class="fas fa-plus"></i>
+        >Add Product <i class="fas fa-plus ml-1"></i>
       </button>
     </div>
-    <table class="table table-zebra">
-      <thead>
-        <tr>
-          <th>Product Image</th>
-          <!-- <th>Client Id</th> -->
-          <th>Asin</th>
-          <th>Product Url</th>
-          <th>Product Title</th>
-          <th>Sku</th>
-          <th>Product Quantity</th>
-          <th>Pending</th>
-          <th>Expiration Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each $inventory as product}
-          <tr id={product.id}>
-            <td
-              ><img
-                class="h-12 w-12 rounded-md object-cover shadow-md"
+
+    <!-- Table for medium screens and above -->
+    <div class="hidden overflow-x-auto md:block">
+      <table class="table table-zebra w-full">
+        <thead>
+          <tr>
+            <th>Product Image</th>
+            <th>Asin</th>
+            <th>Product Url</th>
+            <th>Product Title</th>
+            <th>Sku</th>
+            <th>Quantity</th>
+            <th>Pending</th>
+            <th>Expiration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each $inventory as product}
+            <tr id={product.id}>
+              <td
+                ><img
+                  class="h-12 w-12 rounded-md object-cover shadow-md"
+                  alt="Product Image"
+                  src={product.Product_Image_Url === null
+                    ? '/placeholder-image.jpg'
+                    : product.Product_Image_Url}
+                /></td
+              >
+              <td>{product.Asin}</td>
+              <td
+                ><a
+                  href={`https://www.amazon.com/dp/${product.Asin}`}
+                  target="_blank"
+                  class="font-bold text-info">Product Url</a
+                ></td
+              >
+              <td
+                ><div
+                  class="tooltip"
+                  role="tooltip"
+                  on:mouseenter={() => handleMouseEnter(product['Product_Title'])}
+                  on:mouseleave={handleMouseLeave}
+                >
+                  {abbreviateString(product['Product_Title'], 25)}
+                  {#if hoveredTitleId === product['Product_Title']}
+                    <div
+                      class="absolute left-0 top-full z-50 mt-2 rounded-lg bg-gray-200 p-2 text-gray-800 opacity-100 shadow-lg"
+                      style="opacity: 1; background-color: rgba(229, 231, 235, 1);"
+                    >
+                      {product['Product_Title']}
+                    </div>
+                  {/if}
+                </div>
+              </td>
+              <td>{product.Sku}</td>
+              <td>{product.Quantity}</td>
+              <td>{product.Pending}</td>
+              <td
+                >{product?.Product_Expiration === null
+                  ? 'No Expiration Date'
+                  : product?.Product_Expiration}</td
+              >
+              <td>
+                <div class="flex items-center justify-center">
+                  <button
+                    on:click={() => {
+                      showEditInventory = true
+                      inventoryToEdit = product
+                      clientId = product.Client_Id
+                      name = product.Name
+                      asin = product.Asin
+                      productTitle = product.Product_Title
+                      sku = product.Sku
+                      productImageUrl = product.Product_Image_Url
+                      pending = product.Pending
+                      quantity = product.Quantity
+                      expirationDate = product.Product_Expiration
+                      lotNumber = product.Lot_Number
+                    }}
+                    class="btn btn-info btn-sm mr-2">Edit</button
+                  >
+                  <button
+                    on:click={() => {
+                      showDeleteInventory = true
+                      inventoryToDelete = product
+                    }}
+                    class="btn btn-error btn-sm">Delete</button
+                  >
+                </div>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Card layout for small screens -->
+    <div class="grid grid-cols-1 gap-4 md:hidden">
+      {#each $inventory as product}
+        <div class="card bg-base-200 shadow-md" id={product.id}>
+          <div class="card-body p-4">
+            <div class="flex items-center gap-4">
+              <img
+                class="h-16 w-16 rounded-md object-cover shadow-md"
                 alt="Product Image"
                 src={product.Product_Image_Url === null
                   ? '/placeholder-image.jpg'
                   : product.Product_Image_Url}
-              /></td
-            >
-            <!-- <td>{product.Client_Id}</td> -->
-            <td>{product.Asin}</td>
-            <td
-              ><a
+              />
+              <div>
+                <h3 class="text-md font-bold">
+                  <div
+                    class="tooltip"
+                    role="tooltip"
+                    on:mouseenter={() => handleMouseEnter(product['Product_Title'])}
+                    on:mouseleave={handleMouseLeave}
+                  >
+                    {abbreviateString(product['Product_Title'], 25)}
+                    {#if hoveredTitleId === product['Product_Title']}
+                      <div
+                        class="absolute left-0 top-full z-50 mt-2 rounded-lg bg-gray-200 p-2 text-gray-800 opacity-100 shadow-lg"
+                        style="opacity: 1; background-color: rgba(229, 231, 235, 1);"
+                      >
+                        {product['Product_Title']}
+                      </div>
+                    {/if}
+                  </div>
+                </h3>
+                <p class="text-sm">SKU: {product.Sku}</p>
+              </div>
+            </div>
+
+            <div class="mt-3 grid grid-cols-2 gap-2">
+              <div class="text-sm">ASIN: <span class="font-semibold">{product.Asin}</span></div>
+              <div class="text-sm">
+                Quantity: <span class="font-semibold">{product.Quantity}</span>
+              </div>
+              <div class="text-sm">
+                Pending: <span class="font-semibold">{product.Pending}</span>
+              </div>
+              <div class="text-sm">
+                Expiration: <span class="font-semibold"
+                  >{product?.Product_Expiration === null
+                    ? 'None'
+                    : product?.Product_Expiration}</span
+                >
+              </div>
+            </div>
+
+            <div class="mt-3 flex items-center justify-between">
+              <a
                 href={`https://www.amazon.com/dp/${product.Asin}`}
                 target="_blank"
-                class="font-bold text-info">Product Url</a
-              ></td
-            >
-            <td
-              ><div
-                class="tooltip"
-                role="tooltip"
-                on:mouseenter={() => handleMouseEnter(product['Product_Title'])}
-                on:mouseleave={handleMouseLeave}
+                class="btn btn-ghost btn-xs text-info">Amazon Link</a
               >
-                {abbreviateString(product['Product_Title'], 25)}
-                {#if hoveredTitleId === product['Product_Title']}
-                  <div
-                    class="absolute left-0 top-full z-50 mt-2 rounded-lg bg-gray-200 p-2 text-gray-800 opacity-100 shadow-lg"
-                    style="opacity: 1; background-color: rgba(229, 231, 235, 1);"
-                  >
-                    {product['Product_Title']}
-                  </div>
-                {/if}
-              </div>
-            </td>
-            <td>{product.Sku}</td>
-            <td>{product.Quantity}</td>
-            <td>{product.Pending}</td>
-            <td
-              >{product?.Product_Expiration === null
-                ? 'No Expiration Date'
-                : product?.Product_Expiration}</td
-            >
-            <td>
-              <div class="flex items-center justify-center">
+
+              <div class="flex gap-2">
                 <button
                   on:click={() => {
                     showEditInventory = true
@@ -307,21 +401,21 @@
                     expirationDate = product.Product_Expiration
                     lotNumber = product.Lot_Number
                   }}
-                  class="btn btn-info btn-sm mr-2">Edit</button
+                  class="btn btn-info btn-xs">Edit</button
                 >
                 <button
                   on:click={() => {
                     showDeleteInventory = true
                     inventoryToDelete = product
                   }}
-                  class="btn btn-error btn-sm">Delete</button
+                  class="btn btn-error btn-xs">Delete</button
                 >
               </div>
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
+            </div>
+          </div>
+        </div>
+      {/each}
+    </div>
   </div>
 </div>
 
@@ -355,13 +449,13 @@
 
 <!-- EDIT INVENTORY MODAL BEGINS -->
 <div class={`modal ${showEditInventory ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showEditInventory = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Edit Inventory</h1>
-    <form on:submit={editInventory}>
+    <form on:submit={editInventory} class="max-h-[70vh] overflow-y-auto">
       <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="clientId">Client Id</label>
@@ -501,13 +595,13 @@
 
 <!-- CREATE INVENTORY MODAL BEGINS -->
 <div class={`modal ${showCreateInventory ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showCreateInventory = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Create Inventory</h1>
-    <form on:submit={createProduct}>
+    <form on:submit={createProduct} class="max-h-[70vh] overflow-y-auto">
       <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="clientId">Client Id</label>
