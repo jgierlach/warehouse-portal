@@ -13,13 +13,34 @@
   export let data
 
   // Import stores
-  import { outboundShipments, loadOutboundShipments } from '$lib/stores/outboundShipments.js'
+  import {
+    outboundShipments,
+    loadOutboundShipments,
+    currentPage,
+    pageSize,
+    totalOutboundShipmentCount,
+    searchQuery,
+  } from '$lib/stores/outboundShipments.js'
   import { clients, loadClients } from '$lib/stores/clients.js'
 
   // Execute onMount
-  onMount(() => {
-    loadOutboundShipments(data.supabase)
-    loadClients(data.supabase)
+  onMount(async () => {
+    console.log('Component mounting, initializing data...')
+    // Set loading state to true
+    loading = true
+
+    // Make sure we have clean initial state
+    currentPage.set(1)
+
+    // Wait for both data loading functions to complete
+    await Promise.all([loadOutboundShipments(data.supabase), loadClients(data.supabase)])
+
+    // Explicitly set some derived values
+    getTotalPages()
+    generatePageNumbers()
+
+    console.log('Component initialization complete')
+    loading = false
   })
 
   // Component specific variables and business logic
@@ -27,8 +48,13 @@
   let loading = false
 
   let showDeleteOutboundShipment = false
+  /** @type {any} */
   let outboundShipmentToDelete = {}
 
+  /**
+   * @param {any} id
+   * @param {any} createdAt
+   */
   async function deleteOutboundShipment(id, createdAt) {
     loading = true
     const response = await fetch('/app/api/outboundshipments/deleteShipment', {
@@ -158,6 +184,7 @@
   ]
 
   let showEditOutboundShipment = false
+  /** @type {any} */
   let outboundShipmentToEdit = {}
 
   async function editOutboundShipment() {
@@ -277,19 +304,47 @@
     loading = false
   }
 
-  $: outboundShipmentsByMostRecent = $outboundShipments.sort(
-    (a, b) => new Date(b.Date_Of_Last_Change) - new Date(a.Date_Of_Last_Change),
-  )
+  $: clientIds = $clients
+    .filter(
+      (client) =>
+        client.username !== 'wesley@hometown-industries.com' &&
+        client.username !== 'susan@hometown-industries.com',
+    )
+    .map((client) => client.username)
 
-  // Filtered shipments based on search query, handle null values safely
-  $: filteredShipments = outboundShipmentsByMostRecent.filter((shipment) =>
-    shipment.Shipment_Number?.toLowerCase().includes(searchQuery.toLowerCase().trim()),
-  )
+  // Remove client-side sorting since we're sorting by created_at at the database level
+  $: filteredShipments = $outboundShipments
 
+  /** @type {any} */
   let hoveredTitleId = null
+  /** @type {any} */
   let timer
-  let searchQuery = ''
+  let localSearchQuery = ''
 
+  // Update search query and reload data when local search changes
+  $: {
+    if (localSearchQuery !== $searchQuery) {
+      loading = true
+      $searchQuery = localSearchQuery
+      $currentPage = 1 // Reset to first page on search
+      loadOutboundShipments(data.supabase).then(() => {
+        loading = false
+      })
+    }
+  }
+
+  // Search button click handler
+  async function handleSearch() {
+    loading = true
+    $searchQuery = localSearchQuery
+    $currentPage = 1 // Reset to first page on search
+    await loadOutboundShipments(data.supabase)
+    loading = false
+  }
+
+  /**
+   * @param {any} id
+   */
   function handleMouseEnter(id) {
     timer = setTimeout(() => {
       hoveredTitleId = id
@@ -301,13 +356,136 @@
     hoveredTitleId = null
   }
 
-  $: activeClients = $clients.filter(
-    (client) =>
-      client.username !== 'wesley@hometown-industries.com' &&
-      client.username !== 'susan@hometown-industries.com',
-  )
+  // Pagination controls
+  const pageSizeOptions = [50, 100, 250, 500, 1000]
 
-  $: clientIds = activeClients.map((client) => client.username)
+  /**
+   * @param {number} page
+   */
+  async function goToPage(page) {
+    console.log('Going to page:', page)
+    console.log('Current page before change:', $currentPage)
+    console.log('Total pages:', getTotalPages())
+    console.log('Total count:', $totalOutboundShipmentCount)
+    console.log('Page size:', $pageSize)
+
+    // Ensure page is a valid number and within bounds
+    const totalPages = getTotalPages()
+    if (page < 1) page = 1
+    if (page > totalPages) page = totalPages
+
+    console.log('Adjusted page (if needed):', page)
+
+    // Set loading state to true while we load data
+    loading = true
+
+    // Update the store
+    currentPage.set(page)
+    console.log('Current page after store update:', $currentPage)
+
+    // Load the data for this page
+    await loadOutboundShipments(data.supabase)
+    console.log('Data loaded, current page now:', $currentPage)
+
+    // Set loading state back to false
+    loading = false
+  }
+
+  /**
+   * @param {number} size
+   */
+  async function changePageSize(size) {
+    console.log('Changing page size to:', size)
+    loading = true
+    pageSize.set(size) // Use store.set() instead of $ prefix
+    currentPage.set(1) // Reset to first page on page size change
+    await loadOutboundShipments(data.supabase)
+    loading = false
+  }
+
+  /**
+   * @param {Event} event
+   */
+  function handlePageSizeChange(event) {
+    if (event.target && 'value' in event.target) {
+      const value = Number(event.target.value)
+      changePageSize(value)
+    }
+  }
+
+  function getTotalPages() {
+    const total = Math.ceil($totalOutboundShipmentCount / $pageSize)
+    console.log('getTotalPages calculation:', {
+      totalCount: $totalOutboundShipmentCount,
+      pageSize: $pageSize,
+      result: total,
+    })
+    return total
+  }
+
+  // Helper function to generate page numbers for pagination
+  function generatePageNumbers() {
+    const totalPages = getTotalPages()
+    console.log('Generating page numbers for total pages:', totalPages)
+    console.log('Current page:', $currentPage)
+    const maxVisiblePages = 5
+    const result = []
+
+    if (totalPages <= maxVisiblePages) {
+      // If we have fewer pages than the max we want to show, display all of them
+      for (let i = 1; i <= totalPages; i++) {
+        result.push(i)
+      }
+    } else {
+      // More complex logic for when we have lots of pages
+      const currentPageValue = $currentPage
+
+      // Always show first page
+      result.push(1)
+
+      // Calculate start and end of the visible page window
+      let startPage = Math.max(2, currentPageValue - 1)
+      let endPage = Math.min(totalPages - 1, startPage + 2)
+
+      // Adjust if we're near the end
+      if (endPage - startPage < 2) {
+        startPage = Math.max(2, endPage - 2)
+      }
+
+      // Add ellipsis after first page if needed
+      if (startPage > 2) {
+        result.push('...')
+      }
+
+      // Add the middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        result.push(i)
+      }
+
+      // Add ellipsis before last page if needed
+      if (endPage < totalPages - 1) {
+        result.push('...')
+      }
+
+      // Always show last page
+      if (totalPages > 1) {
+        result.push(totalPages)
+      }
+    }
+
+    console.log('Generated page numbers:', result)
+    return result
+  }
+
+  /**
+   * @param {string|number} pageNum
+   */
+  function handlePageClick(pageNum) {
+    console.log('Handling page click:', pageNum)
+    if (typeof pageNum === 'number') {
+      goToPage(pageNum)
+    }
+  }
 </script>
 
 <Loading {loading} />
@@ -356,9 +534,25 @@
         type="text"
         class="input w-1/4 bg-base-200"
         placeholder="Search by Shipment Number"
-        bind:value={searchQuery}
+        bind:value={localSearchQuery}
       />
-      <button class="btn btn-primary">Search</button>
+      <button class="btn btn-primary" on:click={handleSearch}>Search</button>
+    </div>
+
+    <!-- Page size selector -->
+    <div class="mb-4 flex justify-center">
+      <div class="flex items-center gap-2">
+        <span>Page Size:</span>
+        <select
+          class="select select-bordered select-sm"
+          value={$pageSize}
+          on:change={handlePageSizeChange}
+        >
+          {#each pageSizeOptions as option}
+            <option value={option}>{option}</option>
+          {/each}
+        </select>
+      </div>
     </div>
 
     <div class="overflow-x-auto">
@@ -500,6 +694,48 @@
           {/each}
         </tbody>
       </table>
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="mt-4 flex items-center justify-between">
+      <div>
+        <span
+          >Showing {($currentPage - 1) * $pageSize + 1} to {Math.min(
+            $currentPage * $pageSize,
+            $totalOutboundShipmentCount,
+          )} of {$totalOutboundShipmentCount} items</span
+        >
+      </div>
+      {#if $totalOutboundShipmentCount > 0}
+        <div class="join">
+          <button
+            class="btn join-item btn-sm"
+            disabled={$currentPage === 1}
+            on:click={() => goToPage($currentPage - 1)}
+          >
+            «
+          </button>
+          {#each generatePageNumbers() as pageNum}
+            {#if pageNum === '...'}
+              <span class="btn btn-disabled join-item btn-sm">...</span>
+            {:else}
+              <button
+                class="btn join-item btn-sm {pageNum === $currentPage ? 'btn-active' : ''}"
+                on:click={() => handlePageClick(pageNum)}
+              >
+                {pageNum}
+              </button>
+            {/if}
+          {/each}
+          <button
+            class="btn join-item btn-sm"
+            disabled={$currentPage === getTotalPages() || getTotalPages() === 0}
+            on:click={() => goToPage($currentPage + 1)}
+          >
+            »
+          </button>
+        </div>
+      {/if}
     </div>
   </div>
 </div>

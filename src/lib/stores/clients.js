@@ -1,6 +1,7 @@
-import { writable } from "svelte/store";
+import { writable } from 'svelte/store'
 
-export const clients = writable([]);
+/** @type {import('svelte/store').Writable<Array<any>>} */
+export const clients = writable([])
 
 /**
  *
@@ -8,12 +9,12 @@ export const clients = writable([]);
  * @returns
  */
 export const loadClients = async (supabase) => {
-  const { data, error } = await supabase.from("users").select("*")
+  const { data, error } = await supabase.from('users').select('*')
 
   if (error) {
-    console.error(error);
-    return;
+    console.error(error)
+    return
   }
 
-  clients.set(data);
-};
+  clients.set(data)
+}
