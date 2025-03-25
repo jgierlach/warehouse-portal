@@ -430,49 +430,50 @@
 </script>
 
 <Loading {loading} />
-<div class="mt-10 flex justify-center">
-  <div class="ml-20 mr-20 w-full rounded-lg bg-base-100 p-4 shadow-xl">
-    <h1 class="mb-5 text-center text-3xl font-bold">{shipmentStatus} Inbound Shipments</h1>
+<div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+  <div class="w-full max-w-7xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+    <h1 class="mb-3 text-center text-2xl font-bold sm:mb-5 sm:text-3xl">
+      {shipmentStatus} Inbound Shipments
+    </h1>
 
-    <div class="mb-5 flex justify-center">
+    <div class="mb-3 flex justify-center sm:mb-5">
       <button
         on:click={() => {
           showCreateInboundShipment = !showCreateInboundShipment
           shipmentNumber = generateUniqueShippingNumber()
         }}
-        class="btn btn-primary">Create Inbound Shipment</button
+        class="btn btn-primary btn-sm sm:btn-md">Create Inbound Shipment</button
       >
     </div>
 
-    <div class="mb-4 flex justify-center">
+    <div class="mb-3 flex justify-center gap-2 sm:mb-4">
       <button
         on:click={() => (shipmentStatus = 'Pending')}
         class:btn-active={shipmentStatus === 'Pending'}
-        class="btn">Pending</button
+        class="btn btn-sm sm:btn-md">Pending</button
       >
       <button
         on:click={() => (shipmentStatus = 'Received')}
         class:btn-active={shipmentStatus === 'Received'}
-        class="btn">Received</button
+        class="btn btn-sm sm:btn-md">Received</button
       >
     </div>
 
-    <!-- Replace the search and pagination UI at the top of your table with this -->
-    <div class="mb-4 flex justify-center">
-      <input
-        type="text"
-        class="input w-1/4 bg-base-200"
-        placeholder="Search by Shipment Number"
-        bind:value={searchQueryValue}
-        on:input={handleSearch}
-      />
-      <button class="btn btn-primary" on:click={handleSearch}>Search</button>
-    </div>
+    <!-- Search and page size controls - responsive layout -->
+    <div class="mb-4 flex flex-col items-center justify-center gap-2">
+      <div class="flex w-full gap-2 sm:w-auto">
+        <input
+          type="text"
+          class="input input-sm w-full bg-base-200 sm:input-md sm:w-64"
+          placeholder="Search by Shipment Number"
+          bind:value={searchQueryValue}
+          on:input={handleSearch}
+        />
+        <button class="btn btn-primary btn-sm sm:btn-md" on:click={handleSearch}>Search</button>
+      </div>
 
-    <!-- Page size selector -->
-    <div class="mb-4 flex justify-center">
-      <div class="flex items-center gap-2">
-        <span>Page Size:</span>
+      <div class="mt-2 flex items-center gap-2">
+        <span class="text-sm">Page Size:</span>
         <select
           class="select select-bordered select-sm"
           value={$pageSize}
@@ -485,22 +486,23 @@
       </div>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="table table-zebra">
+    <!-- Table for medium screens and up -->
+    <div class="hidden overflow-x-auto md:block">
+      <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>Product Image</th>
-            <th>Shipment Number</th>
-            <th>BOL Number</th>
+            <th>Image</th>
+            <th>Shipment #</th>
+            <th>BOL #</th>
             <th>Carrier</th>
-            <th>Tracking Number</th>
+            <th>Tracking #</th>
             <th>Status</th>
-            <th>Order Date</th>
-            <th>Product Title</th>
+            <th>Date</th>
+            <th>Product</th>
             <th>Sku</th>
-            <th>Product Quantity</th>
-            <th>Counted Quantity</th>
-            <th>Shipping Discrepancy</th>
+            <th>Qty</th>
+            <th>Counted</th>
+            <th>Discrepancy</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -618,9 +620,118 @@
       </table>
     </div>
 
-    <!-- Replace the pagination controls at the bottom of your table with this -->
-    <div class="mt-4 flex items-center justify-between">
-      <div>
+    <!-- Card layout for small screens -->
+    <div class="grid grid-cols-1 gap-4 md:hidden">
+      {#each shipmentStatus === 'Pending' ? pendingShipments : receivedShipments as shipment}
+        <div class="card bg-base-200 shadow-md" id={shipment.id}>
+          <div class="card-body p-4">
+            <div class="flex items-start gap-3">
+              <img
+                class="h-16 w-16 flex-shrink-0 rounded-md object-cover shadow-md"
+                alt="Product Image"
+                src={shipment.Product_Image_Url === null
+                  ? '/placeholder-image.jpg'
+                  : shipment.Product_Image_Url}
+              />
+              <div class="flex-1">
+                <h3 class="text-md font-bold">Shipment #{shipment.Shipment_Number}</h3>
+                <p class="mt-1 text-sm">
+                  <span class="font-semibold">Status:</span>
+                  <span
+                    class="badge badge-sm ml-1"
+                    class:badge-accent={shipmentStatus === 'Received'}
+                    class:badge-warning={shipmentStatus === 'Pending'}
+                  >
+                    {shipment.Status}
+                  </span>
+                </p>
+                <p class="text-sm">
+                  <span class="font-semibold">Date:</span>
+                  {formatDate(shipment.Date_Of_Last_Change)}
+                </p>
+              </div>
+            </div>
+
+            <div class="divider my-1"></div>
+
+            <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-sm">
+              <div><span class="font-semibold">BOL #:</span> {shipment.BOL_Number || 'N/A'}</div>
+              <div><span class="font-semibold">Carrier:</span> {shipment.Carrier || 'N/A'}</div>
+              <div>
+                <span class="font-semibold">Tracking:</span>
+                {abbreviateString(shipment.Tracking_Number || 'N/A', 10)}
+              </div>
+              <div>
+                <span class="font-semibold">Sku:</span>
+                {abbreviateString(shipment.Sku, 12)}
+              </div>
+              <div><span class="font-semibold">Expected Qty:</span> {shipment.Quantity}</div>
+              <div><span class="font-semibold">Counted Qty:</span> {shipment.Counted_Quantity}</div>
+              <div>
+                <span class="font-semibold">Discrepancy:</span>
+                {shipment.Quantity - shipment.Counted_Quantity}
+              </div>
+            </div>
+
+            <div class="mt-1">
+              <p class="text-sm font-semibold">Product:</p>
+              <p class="text-sm">{abbreviateString(shipment.Product_Title, 50)}</p>
+            </div>
+
+            <div class="mt-3 flex flex-wrap justify-end gap-2">
+              <button
+                on:click={() => {
+                  showEditInboundShipment = true
+                  inboundShipmentToEdit = shipment
+                  clientId = shipment.Client_Id
+                  shipmentNumber = shipment.Shipment_Number
+                  carrier = shipment.Carrier
+                  trackingNumber = shipment.Tracking_Number
+                  bolNumber = shipment.BOL_Number
+                  destination = shipment.Destination
+                  shipmentType = shipment.Shipment_Type
+                  status = shipment.Status
+                  dateOfLastChange = shipment.Date_Of_Last_Change
+                  asin = shipment.Asin
+                  productTitle = shipment.Product_Title
+                  sku = shipment.Sku
+                  productImageUrl = shipment.Product_Image_Url
+                  quantity = shipment.Quantity
+                  countedQuantity = shipment.Counted_Quantity
+                }}
+                class="btn btn-info btn-xs">Edit</button
+              >
+              {#if shipment.Status !== 'Received'}
+                <button
+                  on:click={() => {
+                    showCountFields = true
+                    clientId = shipment.Client_Id
+                    sku = shipment.Sku
+                    shipmentNumber = shipment.Shipment_Number
+                    productTitle = shipment.Product_Title
+                    quantity = shipment.Quantity
+                    countedQuantity = 0
+                    id = shipment.id
+                  }}
+                  class="btn btn-primary btn-xs">Confirm Count</button
+                >
+              {/if}
+              <button
+                on:click={() => {
+                  showDeleteInboundShipment = true
+                  inboundShipmentToDelete = shipment
+                }}
+                class="btn btn-error btn-xs">Delete</button
+              >
+            </div>
+          </div>
+        </div>
+      {/each}
+    </div>
+
+    <!-- Pagination controls - responsive layout -->
+    <div class="mt-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
+      <div class="text-center text-sm sm:text-left">
         <span
           >Showing {($currentPage - 1) * $pageSize + 1} to {Math.min(
             $currentPage * $pageSize,
@@ -631,7 +742,7 @@
       {#if $totalInboundShipmentCount > 0}
         <div class="join">
           <button
-            class="btn join-item btn-sm"
+            class="btn join-item btn-xs sm:btn-sm"
             disabled={$currentPage === 1}
             on:click={() => goToPage($currentPage - 1)}
           >
@@ -639,10 +750,12 @@
           </button>
           {#each generatePageNumbers() as pageNum}
             {#if pageNum === '...'}
-              <span class="btn btn-disabled join-item btn-sm">...</span>
+              <span class="btn btn-disabled join-item btn-xs sm:btn-sm">...</span>
             {:else}
               <button
-                class="btn join-item btn-sm {pageNum === $currentPage ? 'btn-active' : ''}"
+                class="btn join-item btn-xs sm:btn-sm {pageNum === $currentPage
+                  ? 'btn-active'
+                  : ''}"
                 on:click={() => handlePageClick(pageNum)}
               >
                 {pageNum}
@@ -650,7 +763,7 @@
             {/if}
           {/each}
           <button
-            class="btn join-item btn-sm"
+            class="btn join-item btn-xs sm:btn-sm"
             disabled={$currentPage === getTotalPages() || getTotalPages() === 0}
             on:click={() => goToPage($currentPage + 1)}
           >
@@ -664,7 +777,7 @@
 
 <!-- DELETE SHIPMENT MODAL BEGINS -->
 <div class={`modal ${showDeleteInboundShipment ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showDeleteInboundShipment = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
@@ -690,13 +803,13 @@
 
 <!-- EDIT SHIPMENT MODAL BEGINS -->
 <div class={`modal ${showEditInboundShipment ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showEditInboundShipment = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Edit Inbound Shipment</h1>
-    <form on:submit={editInboundShipment}>
+    <form on:submit={editInboundShipment} class="max-h-[70vh] overflow-y-auto">
       <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="clientId">Client Id</label>
@@ -880,6 +993,7 @@
           type="number"
           id="countedQuantity"
           bind:value={countedQuantity}
+          on:input={(e) => (countedQuantity = Number(e.target.value) || 0)}
           placeholder="0"
         />
       </div>
@@ -943,13 +1057,13 @@
 
 <!-- CREATE SHIPMENT MODAL BEGINS -->
 <div class={`modal ${showCreateInboundShipment ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showCreateInboundShipment = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Create Inbound Shipment</h1>
-    <form on:submit={createInboundShipment}>
+    <form on:submit={createInboundShipment} class="max-h-[70vh] overflow-y-auto">
       <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="clientId">Client Id</label>
@@ -1196,7 +1310,7 @@
 
 <!-- Confirm Count MODAL BEGINS -->
 <div class={`modal ${showCountFields ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showCountFields = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
@@ -1205,7 +1319,7 @@
       Confirm Count - {shipmentNumber}
     </h1>
     <form on:submit={confirmCountAndSendNotification}>
-      <!-- quantity -->
+      <!-- Expected quantity -->
       <div class="form-control mb-4">
         <label class="label" for="quantity">Expected Quantity</label>
         <input
@@ -1217,7 +1331,7 @@
         />
       </div>
 
-      <!-- counted quantity -->
+      <!-- Counted quantity -->
       <div class="form-control mb-4">
         <label class="label" for="countedQuantity">Counted Quantity</label>
         <input
@@ -1231,7 +1345,7 @@
       </div>
 
       <!-- Submit Button -->
-      <div class="mt-4 mt-5 flex justify-center">
+      <div class="mt-4 flex justify-center">
         <button class="btn btn-info" type="submit">Confirm Count and Send Notification</button>
       </div>
     </form>
