@@ -286,9 +286,9 @@
 </script>
 
 <Loading {loading} />
-<div class="mt-10 flex justify-center">
-  <div class="ml-10 mr-10 w-full rounded-lg bg-base-100 p-4 shadow-xl">
-    <h1 class="text-center text-3xl font-bold">
+<div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+  <div class="w-full max-w-7xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+    <h1 class="text-center text-2xl font-bold sm:text-3xl">
       {selectedBillingMonthAndYear} - Invoices
     </h1>
     <div class="mt-2 flex justify-center">
@@ -303,13 +303,13 @@
         <i class="fas fa-plus"></i>
       </button>
     </div>
-    <div class="mb-5 mt-2 flex justify-center">
-      <div class="flex flex-col items-center">
-        <label class="label font-semibold" for="selectedBillingMonthAndYear">
+    <div class="mb-3 mt-2 flex justify-center sm:mb-5">
+      <div class="flex w-full max-w-xs flex-col items-center">
+        <label class="label text-center font-semibold" for="selectedBillingMonthAndYear">
           Select Billing Month And Year
         </label>
         <select
-          class="select select-bordered mt-2 bg-base-200"
+          class="select select-bordered mt-2 w-full bg-base-200"
           bind:value={selectedBillingMonthAndYear}
         >
           {#each billingMonthsAndYears as monthAndYear}
@@ -319,43 +319,81 @@
       </div>
     </div>
 
+    <!-- Revenue summary - Responsive table/cards -->
     <div class="flex justify-center">
-      <table class="table max-w-10 shadow-lg">
-        <thead>
-          <tr>
-            <th>Billed Revenue</th>
-            <th>Collected Revenue</th>
-            <th>Accounts Receivable</th>
-            <th>Percent Collected</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{formatDollarValue(revenueBilledForSelectedMonth)}</td>
-            <td>{formatDollarValue(collectedRevenueForSelectedMonth)}</td>
-            <td>{formatDollarValue(accountsReceivableForSelectedMonth)}</td>
-            <td>{percentCollectedForSelectedMonth}%</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="w-full max-w-3xl overflow-x-auto">
+        <table class="table-compact table w-full shadow-xl">
+          <thead>
+            <tr>
+              <th class="text-sm sm:text-base">Billed Revenue</th>
+              <th class="text-sm sm:text-base">Collected Revenue</th>
+              <th class="text-sm sm:text-base">Accounts Receivable</th>
+              <th class="text-sm sm:text-base">Percent Collected</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-sm sm:text-base"
+                >{formatDollarValue(revenueBilledForSelectedMonth)}</td
+              >
+              <td class="text-sm sm:text-base"
+                >{formatDollarValue(collectedRevenueForSelectedMonth)}</td
+              >
+              <td class="text-sm sm:text-base"
+                >{formatDollarValue(accountsReceivableForSelectedMonth)}</td
+              >
+              <td class="text-sm sm:text-base">{percentCollectedForSelectedMonth}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile revenue summary cards -->
+    <div class="mt-4 grid grid-cols-2 gap-2 sm:hidden">
+      <div class="stat rounded-lg bg-base-200 p-2 shadow-sm">
+        <div class="stat-title text-xs">Billed Revenue</div>
+        <div class="stat-value text-sm sm:text-lg">
+          {formatDollarValue(revenueBilledForSelectedMonth)}
+        </div>
+      </div>
+      <div class="stat rounded-lg bg-base-200 p-2 shadow-sm">
+        <div class="stat-title text-xs">Collected Revenue</div>
+        <div class="stat-value text-sm sm:text-lg">
+          {formatDollarValue(collectedRevenueForSelectedMonth)}
+        </div>
+      </div>
+      <div class="stat rounded-lg bg-base-200 p-2 shadow-sm">
+        <div class="stat-title text-xs">Accounts Receivable</div>
+        <div class="stat-value text-sm sm:text-lg">
+          {formatDollarValue(accountsReceivableForSelectedMonth)}
+        </div>
+      </div>
+      <div class="stat rounded-lg bg-base-200 p-2 shadow-sm">
+        <div class="stat-title text-xs">Percent Collected</div>
+        <div class="stat-value text-sm sm:text-lg">{percentCollectedForSelectedMonth}%</div>
+      </div>
     </div>
 
     <div class="mt-4 flex justify-center">
-      <button
-        on:click={() => (displaySetting = 'invoices')}
-        class:btn-active={displaySetting === 'invoices'}
-        class="btn">Invoices</button
-      >
-      <button
-        on:click={() => (displaySetting = 'line items')}
-        class:btn-active={displaySetting === 'line items'}
-        class="btn">Line Items</button
-      >
+      <div class="btn-group">
+        <button
+          on:click={() => (displaySetting = 'invoices')}
+          class:btn-active={displaySetting === 'invoices'}
+          class="btn btn-sm sm:btn-md">Invoices</button
+        >
+        <button
+          on:click={() => (displaySetting = 'line items')}
+          class:btn-active={displaySetting === 'line items'}
+          class="btn btn-sm sm:btn-md">Line Items</button
+        >
+      </div>
     </div>
 
     {#if displaySetting === 'line items'}
-      <div class="mt-5 overflow-x-auto">
-        <table class="table table-zebra">
+      <!-- Line items table for medium screens and up -->
+      <div class="mt-5 hidden overflow-x-auto md:block">
+        <table class="table table-zebra w-full">
           <thead>
             <tr>
               <th>Billing Month</th>
@@ -363,7 +401,7 @@
               <th>Services Provided</th>
               <th>Billing Terms</th>
               <th>Cost</th>
-              <th>Stripe Invoice Url</th>
+              <th>Stripe Invoice</th>
               <th>Payment Status</th>
               <th>Actions</th>
             </tr>
@@ -376,31 +414,31 @@
                 <td>{lineItem.line_item_name}</td>
                 <td>{lineItem.line_item_billing_terms}</td>
                 <td>{formatDollarValue(lineItem.line_item_cost)}</td>
-                <td
-                  ><a
-                    class="link-primary font-semibold underline"
-                    href={lineItem.stripe_dashboard_url}
-                    target="_blank">Dashboard Url</a
-                  ></td
-                >
-                <td
-                  ><a
-                    class="link-primary font-semibold underline"
-                    href={lineItem.stripe_invoice_url}
-                    target="_blank">Invoice</a
-                  ></td
-                >
-                <td
-                  ><button
+                <td>
+                  <div class="flex flex-col gap-1">
+                    <a
+                      class="link-primary text-sm font-semibold underline"
+                      href={lineItem.stripe_dashboard_url}
+                      target="_blank">Dashboard</a
+                    >
+                    <a
+                      class="link-primary text-sm font-semibold underline"
+                      href={lineItem.stripe_invoice_url}
+                      target="_blank">Invoice</a
+                    >
+                  </div>
+                </td>
+                <td>
+                  <button
                     on:click={() => updatePaymentStatus(lineItem.payment_status, lineItem.id)}
                     class="btn btn-sm"
                     class:btn-accent={lineItem.payment_status === 'Paid'}
                     class:btn-error={lineItem.payment_status === 'Unpaid'}
                     >{lineItem.payment_status}</button
-                  ></td
-                >
+                  >
+                </td>
                 <td>
-                  <div class="flex space-x-1">
+                  <div class="flex gap-1">
                     <button
                       on:click={() => {
                         clearLineItemFields()
@@ -417,25 +455,87 @@
                       }}
                       class="btn btn-error btn-sm">Delete</button
                     >
-                    <!-- <button class="btn btn-warning btn-sm">Send Collection Email</button> -->
-                  </div></td
-                >
+                  </div>
+                </td>
               </tr>
             {/each}
           </tbody>
         </table>
       </div>
+
+      <!-- Line items cards for small screens -->
+      <div class="mt-4 grid grid-cols-1 gap-4 md:hidden">
+        {#each invoiceLineItemsForSelectedMonthAlphabetized as lineItem}
+          <div class="card bg-base-200 shadow-md">
+            <div class="card-body p-4">
+              <div class="flex items-start justify-between">
+                <h3 class="text-md font-bold">{lineItem.company_name}</h3>
+                <button
+                  on:click={() => updatePaymentStatus(lineItem.payment_status, lineItem.id)}
+                  class="btn btn-xs"
+                  class:btn-accent={lineItem.payment_status === 'Paid'}
+                  class:btn-error={lineItem.payment_status === 'Unpaid'}
+                  >{lineItem.payment_status}</button
+                >
+              </div>
+
+              <div class="mt-1 text-sm">
+                <p><span class="font-semibold">Service:</span> {lineItem.line_item_name}</p>
+                <p><span class="font-semibold">Billing Month:</span> {lineItem.billing_month}</p>
+                <p><span class="font-semibold">Terms:</span> {lineItem.line_item_billing_terms}</p>
+                <p>
+                  <span class="font-semibold">Cost:</span>
+                  {formatDollarValue(lineItem.line_item_cost)}
+                </p>
+              </div>
+
+              <div class="mt-2 flex gap-2 text-sm">
+                <a
+                  class="link-primary font-semibold underline"
+                  href={lineItem.stripe_dashboard_url}
+                  target="_blank">Dashboard</a
+                >
+                <a
+                  class="link-primary font-semibold underline"
+                  href={lineItem.stripe_invoice_url}
+                  target="_blank">Invoice</a
+                >
+              </div>
+
+              <div class="mt-3 flex justify-end gap-2">
+                <button
+                  on:click={() => {
+                    clearLineItemFields()
+                    setLineItemFields(lineItem)
+                    lineItemToEdit = lineItem
+                    showEditLineItemModal = true
+                  }}
+                  class="btn btn-info btn-xs">Edit</button
+                >
+                <button
+                  on:click={() => {
+                    showDeleteLineItemModal = true
+                    lineItemToDelete = lineItem
+                  }}
+                  class="btn btn-error btn-xs">Delete</button
+                >
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
     {/if}
+
     {#if displaySetting === 'invoices'}
-      <div class="mt-5 overflow-x-auto">
-        <table class="table">
+      <!-- Invoices table for medium screens and up -->
+      <div class="mt-5 hidden overflow-x-auto md:block">
+        <table class="table w-full">
           <thead>
             <tr>
               <th>Billing Month</th>
               <th>Company Name</th>
               <th>Invoice Total</th>
-              <th>Stripe Dashboard Url</th>
-              <th>Stripe Invoice Url</th>
+              <th>Stripe Links</th>
               <th>Payment Status</th>
               <th>Actions</th>
             </tr>
@@ -446,22 +546,22 @@
                 <td>{invoice.billing_month}</td>
                 <td>{invoice.company_name}</td>
                 <td>{formatDollarValue(invoice.invoice_total)}</td>
-                <td
-                  ><a
-                    class="link-primary font-semibold underline"
-                    href={invoice.stripe_dashboard_url}
-                    target="_blank">Dashboard Url</a
-                  ></td
-                >
-                <td
-                  ><a
-                    class="link-primary font-semibold underline"
-                    href={invoice.stripe_invoice_url}
-                    target="_blank">Invoice</a
-                  ></td
-                >
                 <td>
-                  <div class="flex items-center justify-center space-x-2">
+                  <div class="flex flex-col gap-1">
+                    <a
+                      class="link-primary text-sm font-semibold underline"
+                      href={invoice.stripe_dashboard_url}
+                      target="_blank">Dashboard</a
+                    >
+                    <a
+                      class="link-primary text-sm font-semibold underline"
+                      href={invoice.stripe_invoice_url}
+                      target="_blank">Invoice</a
+                    >
+                  </div>
+                </td>
+                <td>
+                  <div class="flex items-center justify-center gap-2">
                     <button
                       on:click={async () =>
                         await updateInvoicePaymentStatus(
@@ -484,31 +584,105 @@
                   </div>
                 </td>
                 <td>
-                  <div class="flex space-x-1">
+                  <div class="flex flex-wrap gap-1">
                     <button
                       on:click={() => {
                         showEditInvoiceModal = !showEditInvoiceModal
                         setInvoiceFields(invoice)
                       }}
-                      class="btn btn-info btn-sm">Edit</button
+                      class="btn btn-info btn-xs">Edit</button
                     >
                     <button
                       on:click={() => {
                         invoiceToDisplayLineItems = invoice
                         showInvoiceLineItemsModal = true
                       }}
-                      class="btn btn-sm">View Line Items</button
+                      class="btn btn-xs">Line Items</button
                     >
                     <button
                       on:click={() => sendToCollections(invoice.user_id, invoice.client_id)}
-                      class="btn btn-warning btn-sm">Send Collection Email</button
+                      class="btn btn-warning btn-xs">Collections</button
                     >
-                  </div></td
-                >
+                  </div>
+                </td>
               </tr>
             {/each}
           </tbody>
         </table>
+      </div>
+
+      <!-- Invoices cards for small screens -->
+      <div class="mt-4 grid grid-cols-1 gap-4 md:hidden">
+        {#each invoicesForSelectedMonth as invoice}
+          <div
+            class="card bg-base-200 shadow-md"
+            class:border-l-4={isInvoicePastDue(invoice)}
+            class:border-error={isInvoicePastDue(invoice)}
+          >
+            <div class="card-body p-4">
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="text-md font-bold">{invoice.company_name}</h3>
+                  <p class="text-sm">{invoice.billing_month}</p>
+                </div>
+                <div class="flex flex-col items-end">
+                  <div class="text-md font-bold">{formatDollarValue(invoice.invoice_total)}</div>
+                  <div class="mt-1 flex items-center gap-1">
+                    <button
+                      on:click={async () =>
+                        await updateInvoicePaymentStatus(
+                          invoice.is_paid ? 'Paid' : 'Unpaid',
+                          invoice,
+                        )}
+                      class="btn btn-xs"
+                      class:btn-accent={invoice.is_paid}
+                      class:btn-error={!invoice.is_paid}
+                    >
+                      {invoice.is_paid ? 'Paid' : 'Unpaid'}
+                    </button>
+                    {#if isInvoicePastDue(invoice)}
+                      <span class="badge badge-error badge-sm">Past Due</span>
+                    {/if}
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-2 flex gap-2 text-sm">
+                <a
+                  class="link-primary font-semibold underline"
+                  href={invoice.stripe_dashboard_url}
+                  target="_blank">Dashboard</a
+                >
+                <a
+                  class="link-primary font-semibold underline"
+                  href={invoice.stripe_invoice_url}
+                  target="_blank">Invoice</a
+                >
+              </div>
+
+              <div class="mt-3 flex justify-end gap-2">
+                <button
+                  on:click={() => {
+                    showEditInvoiceModal = !showEditInvoiceModal
+                    setInvoiceFields(invoice)
+                  }}
+                  class="btn btn-info btn-xs">Edit</button
+                >
+                <button
+                  on:click={() => {
+                    invoiceToDisplayLineItems = invoice
+                    showInvoiceLineItemsModal = true
+                  }}
+                  class="btn btn-xs">Line Items</button
+                >
+                <button
+                  on:click={() => sendToCollections(invoice.user_id, invoice.client_id)}
+                  class="btn btn-warning btn-xs">Collections</button
+                >
+              </div>
+            </div>
+          </div>
+        {/each}
       </div>
     {/if}
   </div>
@@ -516,7 +690,7 @@
 
 <!-- DELETE LINE ITEM MODAL BEGINS -->
 <div class={`modal ${showDeleteLineItemModal ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showDeleteLineItemModal = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
@@ -534,17 +708,17 @@
     </div>
   </div>
 </div>
-<!-- DELTE LINE ITEM MODAL ENDS -->
+<!-- DELETE LINE ITEM MODAL ENDS -->
 
 <!-- EDIT LINE ITEM MODAL BEGINS -->
 <div class={`modal ${showEditLineItemModal ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showEditLineItemModal = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Edit Line Item</h1>
-    <form on:submit|preventDefault={editLineItem}>
+    <form on:submit|preventDefault={editLineItem} class="max-h-[70vh] overflow-y-auto">
       <!-- Billing month and year dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="billingMonth">Billing Month And Year</label>
@@ -688,13 +862,13 @@
 
 <!-- ADD LINE ITEM MODAL BEGINS -->
 <div class={`modal ${addLineItemModal ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (addLineItemModal = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Add Line Item</h1>
-    <form on:submit|preventDefault={addLineItem}>
+    <form on:submit|preventDefault={addLineItem} class="max-h-[70vh] overflow-y-auto">
       <!-- Billing month and year dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="billingMonth">Billing Month And Year</label>
@@ -850,7 +1024,7 @@
 
 <!-- INVOICE LINE ITEMS MODAL BEGINS -->
 <div class={`modal ${showInvoiceLineItemsModal ? 'modal-open' : ''}`}>
-  <div class="modal-box relative bg-base-100">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl bg-base-100">
     <button
       on:click={() => (showInvoiceLineItemsModal = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
@@ -858,8 +1032,8 @@
     <h1 class="mt-2 text-center text-lg font-bold">
       {invoiceToDisplayLineItems?.company_name} - Line Items
     </h1>
-    <div class="mt-5 flex justify-center">
-      <table class="table table-zebra bg-base-100 shadow-lg">
+    <div class="mt-5 overflow-x-auto">
+      <table class="table table-zebra w-full bg-base-100 shadow-lg">
         <thead>
           <tr>
             <th>Billing Month</th>
@@ -886,13 +1060,13 @@
 
 <!-- EDIT INVOICE MODAL BEGINS -->
 <div class={`modal ${showEditInvoiceModal ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showEditInvoiceModal = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">{companyName} - Edit Invoice</h1>
-    <form on:submit|preventDefault={editInvoice}>
+    <form on:submit|preventDefault={editInvoice} class="max-h-[70vh] overflow-y-auto">
       <!-- Stripe Invoice Id -->
       <div class="form-control mb-4">
         <label class="label" for="stripeInvoiceId">Stripe Invoice Id</label>
