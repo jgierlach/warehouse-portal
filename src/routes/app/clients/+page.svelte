@@ -163,9 +163,9 @@
 </script>
 
 {#if $selectedSection === 'Clients'}
-  <div class="mt-10 flex justify-center">
-    <div class="ml-10 mr-10 rounded-lg bg-base-100 p-4 shadow-xl">
-      <h1 class="mb-2 text-center text-3xl font-bold">3PL Clients</h1>
+  <div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+    <div class="w-full max-w-7xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+      <h1 class="mb-2 text-center text-2xl font-bold sm:text-3xl">3PL Clients</h1>
       <div class="mb-2 flex justify-center">
         <a
           href="https://3pl-client-portal.vercel.app/app"
@@ -180,77 +180,149 @@
             showAddUserModal = true
           }}
           class="btn btn-outline btn-primary btn-sm"
-          >Add Client <i class="fas fa-plus"></i>
+          >Add Client <i class="fas fa-plus ml-1"></i>
         </button>
       </div>
-      <table class="table table-zebra">
-        <thead>
-          <tr>
-            <th>Company Name</th>
-            <th>Username</th>
-            <th>Password</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each activeClients as client}
-            <tr class:!bg-red-100={client.per_order_fee === 0}>
-              <td>{client.company_name}</td>
-              <td>{client.username}</td>
-              <td>{client.password}</td>
-              <td
-                ><div class="flex space-x-1">
-                  <button
-                    on:click={() => {
-                      showEditUserModal = true
-                      userToEdit = client
-                      hasLotNumbers = client.has_lot_numbers
-                      per_order_fee = client.per_order_fee
-                      per_order_unit_fee = client.per_order_unit_fee
-                      per_unit_fba_pack_prep = client.per_unit_fba_pack_prep
-                      per_unit_wfs_pack_prep = client.per_unit_wfs_pack_prep
-                      b2b_freight_percentage_markup = client.b2b_freight_percentage_markup
-                      per_pallet_monthly_storage_fee = client.per_pallet_monthly_storage_fee
-                      stripe_customer_id = client.stripe_customer_id
-                      pass_on_card_fees = client.pass_on_card_fees
-                    }}
-                    class="btn btn-info btn-sm">Edit</button
-                  >
-                  <button
-                    on:click={() => {
-                      showDeleteUserModal = true
-                      userToDelete = client
-                    }}
-                    class="btn btn-error btn-sm">Delete Client</button
-                  >
-                  <button
-                    on:click={() => {
-                      setSelectedSection('Create Invoice')
-                      setSelectedClientToInvoice(client)
-                    }}
-                    class="btn btn-primary btn-sm"
-                  >
-                    Create Invoice
-                  </button>
-                  <button
-                    on:click={() => {
-                      showClientBillingTermsModal = true
-                      clientBillingTermsToDisplay = client
-                    }}
-                    class="btn btn-outline btn-sm">View Billing Terms</button
-                  >
-                </div></td
-              >
+
+      <!-- Table for medium screens and up -->
+      <div class="hidden overflow-x-auto md:block">
+        <table class="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th>Company Name</th>
+              <th>Username</th>
+              <th>Password</th>
+              <th>Actions</th>
             </tr>
-          {/each}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {#each activeClients as client}
+              <tr class:!bg-red-100={client.per_order_fee === 0}>
+                <td>{client.company_name}</td>
+                <td>{client.username}</td>
+                <td>{client.password}</td>
+                <td>
+                  <div class="flex flex-wrap gap-1">
+                    <button
+                      on:click={() => {
+                        showEditUserModal = true
+                        userToEdit = client
+                        hasLotNumbers = client.has_lot_numbers
+                        per_order_fee = client.per_order_fee
+                        per_order_unit_fee = client.per_order_unit_fee
+                        per_unit_fba_pack_prep = client.per_unit_fba_pack_prep
+                        per_unit_wfs_pack_prep = client.per_unit_wfs_pack_prep
+                        b2b_freight_percentage_markup = client.b2b_freight_percentage_markup
+                        per_pallet_monthly_storage_fee = client.per_pallet_monthly_storage_fee
+                        stripe_customer_id = client.stripe_customer_id
+                        pass_on_card_fees = client.pass_on_card_fees
+                      }}
+                      class="btn btn-info btn-xs sm:btn-sm">Edit</button
+                    >
+                    <button
+                      on:click={() => {
+                        showDeleteUserModal = true
+                        userToDelete = client
+                      }}
+                      class="btn btn-error btn-xs sm:btn-sm">Delete</button
+                    >
+                    <button
+                      on:click={() => {
+                        setSelectedSection('Create Invoice')
+                        setSelectedClientToInvoice(client)
+                      }}
+                      class="btn btn-primary btn-xs sm:btn-sm"
+                    >
+                      Invoice
+                    </button>
+                    <button
+                      on:click={() => {
+                        showClientBillingTermsModal = true
+                        clientBillingTermsToDisplay = client
+                      }}
+                      class="btn btn-outline btn-xs sm:btn-sm">Billing</button
+                    >
+                  </div>
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Card layout for small screens -->
+      <div class="grid grid-cols-1 gap-4 md:hidden">
+        {#each activeClients as client}
+          <div
+            class="card bg-base-200 shadow-md"
+            class:border-l-4={client.per_order_fee === 0}
+            class:border-red-400={client.per_order_fee === 0}
+          >
+            <div class="card-body p-4">
+              <h3 class="text-lg font-bold">{client.company_name}</h3>
+
+              <div class="mt-1">
+                <p class="text-sm">
+                  <span class="font-semibold">Username:</span>
+                  {client.username}
+                </p>
+                <p class="text-sm">
+                  <span class="font-semibold">Password:</span>
+                  {client.password}
+                </p>
+              </div>
+
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button
+                  on:click={() => {
+                    showEditUserModal = true
+                    userToEdit = client
+                    hasLotNumbers = client.has_lot_numbers
+                    per_order_fee = client.per_order_fee
+                    per_order_unit_fee = client.per_order_unit_fee
+                    per_unit_fba_pack_prep = client.per_unit_fba_pack_prep
+                    per_unit_wfs_pack_prep = client.per_unit_wfs_pack_prep
+                    b2b_freight_percentage_markup = client.b2b_freight_percentage_markup
+                    per_pallet_monthly_storage_fee = client.per_pallet_monthly_storage_fee
+                    stripe_customer_id = client.stripe_customer_id
+                    pass_on_card_fees = client.pass_on_card_fees
+                  }}
+                  class="btn btn-info btn-xs">Edit</button
+                >
+                <button
+                  on:click={() => {
+                    showDeleteUserModal = true
+                    userToDelete = client
+                  }}
+                  class="btn btn-error btn-xs">Delete</button
+                >
+                <button
+                  on:click={() => {
+                    setSelectedSection('Create Invoice')
+                    setSelectedClientToInvoice(client)
+                  }}
+                  class="btn btn-primary btn-xs"
+                >
+                  Create Invoice
+                </button>
+                <button
+                  on:click={() => {
+                    showClientBillingTermsModal = true
+                    clientBillingTermsToDisplay = client
+                  }}
+                  class="btn btn-outline btn-xs">Billing Terms</button
+                >
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
     </div>
   </div>
 
   <!-- VIEW BILLING TERMS MODAL BEGINS -->
   <div class={`modal ${showClientBillingTermsModal ? 'modal-open' : ''}`}>
-    <div class="modal-box relative">
+    <div class="modal-box relative mx-auto w-11/12 max-w-xl">
       <button
         on:click={() => (showClientBillingTermsModal = false)}
         class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
@@ -258,35 +330,31 @@
       <h1 class="mt-2 text-center text-lg font-bold">
         {clientBillingTermsToDisplay.company_name} - Billing Terms
       </h1>
-      <div class="prose mt-5 flex justify-center">
-        <ul>
-          <li>
-            Per Order Fee: <strong
-              >{formatDollarValue(clientBillingTermsToDisplay.per_order_fee)}</strong
-            >
+      <div class="prose mt-5 flex max-w-full justify-center">
+        <ul class="w-full">
+          <li class="flex flex-wrap justify-between">
+            <span>Per Order Fee:</span>
+            <strong>{formatDollarValue(clientBillingTermsToDisplay.per_order_fee)}</strong>
           </li>
-          <li>
-            Per Order Unit Fee: <strong
-              >{formatDollarValue(clientBillingTermsToDisplay.per_order_unit_fee)}</strong
-            >
+          <li class="flex flex-wrap justify-between">
+            <span>Per Order Unit Fee:</span>
+            <strong>{formatDollarValue(clientBillingTermsToDisplay.per_order_unit_fee)}</strong>
           </li>
-          <li>
-            FBA Pack and Prep: <strong
-              >{formatDollarValue(clientBillingTermsToDisplay.per_unit_fba_pack_prep)}</strong
-            >
+          <li class="flex flex-wrap justify-between">
+            <span>FBA Pack and Prep:</span>
+            <strong>{formatDollarValue(clientBillingTermsToDisplay.per_unit_fba_pack_prep)}</strong>
           </li>
-          <li>
-            WFS Pack and Prep: <strong
-              >{formatDollarValue(clientBillingTermsToDisplay.per_unit_wfs_pack_prep)}</strong
-            >
+          <li class="flex flex-wrap justify-between">
+            <span>WFS Pack and Prep:</span>
+            <strong>{formatDollarValue(clientBillingTermsToDisplay.per_unit_wfs_pack_prep)}</strong>
           </li>
-          <li>
-            B2B Freight Percentage Markup: <strong
-              >{clientBillingTermsToDisplay.b2b_freight_percentage_markup}%</strong
-            >
+          <li class="flex flex-wrap justify-between">
+            <span>B2B Freight Markup:</span>
+            <strong>{clientBillingTermsToDisplay.b2b_freight_percentage_markup}%</strong>
           </li>
-          <li>
-            Per Pallet Monthly Storage: <strong
+          <li class="flex flex-wrap justify-between">
+            <span>Per Pallet Monthly Storage:</span>
+            <strong
               >{formatDollarValue(
                 clientBillingTermsToDisplay.per_pallet_monthly_storage_fee,
               )}</strong
@@ -300,12 +368,12 @@
 
   <!-- EDIT USER MODAL BEGINS -->
   <div class={`modal ${showEditUserModal ? 'modal-open' : ''}`}>
-    <div class="modal-box relative">
+    <div class="modal-box relative mx-auto w-11/12 max-w-xl">
       <button
         on:click={() => (showEditUserModal = false)}
         class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
       >
-      <form on:submit={editUser}>
+      <form on:submit={editUser} class="max-h-[70vh] overflow-y-auto">
         <h3 class="text-center text-xl font-bold">{userToEdit?.company_name} - Edit Details</h3>
         <div class="form-control mt-4">
           <label class="label" for="hasLotNumbers">Has Lot Numbers</label>
@@ -390,12 +458,12 @@
 
   <!-- ADD USER MODAL BEGINS -->
   <div class={`modal ${showAddUserModal ? 'modal-open' : ''}`}>
-    <div class="modal-box relative">
+    <div class="modal-box relative mx-auto w-11/12 max-w-xl">
       <button
         on:click={() => (showAddUserModal = false)}
         class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
       >
-      <form on:submit={createUser}>
+      <form on:submit={createUser} class="max-h-[70vh] overflow-y-auto">
         <h3 class="text-center text-xl font-bold">Add New Client</h3>
         <div class="form-control mt-4">
           <label class="label" for="company_name">Company Name</label>
@@ -500,7 +568,7 @@
 
   <!-- DELETE USER MODAL BEGINS -->
   <div class={`modal ${showDeleteUserModal ? 'modal-open' : ''}`}>
-    <div class="modal-box relative">
+    <div class="modal-box relative mx-auto w-11/12 max-w-xl">
       <button
         on:click={() => (showDeleteUserModal = false)}
         class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
