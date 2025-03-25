@@ -152,12 +152,12 @@
 </script>
 
 {#if $unmappedSkus?.length > 0}
-  <div class="mt-10 flex justify-center">
-    <div class="ml-10 mr-10 max-w-5xl rounded-lg bg-base-100 p-4 shadow-xl">
-      <div class="flex items-center justify-center text-2xl font-semibold">
+  <div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+    <div class="w-full max-w-5xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+      <div class="flex items-center justify-center text-xl font-semibold sm:text-2xl">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 flex-shrink-0 stroke-current text-yellow-400"
+          class="h-5 w-5 flex-shrink-0 stroke-current text-yellow-400 sm:h-6 sm:w-6"
           fill="none"
           viewBox="0 0 24 24"
         >
@@ -170,12 +170,13 @@
         </svg>
         <span class="ml-2">Warning! You have unmapped skus.</span>
       </div>
-      <div class="mt-4 flex justify-center">
-        <table class="table shadow-lg">
+
+      <!-- Table for medium screens and up -->
+      <div class="mt-4 hidden overflow-x-auto md:block">
+        <table class="table w-full shadow-lg">
           <thead>
             <tr>
               <th>Product Image</th>
-              <!-- <th>Client Id</th> -->
               <th>Shipment Number</th>
               <th>Sku</th>
               <th>Name</th>
@@ -192,10 +193,9 @@
                       ? '/placeholder-image.jpg'
                       : sku?.product_image_url}
                     alt="product thumbnail"
-                    class="h-20 w-20"
+                    class="h-16 w-16 rounded-md object-cover sm:h-20 sm:w-20"
                   />
                 </td>
-                <!-- <td>{sku?.client_id}</td> -->
                 <td>{sku?.shipment_number}</td>
                 <td>{sku?.sku}</td>
                 <td>{sku?.name}</td>
@@ -210,15 +210,56 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Card layout for small screens -->
+      <div class="mt-4 grid grid-cols-1 gap-4 md:hidden">
+        {#each $unmappedSkus as sku}
+          <div class="card bg-base-200 shadow-md">
+            <div class="card-body p-4">
+              <div class="flex items-center gap-4">
+                <img
+                  src={sku?.product_image_url === null
+                    ? '/placeholder-image.jpg'
+                    : sku?.product_image_url}
+                  alt="product thumbnail"
+                  class="h-16 w-16 rounded-md object-cover"
+                />
+                <div>
+                  <h3 class="text-md font-bold">{sku?.name || 'No name'}</h3>
+                  <p class="text-sm">SKU: {sku?.sku}</p>
+                </div>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-2">
+                <div class="text-sm">
+                  Shipment: <span class="font-semibold">{sku?.shipment_number}</span>
+                </div>
+                <div class="text-sm">
+                  Source: <span class="font-semibold">{sku?.order_source}</span>
+                </div>
+              </div>
+
+              <div class="mt-3 flex justify-end">
+                <button on:click={() => deleteUnmappedSku(sku)} class="btn btn-error btn-sm"
+                  >Delete</button
+                >
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
     </div>
   </div>
 {/if}
 
 {#if showCreateSkuMapping}
-  <div class="mt-10 flex justify-center">
-    <div id="create-sku-mapping" class="ml-10 mr-10 max-w-4xl rounded-lg bg-base-100 p-4 shadow-xl">
-      <h1 class="text-center text-3xl font-bold">Create Sku Mapping</h1>
-      <form on:submit={createSkuMapping} class="mt-4 p-4 shadow-md">
+  <div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+    <div
+      id="create-sku-mapping"
+      class="w-full max-w-4xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4"
+    >
+      <h1 class="text-center text-2xl font-bold sm:text-3xl">Create Sku Mapping</h1>
+      <form on:submit={createSkuMapping} class="mt-4 p-2 shadow-md sm:p-4">
         <div class="mt-4">
           <label for="productImageUrl" class="block">Product Image Url</label>
           <input
@@ -292,16 +333,18 @@
 
   <!-- SELECTED PRODUCT BEGINS -->
   {#if selectedProduct !== null}
-    <div class="mt-10 flex justify-center">
-      <div class="ml-10 mr-10 max-w-5xl rounded-lg bg-base-100 p-4 shadow-xl">
-        <h1 class="text-center text-3xl font-bold">Selected Product</h1>
+    <div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+      <div class="w-full max-w-5xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+        <h1 class="text-center text-2xl font-bold sm:text-3xl">Selected Product</h1>
         <div class="flex justify-center">
           <button on:click={() => (selectedProduct = null)} class="btn btn-outline btn-sm mt-4"
             >Reset</button
           >
         </div>
-        <div class="mt-4 flex justify-center">
-          <table class="table shadow-lg">
+
+        <!-- Table for medium screens and up -->
+        <div class="mt-4 hidden overflow-x-auto md:block">
+          <table class="table w-full shadow-lg">
             <thead>
               <tr>
                 <th>Product Image</th>
@@ -317,7 +360,7 @@
                   <img
                     src={selectedProduct?.Product_Image_Url}
                     alt="selectedProduct thumbnail"
-                    class="h-20 w-20"
+                    class="h-16 w-16 rounded-md object-cover sm:h-20 sm:w-20"
                   />
                 </td>
                 <td>{selectedProduct?.Sku}</td>
@@ -328,17 +371,47 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Card for small screens -->
+        <div class="mt-4 md:hidden">
+          <div class="card bg-base-200 shadow-md">
+            <div class="card-body p-4">
+              <div class="flex items-center gap-4">
+                <img
+                  src={selectedProduct?.Product_Image_Url}
+                  alt="selectedProduct thumbnail"
+                  class="h-16 w-16 rounded-md object-cover"
+                />
+                <div>
+                  <h3 class="text-md font-bold">{selectedProduct?.Name}</h3>
+                  <p class="text-sm">SKU: {selectedProduct?.Sku}</p>
+                </div>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-2">
+                <div class="text-sm">
+                  Product ID: <span class="font-semibold">{selectedProduct?.id}</span>
+                </div>
+                <div class="text-sm">
+                  Client ID: <span class="font-semibold">{selectedProduct?.Client_Id}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   {/if}
   <!-- SELECTED PRODUCT ENDS -->
 
   <!-- Select from existing products to map too begins -->
-  <div class="mt-10 flex justify-center">
-    <div class="ml-10 mr-10 max-w-5xl rounded-lg bg-base-100 p-4 shadow-xl">
-      <h1 class="text-center text-3xl font-bold">Products To Map Too</h1>
-      <div class="mt-4 flex justify-center">
-        <table class="table shadow-lg">
+  <div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+    <div class="w-full max-w-5xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+      <h1 class="text-center text-2xl font-bold sm:text-3xl">Products To Map Too</h1>
+
+      <!-- Table for medium screens and up -->
+      <div class="mt-4 hidden overflow-x-auto md:block">
+        <table class="table w-full shadow-lg">
           <thead>
             <tr>
               <th>Product Image</th>
@@ -353,7 +426,11 @@
             {#each $inventory as product}
               <tr>
                 <td>
-                  <img src={product?.Product_Image_Url} alt="product thumbnail" class="h-20 w-20" />
+                  <img
+                    src={product?.Product_Image_Url}
+                    alt="product thumbnail"
+                    class="h-16 w-16 rounded-md object-cover sm:h-20 sm:w-20"
+                  />
                 </td>
                 <td>{product?.Sku}</td>
                 <td>{product?.Name}</td>
@@ -365,7 +442,7 @@
                       selectedProduct = product
                       goto('/app/sku-mapping/#create-sku-mapping')
                     }}
-                    class="btn btn-outline">Select</button
+                    class="btn btn-outline btn-sm">Select</button
                   ></td
                 >
               </tr>
@@ -373,24 +450,66 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Card layout for small screens -->
+      <div class="mt-4 grid grid-cols-1 gap-4 md:hidden">
+        {#each $inventory as product}
+          <div class="card bg-base-200 shadow-md">
+            <div class="card-body p-4">
+              <div class="flex items-center gap-4">
+                <img
+                  src={product?.Product_Image_Url}
+                  alt="product thumbnail"
+                  class="h-16 w-16 rounded-md object-cover"
+                />
+                <div>
+                  <h3 class="text-md font-bold">{product?.Name}</h3>
+                  <p class="text-sm">SKU: {product?.Sku}</p>
+                </div>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-2">
+                <div class="text-sm">
+                  Product ID: <span class="font-semibold">{product?.id}</span>
+                </div>
+                <div class="text-sm">
+                  Client ID: <span class="font-semibold">{product?.Client_Id}</span>
+                </div>
+              </div>
+
+              <div class="mt-3 flex justify-end">
+                <button
+                  on:click={() => {
+                    selectedProduct = product
+                    goto('/app/sku-mapping/#create-sku-mapping')
+                  }}
+                  class="btn btn-outline btn-sm">Select</button
+                >
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
     </div>
   </div>
   <!-- Select from existing products to map too ends -->
 {/if}
 
 {#if !showCreateSkuMapping}
-  <div class="mt-10 flex justify-center">
-    <div class="ml-10 mr-10 max-w-7xl rounded-lg bg-base-100 p-4 shadow-xl">
-      <h1 class="text-center text-3xl font-bold">Sku Mapping</h1>
+  <div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+    <div class="w-full max-w-7xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+      <h1 class="text-center text-2xl font-bold sm:text-3xl">Sku Mapping</h1>
       <div class="flex justify-center">
         <button
           class="btn btn-outline btn-primary btn-sm mt-4"
           on:click={() => (showCreateSkuMapping = true)}
-          >Create Sku Mapping <i class="fas fa-plus"></i></button
+          >Create Sku Mapping <i class="fas fa-plus ml-1"></i></button
         >
       </div>
-      <div class="mt-4 flex justify-center">
-        <table class="table max-w-10 shadow-lg">
+
+      <!-- Table for medium screens and up -->
+      <div class="mt-4 hidden overflow-x-auto md:block">
+        <table class="table w-full shadow-lg">
           <thead>
             <tr>
               <th>Product Image</th>
@@ -406,7 +525,11 @@
             {#each $skuMapping as sku}
               <tr>
                 <td>
-                  <img src={sku?.product_image_url} alt="product thumbnail" class="h-20 w-20" />
+                  <img
+                    src={sku?.product_image_url}
+                    alt="product thumbnail"
+                    class="h-16 w-16 rounded-md object-cover sm:h-20 sm:w-20"
+                  />
                 </td>
                 <td>{sku?.sku}</td>
                 <td>{sku?.quantity_to_deduct}</td>
@@ -432,7 +555,6 @@
                 <td>{sku?.client_id}</td>
                 <td
                   ><div class="flex space-x-2">
-                    <!-- <button class="btn btn-info btn-sm">Edit</button> -->
                     <button
                       on:click={() => {
                         skuMapToDelete = sku
@@ -447,13 +569,73 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Card layout for small screens -->
+      <div class="mt-4 grid grid-cols-1 gap-4 md:hidden">
+        {#each $skuMapping as sku}
+          <div class="card bg-base-200 shadow-md">
+            <div class="card-body p-4">
+              <div class="flex items-center gap-4">
+                <img
+                  src={sku?.product_image_url}
+                  alt="product thumbnail"
+                  class="h-16 w-16 rounded-md object-cover"
+                />
+                <div>
+                  <h3 class="text-md font-bold">
+                    <div
+                      class="tooltip"
+                      role="tooltip"
+                      on:mouseenter={() => handleMouseEnter(sku?.name)}
+                      on:mouseleave={handleMouseLeave}
+                    >
+                      {abbreviateString(sku?.name, 25)}
+                      {#if hoveredTitleId === sku?.name}
+                        <div
+                          class="absolute left-0 top-full z-50 mt-2 rounded-lg bg-gray-200 p-2 text-gray-800 opacity-100 shadow-lg"
+                          style="opacity: 1; background-color: rgba(229, 231, 235, 1);"
+                        >
+                          {sku?.name}
+                        </div>
+                      {/if}
+                    </div>
+                  </h3>
+                  <p class="text-sm">SKU: {sku?.sku}</p>
+                </div>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-2">
+                <div class="text-sm">
+                  Quantity: <span class="font-semibold">{sku?.quantity_to_deduct}</span>
+                </div>
+                <div class="text-sm">
+                  Product ID: <span class="font-semibold">{sku?.product_id}</span>
+                </div>
+                <div class="text-sm">
+                  Client ID: <span class="font-semibold">{sku?.client_id}</span>
+                </div>
+              </div>
+
+              <div class="mt-3 flex justify-end">
+                <button
+                  on:click={() => {
+                    skuMapToDelete = sku
+                    showDeleteSkuMapping = true
+                  }}
+                  class="btn btn-error btn-sm">Delete</button
+                >
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
     </div>
   </div>
 {/if}
 
 <!-- DELETE SKU MAPPING MODAL BEGINS -->
 <div class={`modal ${showDeleteSkuMapping ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showDeleteSkuMapping = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
@@ -465,7 +647,11 @@
       {skuMapToDelete?.name}
     </p>
     <div class="flex justify-center">
-      <img src={skuMapToDelete?.product_image_url} alt="product thumbnail" class="h-20 w-20" />
+      <img
+        src={skuMapToDelete?.product_image_url}
+        alt="product thumbnail"
+        class="h-16 w-16 rounded-md object-cover sm:h-20 sm:w-20"
+      />
     </div>
     <div class="mt-4 flex justify-center">
       <button on:click={deleteSkuMapping} class="btn btn-error"> Yes, Delete </button>
