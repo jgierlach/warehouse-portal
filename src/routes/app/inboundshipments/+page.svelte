@@ -1,6 +1,6 @@
 <script>
   // Import svelte specific functions
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import { goto } from '$app/navigation'
 
   // Import components
@@ -13,9 +13,84 @@
   export let data
 
   // Import stores
-  import { inboundShipments, loadInboundShipments } from '$lib/stores/inboundShipments.js'
+  import {
+    inboundShipments,
+    loadInboundShipments,
+    currentPage,
+    pageSize,
+    totalInboundShipmentCount,
+    searchQuery,
+  } from '$lib/stores/inboundShipments'
   import { inventory, loadInventory } from '$lib/stores/inventory.js'
   import { clients, loadClients } from '$lib/stores/clients.js'
+
+  // Add these variables for pagination
+  let currentPageValue
+  let totalPages
+  let pageSizeValue
+  let searchQueryValue = ''
+  let debounceTimer
+
+  // Subscribe to the stores
+  const unsubscribeCurrentPage = currentPage.subscribe((value) => {
+    currentPageValue = value
+  })
+
+  const unsubscribePageSize = pageSize.subscribe((value) => {
+    pageSizeValue = value
+  })
+
+  const unsubscribeTotalCount = totalInboundShipmentCount.subscribe((value) => {
+    totalPages = Math.ceil(value / pageSizeValue) || 1
+  })
+
+  const unsubscribeSearchQuery = searchQuery.subscribe((value) => {
+    searchQueryValue = value
+  })
+
+  // Add cleanup on component destruction
+  onDestroy(() => {
+    unsubscribeCurrentPage()
+    unsubscribePageSize()
+    unsubscribeTotalCount()
+    unsubscribeSearchQuery()
+  })
+
+  // Add pagination navigation functions
+  function goToPage(page) {
+    if (page < 1 || page > totalPages) return
+    currentPage.set(page)
+    loadInboundShipments(data.supabase)
+  }
+
+  function nextPage() {
+    if (currentPageValue < totalPages) {
+      currentPage.set(currentPageValue + 1)
+      loadInboundShipments(data.supabase)
+    }
+  }
+
+  function prevPage() {
+    if (currentPageValue > 1) {
+      currentPage.set(currentPageValue - 1)
+      loadInboundShipments(data.supabase)
+    }
+  }
+
+  function handleSearch() {
+    clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      searchQuery.set(searchQueryValue)
+      currentPage.set(1) // Reset to first page on new search
+      loadInboundShipments(data.supabase)
+    }, 300)
+  }
+
+  function changePageSize(newSize) {
+    pageSize.set(newSize)
+    currentPage.set(1) // Reset to first page when changing page size
+    loadInboundShipments(data.supabase)
+  }
 
   // Execute onMount
   onMount(() => {
@@ -256,12 +331,11 @@
 
   // Filtered shipments based on search query, handle null values safely
   $: filteredShipments = inboundShipmentsByMostRecent.filter((shipment) =>
-    shipment.Shipment_Number?.toLowerCase().includes(searchQuery.toLowerCase()),
+    shipment.Shipment_Number?.toLowerCase().includes(searchQueryValue.toLowerCase()),
   )
 
   let hoveredTitleId = null
   let timer
-  let searchQuery = ''
 
   function handleMouseEnter(id) {
     timer = setTimeout(() => {
@@ -281,6 +355,78 @@
   )
 
   $: clientIds = activeClients.map((client) => client.username)
+
+  // Pagination helpers
+  const pageSizeOptions = [50, 100, 250, 500, 1000]
+
+  function getTotalPages() {
+    const total = Math.ceil($totalInboundShipmentCount / $pageSize)
+    return total
+  }
+
+  // Helper function to generate page numbers for pagination
+  function generatePageNumbers() {
+    const totalPages = getTotalPages()
+    const maxVisiblePages = 5
+    const result = []
+
+    if (totalPages <= maxVisiblePages) {
+      // If we have fewer pages than the max we want to show, display all of them
+      for (let i = 1; i <= totalPages; i++) {
+        result.push(i)
+      }
+    } else {
+      // More complex logic for when we have lots of pages
+      const currentPageValue = $currentPage
+
+      // Always show first page
+      result.push(1)
+
+      // Calculate start and end of the visible page window
+      let startPage = Math.max(2, currentPageValue - 1)
+      let endPage = Math.min(totalPages - 1, startPage + 2)
+
+      // Adjust if we're near the end
+      if (endPage - startPage < 2) {
+        startPage = Math.max(2, endPage - 2)
+      }
+
+      // Add ellipsis after first page if needed
+      if (startPage > 2) {
+        result.push('...')
+      }
+
+      // Add the middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        result.push(i)
+      }
+
+      // Add ellipsis before last page if needed
+      if (endPage < totalPages - 1) {
+        result.push('...')
+      }
+
+      // Always show last page
+      if (totalPages > 1) {
+        result.push(totalPages)
+      }
+    }
+
+    return result
+  }
+
+  function handlePageClick(pageNum) {
+    if (typeof pageNum === 'number') {
+      goToPage(pageNum)
+    }
+  }
+
+  function handlePageSizeChange(event) {
+    if (event.target && 'value' in event.target) {
+      const value = Number(event.target.value)
+      changePageSize(value)
+    }
+  }
 </script>
 
 <Loading {loading} />
@@ -311,16 +457,33 @@
       >
     </div>
 
-    <!-- Search input -->
-    <!-- <div class="mb-4 flex justify-center">
+    <!-- Replace the search and pagination UI at the top of your table with this -->
+    <div class="mb-4 flex justify-center">
       <input
         type="text"
         class="input w-1/4 bg-base-200"
         placeholder="Search by Shipment Number"
-        bind:value={searchQuery}
+        bind:value={searchQueryValue}
+        on:input={handleSearch}
       />
-      <button class="btn btn-primary">Search</button>
-    </div> -->
+      <button class="btn btn-primary" on:click={handleSearch}>Search</button>
+    </div>
+
+    <!-- Page size selector -->
+    <div class="mb-4 flex justify-center">
+      <div class="flex items-center gap-2">
+        <span>Page Size:</span>
+        <select
+          class="select select-bordered select-sm"
+          value={$pageSize}
+          on:change={handlePageSizeChange}
+        >
+          {#each pageSizeOptions as option}
+            <option value={option}>{option}</option>
+          {/each}
+        </select>
+      </div>
+    </div>
 
     <div class="overflow-x-auto">
       <table class="table table-zebra">
@@ -453,6 +616,48 @@
           {/each}
         </tbody>
       </table>
+    </div>
+
+    <!-- Replace the pagination controls at the bottom of your table with this -->
+    <div class="mt-4 flex items-center justify-between">
+      <div>
+        <span
+          >Showing {($currentPage - 1) * $pageSize + 1} to {Math.min(
+            $currentPage * $pageSize,
+            $totalInboundShipmentCount,
+          )} of {$totalInboundShipmentCount} items</span
+        >
+      </div>
+      {#if $totalInboundShipmentCount > 0}
+        <div class="join">
+          <button
+            class="btn join-item btn-sm"
+            disabled={$currentPage === 1}
+            on:click={() => goToPage($currentPage - 1)}
+          >
+            «
+          </button>
+          {#each generatePageNumbers() as pageNum}
+            {#if pageNum === '...'}
+              <span class="btn btn-disabled join-item btn-sm">...</span>
+            {:else}
+              <button
+                class="btn join-item btn-sm {pageNum === $currentPage ? 'btn-active' : ''}"
+                on:click={() => handlePageClick(pageNum)}
+              >
+                {pageNum}
+              </button>
+            {/if}
+          {/each}
+          <button
+            class="btn join-item btn-sm"
+            disabled={$currentPage === getTotalPages() || getTotalPages() === 0}
+            on:click={() => goToPage($currentPage + 1)}
+          >
+            »
+          </button>
+        </div>
+      {/if}
     </div>
   </div>
 </div>
