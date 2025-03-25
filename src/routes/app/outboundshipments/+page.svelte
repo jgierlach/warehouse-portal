@@ -489,11 +489,11 @@
 </script>
 
 <Loading {loading} />
-<div class="mt-10 flex justify-center">
-  <div class="ml-20 mr-20 w-full rounded-lg bg-base-100 p-4 shadow-xl">
-    <h1 class="mb-5 text-center text-3xl font-bold">Outbound Shipments</h1>
+<div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
+  <div class="w-full max-w-7xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+    <h1 class="mb-3 text-center text-2xl font-bold sm:mb-5 sm:text-3xl">Outbound Shipments</h1>
 
-    <div class="mb-5 flex justify-center">
+    <div class="mb-3 flex justify-center sm:mb-5">
       <button
         on:click={() => {
           showCreateOutboundShipment = !showCreateOutboundShipment
@@ -524,25 +524,24 @@
           country = ''
           lotNumber = ''
         }}
-        class="btn btn-primary">Create Outbound Shipment</button
+        class="btn btn-primary btn-sm sm:btn-md">Create Outbound Shipment</button
       >
     </div>
 
-    <!-- Search input -->
-    <div class="mb-4 flex justify-center">
-      <input
-        type="text"
-        class="input w-1/4 bg-base-200"
-        placeholder="Search by Shipment Number"
-        bind:value={localSearchQuery}
-      />
-      <button class="btn btn-primary" on:click={handleSearch}>Search</button>
-    </div>
+    <!-- Search and pagination controls - responsive layout -->
+    <div class="mb-4 flex flex-col items-center justify-center gap-2">
+      <div class="flex w-full gap-2 sm:w-auto">
+        <input
+          type="text"
+          class="input input-sm w-full bg-base-200 sm:input-md sm:w-64"
+          placeholder="Search by Shipment Number"
+          bind:value={localSearchQuery}
+        />
+        <button class="btn btn-primary btn-sm sm:btn-md" on:click={handleSearch}>Search</button>
+      </div>
 
-    <!-- Page size selector -->
-    <div class="mb-4 flex justify-center">
-      <div class="flex items-center gap-2">
-        <span>Page Size:</span>
+      <div class="mt-2 flex items-center gap-2">
+        <span class="text-sm">Page Size:</span>
         <select
           class="select select-bordered select-sm"
           value={$pageSize}
@@ -555,21 +554,22 @@
       </div>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="table table-zebra">
+    <!-- Table for medium screens and up -->
+    <div class="hidden overflow-x-auto md:block">
+      <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>Product Image</th>
-            <th>Shipment Number</th>
+            <th>Image</th>
+            <th>Shipment #</th>
             <th>Carrier</th>
-            <th>Tracking Number</th>
-            <th>PO Number</th>
+            <th>Tracking #</th>
+            <th>PO #</th>
             <th>Destination</th>
             <th>Status</th>
             <th>Order Date</th>
-            <th>Product Title</th>
+            <th>Product</th>
             <th>Sku</th>
-            <th>Product Quantity</th>
+            <th>Qty</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -696,9 +696,131 @@
       </table>
     </div>
 
-    <!-- Pagination controls -->
-    <div class="mt-4 flex items-center justify-between">
-      <div>
+    <!-- Card layout for small screens -->
+    <div class="grid grid-cols-1 gap-4 md:hidden">
+      {#each filteredShipments as shipment}
+        <div class="card bg-base-200 shadow-md" id={shipment.id}>
+          <div class="card-body p-4">
+            <div class="flex items-start gap-3">
+              <img
+                class="h-16 w-16 flex-shrink-0 rounded-md object-cover shadow-md"
+                alt="Product Image"
+                src={shipment.Product_Image_Url === null
+                  ? '/placeholder-image.jpg'
+                  : shipment.Product_Image_Url}
+              />
+              <div class="flex-1">
+                <h3 class="text-md font-bold">Shipment #{shipment.Shipment_Number}</h3>
+                <p class="mt-1 text-sm">
+                  <span class="font-semibold">Status:</span>
+                  <span
+                    class="badge badge-sm ml-1"
+                    class:badge-accent={shipment.Status === 'Shipped'}
+                    class:badge-warning={shipment.Status === 'Pending'}
+                  >
+                    {shipment.Status}
+                  </span>
+                </p>
+                <p class="text-sm">
+                  <span class="font-semibold">Date:</span>
+                  {formatDate(shipment.Date_Of_Last_Change)}
+                </p>
+              </div>
+            </div>
+
+            <div class="divider my-1"></div>
+
+            <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-sm">
+              <div>
+                <span class="font-semibold">Carrier:</span>
+                {shipment.Carrier === null ? 'Pending' : shipment.Carrier}
+              </div>
+              <div>
+                <span class="font-semibold">Tracking:</span>
+                {shipment.Tracking_Number === null
+                  ? 'Pending'
+                  : abbreviateString(shipment.Tracking_Number, 10)}
+              </div>
+              <div>
+                <span class="font-semibold">Destination:</span>
+                {abbreviateString(shipment.Destination, 15)}
+              </div>
+              <div><span class="font-semibold">PO #:</span> {shipment.PO_Number || 'N/A'}</div>
+              <div>
+                <span class="font-semibold">Sku:</span>
+                {abbreviateString(shipment.Sku, 12)}
+              </div>
+              <div><span class="font-semibold">Qty:</span> {shipment.Quantity}</div>
+            </div>
+
+            <div class="mt-1">
+              <p class="text-sm font-semibold">Product:</p>
+              <p class="text-sm">{abbreviateString(shipment.Product_Title, 50)}</p>
+            </div>
+
+            <div class="mt-3 flex flex-wrap justify-end gap-2">
+              <button
+                on:click={() => {
+                  showEditOutboundShipment = true
+                  outboundShipmentToEdit = shipment
+                  // ... set all the fields as in original
+                  clientId = shipment.Client_Id
+                  shipmentNumber = shipment.Shipment_Number
+                  carrier = shipment.Carrier
+                  trackingNumber = shipment.Tracking_Number
+                  poNumber = shipment.PO_Number
+                  destination = shipment.Destination
+                  requiresAmazonLabeling = shipment.Requires_Amazon_Labeling
+                  shipmentType = shipment.Shipment_Type
+                  status = shipment.Status
+                  dateOfLastChange = shipment.Date_Of_Last_Change
+                  asin = shipment.Asin
+                  productTitle = shipment.Product_Title
+                  sku = shipment.Sku
+                  productImageUrl = shipment.Product_Image_Url
+                  quantity = shipment.Quantity
+                  costOfShipment = shipment.Cost_Of_Shipment
+                  buyerName = shipment.Buyer_Name
+                  buyerEmail = shipment.Buyer_Email
+                  recipientName = shipment.Recipient_Name
+                  recipientCompany = shipment.Recipient_Company
+                  recipientAddressLine1 = shipment.Recipient_Address_Line_1
+                  recipientCity = shipment.Recipient_City
+                  recipientState = shipment.Recipient_State
+                  recipientPostalCode = shipment.Recipient_Postal_Code
+                  country = shipment.Recipient_Country
+                  lotNumber = shipment.Lot_Number
+                }}
+                class="btn btn-info btn-xs">Edit</button
+              >
+              <button
+                on:click={() => {
+                  showTrackingFields = true
+                  clientId = shipment.Client_Id
+                  shipmentNumber = shipment.Shipment_Number
+                  carrier = shipment.Carrier
+                  trackingNumber = shipment.Tracking_Number
+                  poNumber = shipment.PO_Number
+                  recipientName = shipment.Recipient_Name
+                }}
+                class="btn btn-primary btn-xs">Update Tracking</button
+              >
+              <button
+                on:click={() => {
+                  showDeleteOutboundShipment = true
+                  outboundShipmentToDelete = shipment
+                }}
+                class="btn btn-error btn-xs">Delete</button
+              >
+            </div>
+          </div>
+        </div>
+      {/each}
+    </div>
+
+    <!-- Pagination controls - responsive layout -->
+    <div class="mt-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
+      <div class="text-center text-sm sm:text-left">
         <span
           >Showing {($currentPage - 1) * $pageSize + 1} to {Math.min(
             $currentPage * $pageSize,
@@ -709,7 +831,7 @@
       {#if $totalOutboundShipmentCount > 0}
         <div class="join">
           <button
-            class="btn join-item btn-sm"
+            class="btn join-item btn-xs sm:btn-sm"
             disabled={$currentPage === 1}
             on:click={() => goToPage($currentPage - 1)}
           >
@@ -717,10 +839,12 @@
           </button>
           {#each generatePageNumbers() as pageNum}
             {#if pageNum === '...'}
-              <span class="btn btn-disabled join-item btn-sm">...</span>
+              <span class="btn btn-disabled join-item btn-xs sm:btn-sm">...</span>
             {:else}
               <button
-                class="btn join-item btn-sm {pageNum === $currentPage ? 'btn-active' : ''}"
+                class="btn join-item btn-xs sm:btn-sm {pageNum === $currentPage
+                  ? 'btn-active'
+                  : ''}"
                 on:click={() => handlePageClick(pageNum)}
               >
                 {pageNum}
@@ -728,7 +852,7 @@
             {/if}
           {/each}
           <button
-            class="btn join-item btn-sm"
+            class="btn join-item btn-xs sm:btn-sm"
             disabled={$currentPage === getTotalPages() || getTotalPages() === 0}
             on:click={() => goToPage($currentPage + 1)}
           >
@@ -742,7 +866,7 @@
 
 <!-- DELETE SHIPMENT MODAL BEGINS -->
 <div class={`modal ${showDeleteOutboundShipment ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showDeleteOutboundShipment = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
@@ -768,13 +892,13 @@
 
 <!-- EDIT SHIPMENT MODAL BEGINS -->
 <div class={`modal ${showEditOutboundShipment ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showEditOutboundShipment = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Edit Outbound Shipment</h1>
-    <form on:submit={editOutboundShipment}>
+    <form on:submit={editOutboundShipment} class="max-h-[70vh] overflow-y-auto">
       <!-- Client ID Dropdown -->
       <div class="form-control mb-4">
         <label class="label" for="clientId">Client Id</label>
@@ -1104,13 +1228,13 @@
 
 <!-- CREATE SHIPMENT MODAL BEGINS -->
 <div class={`modal ${showCreateOutboundShipment ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showCreateOutboundShipment = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="mb-5 text-center text-xl font-semibold">Create Outbound Shipment</h1>
-    <form on:submit={createOutboundShipment}>
+    <form on:submit={createOutboundShipment} class="max-h-[70vh] overflow-y-auto">
       <!-- Create in Shipstation Toggle -->
       <div class="form-control mb-4">
         <label class="label cursor-pointer">
@@ -1439,7 +1563,7 @@
 
 <!-- UPDATE TRACKING MODAL BEGINS -->
 <div class={`modal ${showTrackingFields ? 'modal-open' : ''}`}>
-  <div class="modal-box relative">
+  <div class="modal-box relative mx-auto w-11/12 max-w-xl">
     <button
       on:click={() => (showTrackingFields = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
