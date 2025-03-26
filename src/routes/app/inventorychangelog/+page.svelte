@@ -44,6 +44,7 @@
           <tr>
             <th>Timestamp</th>
             <th>Client Id</th>
+            <th>Shipment #</th>
             <th>Change Source</th>
             <th>Name</th>
             <th>Sku</th>
@@ -57,6 +58,7 @@
             <tr>
               <td>{formatTimeStampForChangelog(log?.created_at)}</td>
               <td>{log?.client_id}</td>
+              <td>{log?.shipment_number === null ? 'N/A' : log?.shipment_number}</td>
               <td>{log?.change_source}</td>
               <td
                 ><div
