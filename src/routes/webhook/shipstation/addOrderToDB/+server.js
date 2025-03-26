@@ -228,6 +228,7 @@ export async function POST({ request, locals }) {
               // Update the inventory changelog table
               const log = {
                 client_id: clientId,
+                shipment_number: shipmentNumber,
                 change_source: storeName,
                 name: item?.name,
                 asin: item?.upc,
