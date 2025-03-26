@@ -20,6 +20,7 @@ export async function PUT({ request, locals }) {
   // Execute inventory changelog
   const log = {
     client_id: clientId,
+    shipment_number: null,
     change_source: 'Warehouse Portal',
     name,
     asin,
