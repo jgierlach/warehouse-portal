@@ -38,19 +38,19 @@
   // Component specific variables and business logic
 
   // Company variables
-  let userId = $selectedClientToInvoice.id
-  let clientName = $selectedClientToInvoice.company_name
-  let companyName = $selectedClientToInvoice.company_name
-  let clientId = $selectedClientToInvoice.username
-  let billingContactEmail = $selectedClientToInvoice.username
-  let perOrderFee = $selectedClientToInvoice.per_order_fee
-  let perOrderUnitFee = $selectedClientToInvoice.per_order_unit_fee
-  let perUnitFBAPackAndPrep = $selectedClientToInvoice.per_unit_fba_pack_prep
-  let perUnitWFSPackAndPrep = $selectedClientToInvoice.per_unit_wfs_pack_prep
-  let b2bFreightPercentageMarkup = $selectedClientToInvoice.b2b_freight_percentage_markup
-  let perPalletMonthlyStorageFee = $selectedClientToInvoice.per_pallet_monthly_storage_fee
-  let stripeCustomerId = $selectedClientToInvoice.stripe_customer_id
-  let passCardFeesOn = $selectedClientToInvoice.pass_on_card_fees
+  let userId = $selectedClientToInvoice?.id
+  let clientName = $selectedClientToInvoice?.company_name
+  let companyName = $selectedClientToInvoice?.company_name
+  let clientId = $selectedClientToInvoice?.username
+  let billingContactEmail = $selectedClientToInvoice?.username
+  let perOrderFee = $selectedClientToInvoice?.per_order_fee
+  let perOrderUnitFee = $selectedClientToInvoice?.per_order_unit_fee
+  let perUnitFBAPackAndPrep = $selectedClientToInvoice?.per_unit_fba_pack_prep
+  let perUnitWFSPackAndPrep = $selectedClientToInvoice?.per_unit_wfs_pack_prep
+  let b2bFreightPercentageMarkup = $selectedClientToInvoice?.b2b_freight_percentage_markup
+  let perPalletMonthlyStorageFee = $selectedClientToInvoice?.per_pallet_monthly_storage_fee
+  let stripeCustomerId = $selectedClientToInvoice?.stripe_customer_id
+  let passCardFeesOn = $selectedClientToInvoice?.pass_on_card_fees
 
   // Toggling date range specific variables and functions
   const now = new Date()
@@ -66,6 +66,7 @@
     const currentYear = now.getFullYear()
     startDate = formatDateInDateRange(new Date(currentYear, 0, 1))
     endDate = formatDateInDateRange(now)
+    await updateData()
   }
 
   async function monthToDate() {
@@ -74,6 +75,7 @@
     const currentMonth = now.getMonth()
     startDate = formatDateInDateRange(new Date(currentYear, currentMonth, 1))
     endDate = formatDateInDateRange(now)
+    await updateData()
   }
 
   // Variables for email
@@ -82,38 +84,12 @@
   $: billingPeriod = `For work done ${formatDateInSubjectLine(startDate)} - ${formatDateInSubjectLine(endDate)}`
 
   let outboundShipments = []
-  // Shipments filtered by client and date range
+
+  // Shipments filtered by client
   $: clientShipments = outboundShipments.filter((shipment) => shipment.Client_Id === clientId)
 
-  $: {
-    console.log('clientShipments', clientShipments)
-  }
-
-  $: {
-    console.log('Date Range Values:', {
-      startDate,
-      endDate,
-      startDateType: typeof startDate,
-      endDateType: typeof endDate,
-      formattedStart: new Date(startDate).toISOString(),
-      formattedEnd: new Date(endDate).toISOString(),
-    })
-  }
-
-  $: clientShipmentsInDateRange = clientShipments.filter((shipment) => {
-    const isInRange = isWithinDateRange(shipment.created_at, startDate, endDate)
-    if (!isInRange) {
-      console.log('Excluded shipment:', {
-        number: shipment.Shipment_Number,
-        created_at: shipment.created_at,
-        date: new Date(shipment.created_at).toISOString(),
-      })
-    }
-    return isInRange
-  })
-
   $: shipmentLineItems = generateShipmentLineItems(
-    clientShipmentsInDateRange,
+    clientShipments,
     perOrderFee,
     perOrderUnitFee,
     perUnitFBAPackAndPrep,

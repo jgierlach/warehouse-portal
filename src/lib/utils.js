@@ -444,7 +444,7 @@ export const generateShipmentLineItems = (
 
     if (!groupedShipments[shipmentNumber]) {
       groupedShipments[shipmentNumber] = {
-        orderDate: item.Date_Of_Last_Change,
+        orderDate: item.created_at,
         shipmentNumber: item.Shipment_Number,
         recipientName: item.Recipient_Name,
         poNumber: item.PO_Number,
@@ -485,21 +485,34 @@ export const generateShipmentLineItems = (
     }
   })
 
-  return transformedData
+  return transformedData.sort((a, b) => new Date(a.orderDate) - new Date(b.orderDate))
 }
 
 export const isWithinDateRange = (shipmentDate, start, end) => {
-  // Convert all dates to a consistent format: YYYY-MM-DD
-  const formattedShipmentDate = new Date(shipmentDate).toISOString().split('T')[0]
-  const formattedStartDate = new Date(start).toISOString().split('T')[0]
-  const formattedEndDate = new Date(end).toISOString().split('T')[0]
+  // Handle null dates
+  if (!shipmentDate || !start || !end) {
+    console.log('Missing date value:', { shipmentDate, start, end })
+    return false
+  }
 
-  // Convert the formatted dates back to timestamps
-  const shipmentTime = new Date(formattedShipmentDate).getTime()
-  const startTime = new Date(formattedStartDate).getTime()
-  const endTime = new Date(formattedEndDate).setHours(23, 59, 59, 999)
+  // Parse all dates to Date objects
+  const shipmentDateTime = new Date(shipmentDate)
+  const startDateTime = new Date(start)
+  const endDateTime = new Date(end)
 
-  return shipmentTime >= startTime && shipmentTime <= endTime
+  // Set end date to end of day (23:59:59.999)
+  endDateTime.setHours(23, 59, 59, 999)
+
+  // Log date values for debugging
+  console.log('Date comparison:', {
+    shipment: shipmentDateTime.toISOString(),
+    start: startDateTime.toISOString(),
+    end: endDateTime.toISOString(),
+    result: shipmentDateTime >= startDateTime && shipmentDateTime <= endDateTime,
+  })
+
+  // Compare timestamps directly
+  return shipmentDateTime >= startDateTime && shipmentDateTime <= endDateTime
 }
 
 export const formatDateInDateRange = (date) => {
