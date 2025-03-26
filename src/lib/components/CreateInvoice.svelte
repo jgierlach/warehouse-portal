@@ -31,7 +31,7 @@
   export let supabase
 
   // Import stores
-  import { outboundShipments, loadOutboundShipments } from '$lib/stores/outboundShipments'
+  // import { outboundShipments, loadOutboundShipments } from '$lib/stores/outboundShipments'
   import { setSelectedSection } from '$lib/stores/selectedSection'
   import { selectedClientToInvoice } from '$lib/stores/selectedClientToInvoice'
 
@@ -81,11 +81,36 @@
 
   $: billingPeriod = `For work done ${formatDateInSubjectLine(startDate)} - ${formatDateInSubjectLine(endDate)}`
 
+  let outboundShipments = []
   // Shipments filtered by client and date range
-  $: clientShipments = $outboundShipments.filter((shipment) => shipment.Client_Id === clientId)
-  $: clientShipmentsInDateRange = clientShipments.filter((shipment) =>
-    isWithinDateRange(shipment.Date_Of_Last_Change, startDate, endDate),
-  )
+  $: clientShipments = outboundShipments.filter((shipment) => shipment.Client_Id === clientId)
+
+  $: {
+    console.log('clientShipments', clientShipments)
+  }
+
+  $: {
+    console.log('Date Range Values:', {
+      startDate,
+      endDate,
+      startDateType: typeof startDate,
+      endDateType: typeof endDate,
+      formattedStart: new Date(startDate).toISOString(),
+      formattedEnd: new Date(endDate).toISOString(),
+    })
+  }
+
+  $: clientShipmentsInDateRange = clientShipments.filter((shipment) => {
+    const isInRange = isWithinDateRange(shipment.created_at, startDate, endDate)
+    if (!isInRange) {
+      console.log('Excluded shipment:', {
+        number: shipment.Shipment_Number,
+        created_at: shipment.created_at,
+        date: new Date(shipment.created_at).toISOString(),
+      })
+    }
+    return isInRange
+  })
 
   $: shipmentLineItems = generateShipmentLineItems(
     clientShipmentsInDateRange,
@@ -419,9 +444,42 @@
     }
   }
 
+  async function fetchOutboundShipments() {
+    loading = true
+
+    // Adjust the endDate to include the end of the day in local time, then convert to UTC
+    const endDateTime = new Date(endDate)
+    endDateTime.setHours(23, 59, 59, 999) // Set time to the end of the local day
+
+    // Adjust to UTC
+    const adjustedEndDateTime = new Date(
+      endDateTime.getTime() + endDateTime.getTimezoneOffset() * 60000,
+    )
+
+    const response = await fetch(
+      `/app/api/outboundshipments/fetchShipment?start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(adjustedEndDateTime.toISOString())}`,
+    )
+
+    const data = await response.json()
+    console.log('DATA FETCH PRODUCT SALES', data.body)
+
+    if (response.ok) {
+      loading = false
+      return data.body
+    } else {
+      loading = false
+      console.error(data.error)
+      return []
+    }
+  }
+
+  async function updateData() {
+    outboundShipments = await fetchOutboundShipments()
+  }
+
   // Execute onMount
-  onMount(() => {
-    loadOutboundShipments(supabase)
+  onMount(async () => {
+    await updateData()
   })
 </script>
 
@@ -442,13 +500,23 @@
         <label class="label">
           <span class="label-text">Start Date</span>
         </label>
-        <input type="date" bind:value={startDate} class="input input-bordered" />
+        <input
+          type="date"
+          bind:value={startDate}
+          on:change={updateData}
+          class="input input-bordered"
+        />
       </div>
       <div class="form-control">
         <label class="label">
           <span class="label-text">End Date</span>
         </label>
-        <input type="date" bind:value={endDate} class="input input-bordered" />
+        <input
+          type="date"
+          bind:value={endDate}
+          on:change={updateData}
+          class="input input-bordered"
+        />
       </div>
     </div>
     <div class="mt-5 flex items-center justify-center">
