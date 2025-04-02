@@ -237,7 +237,8 @@
     editShipmentIndex = index
   }
 
-  function editShipmentLineItem() {
+  function editShipmentLineItem(event) {
+    event.preventDefault()
     if (editShipmentIndex !== null) {
       shipmentLineItems[editShipmentIndex] = {
         orderDate,
