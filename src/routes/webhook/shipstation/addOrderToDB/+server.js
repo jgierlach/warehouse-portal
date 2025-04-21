@@ -154,7 +154,7 @@ export async function POST({ request, locals }) {
               console.error('Supabase error: inserting into unmapped_skus table', insertError)
             }
 
-            // Send an alert with send grid
+            // Send email notification about unmapped SKU
             const endpoint = 'https://api.sendgrid.com/v3/mail/send'
             const emailData = {
               personalizations: [
@@ -199,67 +199,69 @@ export async function POST({ request, locals }) {
 
           // If sku mappings are found execute lookup and deduct inventory quantity from correct product
           if (data?.length > 0) {
-            // You'll need to do a loop and deduct for every time a sku map is found
-            for (const skuMap of data) {
-              const { product_id, sku, quantity_to_deduct } = skuMap
-              const valueToSubtractFromInventoryQuantity = quantity_to_deduct * quantity
+            // Calculate total quantity to deduct for THIS specific SKU
+            const totalQuantityToDeduct = data.reduce((total, skuMap) => {
+              return total + skuMap.quantity_to_deduct * quantity
+            }, 0)
 
-              // Fetch the current inventory quantity
-              const { data: inventoryData, error: fetchError } = await locals.supabase
-                .from('Inventory')
-                .select('*')
-                .eq('id', product_id)
-                .single()
+            // Fetch the current inventory quantity
+            const { data: inventoryData, error: fetchError } = await locals.supabase
+              .from('Inventory')
+              .select('*')
+              .eq('id', data[0].product_id)
+              .single()
 
-              if (fetchError) {
-                console.error(`Error fetching inventory for product_id ${product_id}:`, fetchError)
-              }
+            if (fetchError) {
+              console.error(
+                `Error fetching inventory for product_id ${data[0].product_id}:`,
+                fetchError,
+              )
+            }
 
-              if (!inventoryData) {
-                console.warn(`No inventory found for product_id ${product_id}`)
-              }
+            if (!inventoryData) {
+              console.warn(`No inventory found for product_id ${data[0].product_id}`)
+            }
 
-              const currentQuantity = inventoryData?.Quantity
-              const newQuantity = Math.max(
-                0,
-                currentQuantity - valueToSubtractFromInventoryQuantity,
-              ) // Prevent negative values
+            const currentQuantity = inventoryData?.Quantity
+            const newQuantity = Math.max(0, currentQuantity - totalQuantityToDeduct) // Prevent negative values
 
-              // Update the inventory changelog table
-              const log = {
-                client_id: clientId,
-                shipment_number: shipmentNumber,
-                change_source: storeName,
-                name: item?.name,
-                asin: item?.upc,
-                sku,
-                previous_quantity: currentQuantity,
-                new_quantity: newQuantity,
-                previous_pending: 0,
-                new_pending: 0,
-              }
+            // Update the inventory changelog table
+            const log = {
+              client_id: clientId,
+              shipment_number: shipmentNumber,
+              change_source: storeName,
+              name: item?.name,
+              asin: item?.upc,
+              sku,
+              previous_quantity: currentQuantity,
+              new_quantity: newQuantity,
+              previous_pending: 0,
+              new_pending: 0,
+            }
 
-              const { error: logError } = await locals.supabase
-                .from('inventory_changelog')
-                .insert([log])
+            const { error: logError } = await locals.supabase
+              .from('inventory_changelog')
+              .insert([log])
 
-              if (logError) {
-                console.error('Supabase error: inserting into inventory_changelog table', logError)
-              }
+            if (logError) {
+              console.error('Supabase error: inserting into inventory_changelog table', logError)
+            }
 
-              // Deduct the appropriate quantities from the inventory table
-              const { error: updateError } = await locals.supabase
-                .from('Inventory')
-                .update({ Quantity: newQuantity })
-                .eq('id', product_id)
+            // Deduct the appropriate quantities from the inventory table
+            const { error: updateError } = await locals.supabase
+              .from('Inventory')
+              .update({ Quantity: newQuantity })
+              .eq('id', data[0].product_id)
 
-              if (updateError) {
-                console.error(`Error updating inventory for product_id ${product_id}:`, updateError)
-              } else {
-                console.log(
-                  `Successfully updated inventory for product_id ${product_id}. New quantity: ${newQuantity}`,
-                )
-              }
+            if (updateError) {
+              console.error(
+                `Error updating inventory for product_id ${data[0].product_id}:`,
+                updateError,
+              )
+            } else {
+              console.log(
+                `Successfully updated inventory for product_id ${data[0].product_id}. New quantity: ${newQuantity}`,
+              )
             }
           }
 
@@ -763,7 +765,7 @@ export function OPTIONS() {
 //         "orderItemId": 780231203,
 //         "lineItemKey": "107098493204121",
 //         "sku": "B07GJZDVRK",
-//         "name": "Dixie Belle Synthetic Flat Small Paint Brush | 1” Quality Synthetic Smooth Release Bristles | Professional Grade Paint Brush | Made in The USA",
+//         "name": "Dixie Belle Synthetic Flat Small Paint Brush | 1" Quality Synthetic Smooth Release Bristles | Professional Grade Paint Brush | Made in The USA",
 //         "imageUrl": "https://m.media-amazon.com/images/I/41ag8sKLnPL.jpg",
 //         "weight": {
 //           "value": 1.55,
