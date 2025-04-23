@@ -119,6 +119,7 @@ export async function POST({ request, locals }) {
       // Loop through each item in the order
       const shipmentData = await Promise.all(
         items.map(async (item) => {
+          console.log('Item:', JSON.stringify(item, null, 2))
           let sku = item?.sku
           let quantity = item?.quantity
           let imageUrl = item?.imageUrl
