@@ -222,14 +222,16 @@
                 <td>{sku?.name}</td>
                 <td>{sku?.order_source}</td>
                 <td>
-                  <button
-                    on:click={() => addCoupon(sku?.client_id, sku?.name, sku?.sku, sku?.id)}
-                    class="btn btn-info btn-sm">Add As Coupon</button
-                  >
-                  <button on:click={() => deleteUnmappedSku(sku)} class="btn btn-error btn-sm"
-                    >Delete</button
-                  ></td
-                >
+                  <div class="block">
+                    <button
+                      on:click={() => addCoupon(sku?.client_id, sku?.name, sku?.sku, sku?.id)}
+                      class="btn btn-info btn-sm mb-2">Add As Coupon</button
+                    >
+                    <button on:click={() => deleteUnmappedSku(sku)} class="btn btn-error btn-sm"
+                      >Delete</button
+                    >
+                  </div>
+                </td>
               </tr>
             {/each}
           </tbody>

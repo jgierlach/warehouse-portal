@@ -18,7 +18,7 @@
 </script>
 
 <div class="mt-4 flex justify-center px-2 sm:px-4 md:mt-10">
-  <div class="w-full max-w-3xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
+  <div class="w-full max-w-4xl rounded-lg bg-base-100 p-2 shadow-xl sm:p-4">
     <h1 class="mb-3 text-center text-2xl font-bold sm:mb-5 sm:text-3xl">Coupons</h1>
     <!-- Table for medium screens and up -->
     <div class="hidden overflow-x-auto md:block">
@@ -38,8 +38,10 @@
               <td>{coupon?.client_id}</td>
               <td>{coupon?.name}</td>
               <td>
-                <button class="btn btn-primary">Edit</button>
-                <button class="btn-danger btn">Delete</button>
+                <div class="flex space-x-2">
+                  <button class="btn btn-info btn-sm">Edit</button>
+                  <button class="btn btn-error btn-sm">Delete</button>
+                </div>
               </td>
             </tr>
           {/each}
