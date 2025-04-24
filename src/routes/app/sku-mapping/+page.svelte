@@ -6,6 +6,7 @@
   import { skuMapping, loadSkuMapping } from '$lib/stores/skuMapping'
   import { inventory, loadInventory } from '$lib/stores/inventory'
   import { unmappedSkus, loadUnmappedSkus } from '$lib/stores/unmappedSkus'
+  import { loadCoupons } from '$lib/stores/coupons.js'
 
   // Props
   export let data
@@ -136,6 +137,26 @@
     }
   }
 
+  async function addCoupon(clientId, name, sku, id) {
+    const response = await fetch('/app/api/coupons/createCoupon', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        name,
+      }),
+    })
+    if (response.ok) {
+      await loadCoupons(data.supabase)
+      await deleteUnmappedSku({ sku, id })
+    } else {
+      const error = response.json()
+      console.error('Failed to add coupon', error)
+    }
+  }
+
   let hoveredTitleId = null
   let timer
 
@@ -200,8 +221,12 @@
                 <td>{sku?.sku}</td>
                 <td>{sku?.name}</td>
                 <td>{sku?.order_source}</td>
-                <td
-                  ><button on:click={() => deleteUnmappedSku(sku)} class="btn btn-error btn-sm"
+                <td>
+                  <button
+                    on:click={() => addCoupon(sku?.client_id, sku?.name, sku?.sku, sku?.id)}
+                    class="btn btn-info btn-sm">Add As Coupon</button
+                  >
+                  <button on:click={() => deleteUnmappedSku(sku)} class="btn btn-error btn-sm"
                     >Delete</button
                   ></td
                 >
