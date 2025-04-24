@@ -42,7 +42,7 @@ export async function POST({ request, locals }) {
     }
 
     const { orders } = await response.json()
-    console.log('Fetched orders', JSON.stringify(orders, null, 2))
+    // console.log('Fetched orders', JSON.stringify(orders, null, 2))
 
     const allShipmentData = []
 
@@ -314,12 +314,12 @@ export async function POST({ request, locals }) {
       allShipmentData.push(...shipmentData)
     }
 
-    console.log('All Shipment Data:', JSON.stringify(allShipmentData, null, 2))
+    // console.log('All Shipment Data:', JSON.stringify(allShipmentData, null, 2))
 
     // Insert all shipment data into the database
     const { data, error } = await locals.supabase.from('Outbound_Shipments').insert(allShipmentData)
 
-    console.log('Insert result:', allShipmentData, data, error)
+    // console.log('Insert result:', allShipmentData, data, error)
 
     if (error) {
       console.error('Error inserting shipment data:', error)
