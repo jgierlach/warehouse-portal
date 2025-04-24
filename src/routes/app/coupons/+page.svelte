@@ -11,6 +11,46 @@
   // Import stores
   import { coupons, loadCoupons } from '$lib/stores/coupons.js'
 
+  // Coupon fields
+  let client_id = ''
+  let name = ''
+
+  let showEditCouponModal = false
+  let couponToEdit = {}
+  async function editCoupon(event) {
+    event.preventDefault()
+    const response = await fetch('/app/api/coupons/editCoupon', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: couponToEdit?.id,
+        client_id,
+        name,
+      }),
+    })
+    if (response.ok) {
+      await loadCoupons(data.supabase)
+      resetCouponFields()
+    } else {
+      const errorData = await response.json()
+      console.error(errorData)
+      alert(`Failed to edit product: ${errorData.message}`)
+    }
+    showEditCouponModal = false
+  }
+
+  function resetCouponFields() {
+    couponToEdit = {}
+    client_id = ''
+    name = ''
+  }
+
+  function setCouponFields(coupon) {
+    couponToEdit = coupon
+    client_id = coupon?.client_id
+    name = coupon?.name
+  }
+
   async function deleteCoupon(id) {
     const response = await fetch(`/app/api/coupons/deleteCoupon`, {
       method: 'DELETE',
@@ -56,7 +96,13 @@
               <td>{coupon?.name}</td>
               <td>
                 <div class="flex space-x-2">
-                  <button class="btn btn-info btn-sm">Edit</button>
+                  <button
+                    on:click={() => {
+                      setCouponFields(coupon)
+                      showEditCouponModal = true
+                    }}
+                    class="btn btn-info btn-sm">Edit</button
+                  >
                   <button on:click={() => deleteCoupon(coupon?.id)} class="btn btn-error btn-sm"
                     >Delete</button
                   >
@@ -69,3 +115,37 @@
     </div>
   </div>
 </div>
+
+<!-- EDIT Coupon MODAL BEGINS -->
+<div class={`modal ${showEditCouponModal ? 'modal-open' : ''}`}>
+  <div class="modal-box relative">
+    <button
+      on:click={() => (showEditCouponModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
+    <form on:submit={editCoupon}>
+      <h3 class="text-center text-xl font-bold">Edit Coupon</h3>
+      <div class="form-control mt-4">
+        <label class="label" for="brand_name">Client Id</label>
+        <input
+          type="text"
+          placeholder="Client Id"
+          bind:value={client_id}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+        <label class="label" for="clientId">Name</label>
+        <input
+          type="text"
+          placeholder="Coupon Name"
+          bind:value={name}
+          class="input input-bordered mb-2 bg-base-200"
+        />
+
+        <div class="mt-4 flex justify-center">
+          <button class="btn btn-primary" type="submit">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- EDIT Coupon MODAL ENDS -->

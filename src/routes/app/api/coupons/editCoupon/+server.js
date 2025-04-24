@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit'
 
 export async function PUT({ request, locals }) {
   try {
-    const { client_id, name, id } = await request.json()
+    const { id, client_id, name } = await request.json()
 
     const coupon = {
       client_id,
