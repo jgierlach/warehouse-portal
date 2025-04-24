@@ -126,11 +126,29 @@ export async function POST({ request, locals }) {
           let name = item?.name
           let shipmentNumber = orderNumber
 
+          // Check if the item name matches any coupon in the coupons table
+          const { data: couponData, error: couponError } = await locals.supabase
+            .from('coupons')
+            .select('*')
+            .eq('client_id', clientId)
+            .eq('name', name)
+
+          if (couponError) {
+            console.error('Error checking coupons table:', couponError)
+          }
+
+          // If a matching coupon is found, skip processing this item
+          if (couponData && couponData.length > 0) {
+            console.log('Coupon found, skipping item:', name)
+            return null
+          }
+
           // Check sku against the sku mapping table
           const { data, error } = await locals.supabase
             .from('sku_mapping')
             .select('*')
             .eq('sku', sku)
+            .eq('client_id', clientId)
 
           // No sku is found in the sku mapping table that matches
           if (data?.length === 0) {
@@ -311,7 +329,9 @@ export async function POST({ request, locals }) {
         }),
       )
 
-      allShipmentData.push(...shipmentData)
+      // Filter out any null values (coupon items) before adding to allShipmentData
+      const filteredShipmentData = shipmentData.filter((item) => item !== null)
+      allShipmentData.push(...filteredShipmentData)
     }
 
     // console.log('All Shipment Data:', JSON.stringify(allShipmentData, null, 2))
