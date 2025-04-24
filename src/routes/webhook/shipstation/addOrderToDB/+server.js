@@ -161,7 +161,6 @@ export async function POST({ request, locals }) {
               personalizations: [
                 {
                   to: [
-                    { email: 'jan@hometown-industries.com' },
                     { email: 'storageandfulfillment@hometown-industries.com' },
                     { email: 'wesley@hometown-industries.com' },
                   ],
