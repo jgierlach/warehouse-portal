@@ -11,6 +11,23 @@
   // Import stores
   import { coupons, loadCoupons } from '$lib/stores/coupons.js'
 
+  async function deleteCoupon(id) {
+    const response = await fetch(`/app/api/coupons/deleteCoupon`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+      }),
+    })
+    if (response.ok) {
+      await loadCoupons(data.supabase)
+    } else {
+      const errorData = await response.json()
+      console.error(errorData)
+      alert(`Failed to delete coupon: ${errorData.message}`)
+    }
+  }
+
   // Execute onMount
   onMount(() => {
     loadCoupons(data.supabase)
@@ -40,7 +57,9 @@
               <td>
                 <div class="flex space-x-2">
                   <button class="btn btn-info btn-sm">Edit</button>
-                  <button class="btn btn-error btn-sm">Delete</button>
+                  <button on:click={() => deleteCoupon(coupon?.id)} class="btn btn-error btn-sm"
+                    >Delete</button
+                  >
                 </div>
               </td>
             </tr>
