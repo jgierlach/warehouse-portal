@@ -235,6 +235,8 @@
         <thead>
           <tr>
             <th>Product Image</th>
+            <th>Client Id</th>
+            <th>Product Id</th>
             <th>Asin</th>
             <th>Product Url</th>
             <th>Product Title</th>
@@ -257,6 +259,8 @@
                     : product.Product_Image_Url}
                 /></td
               >
+              <td>{product.Client_Id}</td>
+              <td>{product.id}</td>
               <td>{product.Asin}</td>
               <td
                 ><a

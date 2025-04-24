@@ -236,11 +236,12 @@ export async function POST({ request, locals }) {
               // Create changelog entry for this specific product
               const log = {
                 client_id: clientId,
+                product_id: skuMap?.product_id,
                 shipment_number: shipmentNumber,
                 change_source: storeName,
                 name: item?.name,
                 asin: item?.upc,
-                sku: skuMap.sku,
+                sku: skuMap?.sku,
                 previous_quantity: currentQuantity,
                 new_quantity: newQuantity,
                 previous_pending: 0,
