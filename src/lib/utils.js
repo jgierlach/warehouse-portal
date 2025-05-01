@@ -556,6 +556,9 @@ export const assignClientIdBasedOnStoreName = (storeName) => {
   if (storeName === 'Get Your Thing Amazon') {
     return 'orders@getyourthing.com'
   }
+  if (storeName === 'Get Your Thing Amazon 2') {
+    return 'orders@getyourthing.com'
+  }
   // Veto Athletics categorization
   if (storeName === 'Veto Athletics Shopify') {
     return 'staff@vetoathletic.com'
@@ -582,6 +585,12 @@ export const assignClientIdBasedOnStoreName = (storeName) => {
     return 'operations@podiumpetproducts.com'
   }
   if (storeName === 'Dog Rocks Amazon') {
+    return 'operations@podiumpetproducts.com'
+  }
+  if (storeName === 'Dog Rocks Canada') {
+    return 'operations@podiumpetproducts.com'
+  }
+  if (storeName === 'Dog Rocks Mexico') {
     return 'operations@podiumpetproducts.com'
   }
   if (storeName === 'Dog Rocks Shopify') {
