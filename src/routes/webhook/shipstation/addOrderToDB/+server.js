@@ -174,45 +174,45 @@ export async function POST({ request, locals }) {
             }
 
             // Send email notification about unmapped SKU
-            const endpoint = 'https://api.sendgrid.com/v3/mail/send'
-            const emailData = {
-              personalizations: [
-                {
-                  to: [
-                    { email: 'storageandfulfillment@hometown-industries.com' },
-                    { email: 'wesley@hometown-industries.com' },
-                  ],
-                  subject: `Sku Value: ${sku} not found in Sku Mapping Table`,
-                },
-              ],
-              from: {
-                email: 'storageandfulfillment@hometown-industries.com',
-                name: 'Sku Mapping',
-              },
-              content: [
-                {
-                  type: 'text/html',
-                  value: `
-                <p>Sku Value: <strong>${sku}</strong> not found in Sku Mapping table.</p>
-                <ul>
-                  <li>Product Name: <strong>${name}</strong></li>
-                  <li>Quantity: <strong>${quantity}</strong></li>
-                  <li>Shipment Number: <strong>${shipmentNumber}</strong></li>
-                  <li>Order Source: <strong>${storeName}</strong></li>
-                </ul>
-                <p>Please navigate to <strong><a href="https://warehouse-portal.vercel.app/app/sku-mapping" target="_blank">Sku Mapping</a></strong> in the warehouse portal and add this sku as a value.</p>
-                <p>The shipment number associated with this sku is <strong>${shipmentNumber}</strong></p>`,
-                },
-              ],
-            }
-            await fetch(endpoint, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${SEND_GRID_API_KEY}`,
-              },
-              body: JSON.stringify(emailData),
-            })
+            // const endpoint = 'https://api.sendgrid.com/v3/mail/send'
+            // const emailData = {
+            //   personalizations: [
+            //     {
+            //       to: [
+            //         { email: 'storageandfulfillment@hometown-industries.com' },
+            //         { email: 'wesley@hometown-industries.com' },
+            //       ],
+            //       subject: `Sku Value: ${sku} not found in Sku Mapping Table`,
+            //     },
+            //   ],
+            //   from: {
+            //     email: 'storageandfulfillment@hometown-industries.com',
+            //     name: 'Sku Mapping',
+            //   },
+            //   content: [
+            //     {
+            //       type: 'text/html',
+            //       value: `
+            //     <p>Sku Value: <strong>${sku}</strong> not found in Sku Mapping table.</p>
+            //     <ul>
+            //       <li>Product Name: <strong>${name}</strong></li>
+            //       <li>Quantity: <strong>${quantity}</strong></li>
+            //       <li>Shipment Number: <strong>${shipmentNumber}</strong></li>
+            //       <li>Order Source: <strong>${storeName}</strong></li>
+            //     </ul>
+            //     <p>Please navigate to <strong><a href="https://warehouse-portal.vercel.app/app/sku-mapping" target="_blank">Sku Mapping</a></strong> in the warehouse portal and add this sku as a value.</p>
+            //     <p>The shipment number associated with this sku is <strong>${shipmentNumber}</strong></p>`,
+            //     },
+            //   ],
+            // }
+            // await fetch(endpoint, {
+            //   method: 'POST',
+            //   headers: {
+            //     'Content-Type': 'application/json',
+            //     Authorization: `Bearer ${SEND_GRID_API_KEY}`,
+            //   },
+            //   body: JSON.stringify(emailData),
+            // })
           }
 
           // If sku mappings are found execute lookup and deduct inventory quantity from correct product
