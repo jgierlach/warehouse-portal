@@ -91,48 +91,48 @@ export async function POST({ request, locals }) {
       }
 
       // Send the client an email notification with carrier and tracking information
-      const apiKey = import.meta.env.VITE_SEND_GRID_API_KEY
-      const endpoint = 'https://api.sendgrid.com/v3/mail/send'
+      // const apiKey = import.meta.env.VITE_SEND_GRID_API_KEY
+      // const endpoint = 'https://api.sendgrid.com/v3/mail/send'
 
-      let notificationEmail = ''
-      if (clientId === 'jen@bessiesbest.com') {
-        notificationEmail = 'storageandfulfillment@hometown-industries.com'
-      } else {
-        notificationEmail = clientId
-      }
+      // let notificationEmail = ''
+      // if (clientId === 'jen@bessiesbest.com') {
+      //   notificationEmail = 'storageandfulfillment@hometown-industries.com'
+      // } else {
+      //   notificationEmail = clientId
+      // }
 
-      const emailData = {
-        personalizations: [
-          {
-            to: [
-              { email: notificationEmail }, // Ensure this email is correctly formatted
-              { email: 'storageandfulfillment@hometown-industries.com' },
-            ],
-            subject: `Tracking has been updated for Shipment Number: ${orderNumber}`,
-          },
-        ],
-        from: { email: 'storageandfulfillment@hometown-industries.com', name: 'Inventory Update' },
-        content: [
-          {
-            type: 'text/html',
-            value: `
-          <p>Tracking has been updated for Shipment Number: <strong>${orderNumber}</strong></p> 
-          <ul>
-            <li><strong>Carrier:</strong> ${carrierCode}</li>
-            <li><strong>Tracking Number:</strong> ${trackingNumber}</li>
-          </ul>`,
-          },
-        ],
-      }
+      // const emailData = {
+      //   personalizations: [
+      //     {
+      //       to: [
+      //         { email: notificationEmail }, // Ensure this email is correctly formatted
+      //         { email: 'storageandfulfillment@hometown-industries.com' },
+      //       ],
+      //       subject: `Tracking has been updated for Shipment Number: ${orderNumber}`,
+      //     },
+      //   ],
+      //   from: { email: 'storageandfulfillment@hometown-industries.com', name: 'Inventory Update' },
+      //   content: [
+      //     {
+      //       type: 'text/html',
+      //       value: `
+      //     <p>Tracking has been updated for Shipment Number: <strong>${orderNumber}</strong></p>
+      //     <ul>
+      //       <li><strong>Carrier:</strong> ${carrierCode}</li>
+      //       <li><strong>Tracking Number:</strong> ${trackingNumber}</li>
+      //     </ul>`,
+      //     },
+      //   ],
+      // }
 
-      await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify(emailData),
-      })
+      // await fetch(endpoint, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Authorization: `Bearer ${apiKey}`,
+      //   },
+      //   body: JSON.stringify(emailData),
+      // })
     }
 
     return json({ success: true }, { headers })
